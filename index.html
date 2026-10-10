@@ -213,15 +213,15 @@
       <header><h3>Color of Days</h3><span class="tag">Flutter · iOS / Android</span></header>
       <dl class="pedd">
         <dt>Problem</dt>
-        <dd>A mood diary for days you don't feel like writing — pick one color. Later: marketing four solo apps without a marketing team.</dd>
+        <dd>A mood diary for days you don't feel like writing: pick one of seven colors, and a year of entries comes back as a calendar, stats and recaps.</dd>
         <dt>Engineering challenge</dt>
-        <dd>Attribution. The post → click → install funnel looked healthy, but almost every click was a crawler. User-agent rules broke whenever crawlers changed versions, and widening them would drop real users on Android Chrome's reduced user agent.</dd>
+        <dd>Getting meaningful insight out of very short entries — when insights relied on tags, a user with 800 days of entries still saw "need more data". The streak was also computed in two places, client and server, and could disagree. And the AI recap had to work without sending anyone's diary text.</dd>
         <dt>Design decision</dt>
-        <dd>Bots are flagged by timing and IP reputation (arrival within 60 s of posting, the same user agent reappearing within 120 s, IPs already seen as bots), and counting switched from a blacklist to a whitelist of real platforms, with past data corrected by migration. A multi-agent pipeline (Claude Agent SDK) writes the posts; publishing runs on Supabase pg_cron.</dd>
+        <dd>Insights, weekly/monthly recaps and tag suggestions are pure on-device functions with unit tests; insights read color, weekday and tags, so they work even without tags. One streak function is the single source, and the evening "your streak is about to break" push (Edge Function + pg_cron) is tested to follow the same rule. The AI recap sends only color sequences and tag counts, falls back to static copy on any failure, and sits behind a Remote Config kill switch.</dd>
         <dt>Evidence</dt>
-        <dd>59% of sign-ups write entries, averaging 31 entries each; 625 posts auto-published to Threads and Instagram since April 2026.</dd>
+        <dd>59% of sign-ups write entries, averaging 31 entries each (up to 855); interactive home-screen and iOS lock-screen widgets let users record a color without opening the app.</dd>
       </dl>
-      <ul class="chips"><li>Flutter</li><li>Supabase</li><li>Firebase</li><li>Claude Agent SDK</li></ul>
+      <ul class="chips"><li>Flutter</li><li>Riverpod</li><li>Supabase</li><li>Firebase</li><li>home_widget</li></ul>
       <div class="links">
         <a href="https://apps.joon.is-a.dev/colorofdays/">Site</a>
         <a href="https://apps.apple.com/app/id6443436725">App Store</a>

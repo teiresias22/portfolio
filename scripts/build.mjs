@@ -10,12 +10,14 @@ const PAGES = [
   { name: 'career', path: 'career/', toc: 3 },
 ]
 const UI = {
-  en: { toc: 'Contents', skip: 'Skip to content', name: 'Joonhwan Jeon', role: 'Cross-platform developer · Flutter · Swift · React · Laravel', resume: 'Resume', career: 'Career', other: '한국어', otherLang: 'ko' },
-  ko: { toc: '목차', skip: '본문 바로가기', name: '전준환', role: '크로스플랫폼 개발자 · Flutter · Swift · React · Laravel', resume: '이력서', career: '경력기술서', other: 'English', otherLang: 'en' },
+  en: { toc: 'Contents', skip: 'Skip to content', name: 'Joonhwan Jeon', role: 'Cross-platform developer · Flutter · Swift · React · Laravel', resume: 'Resume', career: 'Career', other: '한국어', otherLang: 'ko', contact: 'Get in touch', contactSub: 'For questions or opportunities, email is the fastest way to reach me.', apps: 'My apps', updated: 'Updated', top: 'Back to top' },
+  ko: { toc: '목차', skip: '본문 바로가기', name: '전준환', role: '크로스플랫폼 개발자 · Flutter · Swift · React · Laravel', resume: '이력서', career: '경력기술서', other: 'English', otherLang: 'en', contact: '연락하기', contactSub: '문의나 제안은 이메일로 주시면 가장 빠르게 답변드립니다.', apps: '내 앱 모음', updated: '최종 업데이트', top: '맨 위로' },
 }
 const url = (lang, path) => `${SITE}/${lang === 'ko' ? 'ko/' : ''}${path}`
 // Cache-bust the stylesheet: the URL changes whenever its content does.
 const CSS = `/style.css?v=${createHash('sha1').update(readFileSync(new URL('../static/style.css', import.meta.url))).digest('hex').slice(0, 8)}`
+// Build date in KST, shown as the document's last update.
+const UPDATED = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10)
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;')
 
 const EMOJI = /^(?:\p{Extended_Pictographic}|\uFE0F|\u200D)+\s*/u
@@ -73,7 +75,7 @@ function page(lang, { name, path }) {
 <link rel="alternate" hreflang="x-default" href="${url('en', path)}">
 <link rel="stylesheet" href="${CSS}">
 </head>
-<body>
+<body id="top">
 <a class="skip" href="#main">${t.skip}</a>
 <header class="top">
   <div class="wrap">
@@ -88,7 +90,23 @@ ${html}
 </main>
 </div>
 <script>if (matchMedia('(min-width: 1100px)').matches) document.querySelector('.toc details').open = true</script>
-<footer class="wrap">© 2026 ${t.name} · <a href="https://github.com/teiresias22">GitHub</a> · <a href="mailto:teiresias1987@gmail.com">Email</a></footer>
+<footer class="foot">
+  <div class="wrap">
+    <section class="foot-cta" aria-labelledby="contact">
+      <h2 id="contact">${t.contact}</h2>
+      <p>${t.contactSub}</p>
+      <div class="foot-links">
+        <a class="btn primary" href="mailto:teiresias1987@gmail.com">Email</a>
+        <a class="btn" href="https://github.com/teiresias22">GitHub</a>
+        <a class="btn" href="https://apps.joon.is-a.dev/">${t.apps}</a>
+      </div>
+    </section>
+    <div class="foot-bottom">
+      <span>© 2026 ${t.name} · ${t.updated} <time datetime="${UPDATED}">${UPDATED}</time></span>
+      <a href="#top">${t.top} ↑</a>
+    </div>
+  </div>
+</footer>
 </body>
 </html>
 `

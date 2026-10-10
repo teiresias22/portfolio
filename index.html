@@ -70,23 +70,32 @@
 
     <article class="card">
       <header><h3>ICU Company</h3><span class="tag">2024.08 – present</span></header>
-      <p>Sole developer for <strong>KoreHalal</strong>, a travel service for Muslim travelers (~3,500 active installs, mainly Singapore, Malaysia, Indonesia and Korea). The team went from frontend + backend + designer to one developer + one designer, and I took over the backend to own the whole stack.</p>
-      <ul>
-        <li>Mobile app (Flutter): took over a legacy app, then led a full rebuild in 2025 into a 13-domain layered architecture with Riverpod + Freezed; PayPal payments, social login, halal barcode-scanner OCR, real-time 1:1 chat, 5 languages incl. Arabic RTL</li>
-        <li>Admin / partner console (Flutter Web) with a three-role permission system</li>
-        <li>User web app (React 19, TypeScript, Zustand, Tailwind CSS 4)</li>
-        <li>Backend (Laravel 10 on AWS Lambda via Vapor, Aurora MySQL, DynamoDB, SQS, S3/CloudFront): recommendation engine, presigned-upload image server, chat domain</li>
-        <li>Internal sales tooling: overseas travel-agency discovery pipeline across 20 countries, quote builder with PDF output, segmented push campaigns</li>
-      </ul>
+      <p>Sole developer for <strong>KoreHalal</strong>, a travel service for Muslim travelers (~3,500 active installs, mainly Singapore, Malaysia, Indonesia and Korea): Flutter app, Flutter Web partner/admin console, React user web and the Laravel API.</p>
+      <dl class="pedd">
+        <dt>Problem</dt>
+        <dd>The team went from frontend + backend + designer to one developer + one designer, so I took over a backend with accumulated authorization, payment and concurrency defects on top of a legacy app built from a template.</dd>
+        <dt>Engineering challenge</dt>
+        <dd>Cross-account booking reads (IDOR in 6 routes), self-escalation through profile updates, unrecorded PayPal charges and zero-amount payments, double submits — while keeping four surfaces (app, console, web, server) behaving the same.</dd>
+        <dt>Design decision</dt>
+        <dd>Rebuilt the app into 13 layered domains (Riverpod + Freezed). Made the server authoritative for prices and order gates through quote APIs, with ownership guards by scope, reusable idempotency middleware and refresh-token rotation with reuse detection. Photos go straight to S3 via presigned URLs instead of a proxy capped at 10 MB.</dd>
+        <dt>Evidence</dt>
+        <dd>The legacy upload route was removed only after CloudWatch showed zero traffic; PHPUnit (659 files) was restored as a parallel pre-push gate, and fixing 14 assertions that checked nothing exposed real hidden defects; 293 hard-coded strings localized and 100 icon-only controls given accessible names.</dd>
+      </dl>
     </article>
 
     <article class="card">
       <header><h3>MarkCloud</h3><span class="tag">2022.11 – 2024.01</span></header>
-      <p>An AI-for-intellectual-property startup. I built the mobile apps for its trademark search and attorney-matching products.</p>
-      <ul>
-        <li><strong>MarkView</strong> — AI image &amp; text trademark search. Led the Swift → Flutter migration (MVVM, Provider, go_router), improved image search performance by 50%, shown at CES 2023</li>
-        <li><strong>MarkTong</strong> — patent-attorney matching iOS app (Swift, UIKit, Firebase), real-time 1:1 chat with MessageKit, identity verification; released on the App Store</li>
-      </ul>
+      <p>An AI-for-intellectual-property startup. I built the mobile apps for its trademark search (<strong>MarkView</strong>) and patent-attorney matching (<strong>MarkTong</strong>) products.</p>
+      <dl class="pedd">
+        <dt>Problem</dt>
+        <dd>MarkView, an AI image and text trademark search app, existed only on iOS; MarkTong had to connect applicants with patent attorneys on iOS.</dd>
+        <dt>Engineering challenge</dt>
+        <dd>Moving MarkView from Swift to Flutter without losing the iOS UI spec while keeping large image searches fast; in MarkTong, two user roles with different sign-up and profiles, plus real-time chat with per-room unread badges.</dd>
+        <dt>Design decision</dt>
+        <dd>Led the Flutter rewrite with MVVM, Provider and go_router, defining design tokens and shared components first. MarkTong split sign-up and profiles by role and computed unread badges by comparing last-read indexes in Firebase Realtime Database.</dd>
+        <dt>Evidence</dt>
+        <dd>Image search 50% faster and shown at CES 2023; MarkTong (about 27k lines of Swift) released on the App Store.</dd>
+      </dl>
     </article>
   </section>
 

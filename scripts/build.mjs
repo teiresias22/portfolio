@@ -1,5 +1,6 @@
 // content/*.md → dist/ (GitHub Pages). English at /, Korean at /ko/.
-import { mkdirSync, writeFileSync, copyFileSync, rmSync } from 'node:fs'
+import { mkdirSync, writeFileSync, copyFileSync, rmSync, readFileSync } from 'node:fs'
+import { createHash } from 'node:crypto'
 import { marked } from 'marked'
 import { load } from './content.mjs'
 
@@ -13,6 +14,8 @@ const UI = {
   ko: { name: '전준환', role: '크로스플랫폼 개발자 · Flutter · Swift · React · Laravel', resume: '이력서', career: '경력기술서', other: 'English', otherLang: 'en' },
 }
 const url = (lang, path) => `${SITE}/${lang === 'ko' ? 'ko/' : ''}${path}`
+// Cache-bust the stylesheet: the URL changes whenever its content does.
+const CSS = `/style.css?v=${createHash('sha1').update(readFileSync(new URL('../static/style.css', import.meta.url))).digest('hex').slice(0, 8)}`
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;')
 
 function toHtml(body) {
@@ -45,7 +48,7 @@ function page(lang, { name, path }) {
 <link rel="alternate" hreflang="en" href="${url('en', path)}">
 <link rel="alternate" hreflang="ko" href="${url('ko', path)}">
 <link rel="alternate" hreflang="x-default" href="${url('en', path)}">
-<link rel="stylesheet" href="/style.css">
+<link rel="stylesheet" href="${CSS}">
 </head>
 <body>
 <header class="top">

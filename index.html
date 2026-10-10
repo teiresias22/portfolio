@@ -42,6 +42,10 @@
     .tag { font-size: .8rem; color: var(--muted); }
     .card p, .card li { color: var(--muted); }
     .card .links { gap: 14px; margin-top: 10px; font-size: .9rem; }
+    .pedd { margin: 4px 0 0; }
+    .pedd dt { font-size: .72rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; margin-top: 12px; }
+    .pedd dd { margin: 2px 0 0; color: var(--muted); }
+    code { font-size: .85em; background: var(--chip); border-radius: 4px; padding: 0 4px; }
     footer { margin-top: 64px; color: var(--muted); font-size: .85rem; }
   </style>
 </head>
@@ -108,7 +112,16 @@
 
     <article class="card">
       <header><h3>Nureongso (누렁소검은소)</h3><span class="tag">Web · open source</span></header>
-      <p>Puts Korean elected officials' campaign pledges next to their public record: bills, votes, attendance and asset disclosures. Python pipelines collect official government data and PDFs, an LLM pipeline extracts 21k+ pledges, and pledge fulfillment is judged by published rules with server-side checks against the model's cited evidence.</p>
+      <dl class="pedd">
+        <dt>Problem</dt>
+        <dd>Campaign booklets don't tell voters what an incumbent actually did last term. Pledges and records are scattered across six government agencies as APIs, spreadsheets and PDFs.</dd>
+        <dt>Engineering challenge</dt>
+        <dd>Getting complete, correctly attributed data. Without an API key, one source ignored paging and kept returning the same 5 rows with a normal total count; attendance and side-job records name members only by name, with hanja, spacing and bracket variants.</dd>
+        <dt>Design decision</dt>
+        <dd>The LLM only answers "is this record the same thing as this pledge?" Whether a pledge counts as fulfilled is decided by a published SQL rule table, so reruns give the same answer and anyone can audit it. Pledges with nothing measurable stay "cannot judge" instead of being forced into a verdict — only about 10% of lawmakers' pledges are legislative.</dd>
+        <dt>Evidence</dt>
+        <dd>21,336 pledges extracted from 1,683 election bulletins; records for 3,239 lawmakers and 259 sitting governors, mayors and superintendents, refreshed by scheduled GitHub Actions. Source code and judging rules are public.</dd>
+      </dl>
       <ul class="chips"><li>Next.js 16</li><li>Supabase</li><li>Python</li><li>LLM</li><li>Vercel</li></ul>
       <div class="links">
         <a href="https://github.com/teiresias22/nureongso">Source</a>
@@ -118,7 +131,16 @@
 
     <article class="card">
       <header><h3>Gilmok (길목)</h3><span class="tag">Flutter · iOS / Android / Web</span></header>
-      <p>An offline-first map archive. Drift (SQLite) is the primary store with Supabase as an optional sync layer; Google My Maps KML import, offline tile caching, and supercluster clustering that renders up to 2,800 markers on one map.</p>
+      <dl class="pedd">
+        <dt>Problem</dt>
+        <dd>Places saved in Google My Maps are useless abroad exactly when there is no data connection.</dd>
+        <dt>Engineering challenge</dt>
+        <dd>Importing whole maps from a single URL, keeping them re-syncable, and rendering thousands of markers smoothly on a phone with offline tiles.</dd>
+        <dt>Design decision</dt>
+        <dd>Drift (SQLite) is the primary store and Supabase only an optional sync layer, so every feature works with no network — a cloud-first design would fail where the app is needed most. Supercluster clustering instead of drawing every marker, and flutter_map driven directly to control tile caching.</dd>
+        <dt>Evidence</dt>
+        <dd>Live on the App Store and Google Play. Users' maps hold up to 2,798 markers on a single map (8,002 in total) and render without slowdown.</dd>
+      </dl>
       <ul class="chips"><li>Flutter</li><li>Drift</li><li>Supabase</li><li>flutter_map</li></ul>
       <div class="links">
         <a href="https://apps.joon.is-a.dev/gilmok/">Web</a>
@@ -129,7 +151,16 @@
 
     <article class="card">
       <header><h3>Yeowun (여운)</h3><span class="tag">Flutter · iOS / Android</span></header>
-      <p>Leave photos and notes at real places for others to open nearby. Background geofencing designed around iOS's 20-region limit, journeys rebuilt from photo EXIF GPS, PostGIS spatial queries, and Gemini-generated travel badges and recaps.</p>
+      <dl class="pedd">
+        <dt>Problem</dt>
+        <dd>Let travelers leave photos and notes at real places that others can open only when they are nearby.</dd>
+        <dt>Engineering challenge</dt>
+        <dd>Background detection on iOS allows only 20 monitored regions, while any number of notes can be around the user.</dd>
+        <dt>Design decision</dt>
+        <dd>Monitor the 18 nearest notes plus one 3 km "re-centering" geofence; leaving it refreshes the set. Chosen over continuous background GPS, which drains battery and is hard to justify in review. Journeys are rebuilt from photo EXIF GPS with proximity clustering and PostGIS queries instead of manual entry.</dd>
+        <dt>Evidence</dt>
+        <dd>Live on the App Store and Google Play, with Gemini-generated travel badges and recaps.</dd>
+      </dl>
       <ul class="chips"><li>Flutter</li><li>Supabase</li><li>PostGIS</li><li>Geofencing</li><li>Gemini</li></ul>
       <div class="links">
         <a href="https://apps.joon.is-a.dev/yeowun/">Site</a>
@@ -140,7 +171,16 @@
 
     <article class="card">
       <header><h3>Time with Me</h3><span class="tag">Flutter · iOS / Android</span></header>
-      <p>A shared calendar for couples and families. Share a booking confirmation message and a Supabase Edge Function uses Gemini structured output to pre-fill the event; home-screen widgets and invite links via App Links / Universal Links.</p>
+      <dl class="pedd">
+        <dt>Problem</dt>
+        <dd>Couples and families want one shared calendar, but typing in booking details by hand is tedious.</dd>
+        <dt>Engineering challenge</dt>
+        <dd>Turning free-form booking messages into reliable events, and anniversaries (yearly, multi-day, across New Year) that showed up on different dates on different screens.</dd>
+        <dt>Design decision</dt>
+        <dd>The user shares the message to the app; a Supabase Edge Function calls Gemini structured output and pre-fills only when the reservation flag, confidence ≥ 0.5 and the time parse all pass. Background SMS detection was rejected for platform policy and privacy. Recurring events are stored once and expanded at display time through one <code>occursOn</code> function that replaced four duplicated checks.</dd>
+        <dt>Evidence</dt>
+        <dd>Live on the App Store and Google Play; invite links sent before a domain migration still open the app.</dd>
+      </dl>
       <ul class="chips"><li>Flutter</li><li>Supabase</li><li>Gemini</li><li>home_widget</li></ul>
       <div class="links">
         <a href="https://apps.joon.is-a.dev/time-with-me/">Site</a>
@@ -151,7 +191,16 @@
 
     <article class="card">
       <header><h3>Pick and Go</h3><span class="tag">Flutter · iOS / Android</span></header>
-      <p>Random trip courses you can actually reach: a filter-then-draw engine over distance ranges per transport mode, subway line and transfer-station normalization, plus roulette / ladder / card-draw game UI and a couple mode.</p>
+      <dl class="pedd">
+        <dt>Problem</dt>
+        <dd>"Random trip" ideas are fun until the place can't be reached in the time and transport you have.</dd>
+        <dt>Engineering challenge</dt>
+        <dd>Subway routing: the same transfer station is named differently on different lines, which breaks direct and one-transfer route finding.</dd>
+        <dt>Design decision</dt>
+        <dd>Filter first, then draw — candidates are limited to per-transport distance ranges before the random pick, so every result is reachable (drawing first and re-rolling wastes draws and can loop). Station names are normalized before routes are computed.</dd>
+        <dt>Evidence</dt>
+        <dd>Live on the App Store and Google Play, with roulette / ladder / card-draw game UI and a couple mode for taking turns.</dd>
+      </dl>
       <ul class="chips"><li>Flutter</li><li>Riverpod</li><li>Neon</li><li>Next.js (site)</li></ul>
       <div class="links">
         <a href="https://apps.joon.is-a.dev/pick-and-go/">Site</a>
@@ -162,7 +211,16 @@
 
     <article class="card">
       <header><h3>Color of Days</h3><span class="tag">Flutter · iOS / Android</span></header>
-      <p>A mood diary that records each day as a color, in 5 languages with home widgets. Its marketing runs on a multi-agent pipeline built with the Claude Agent SDK, publishing to Threads and Instagram via Supabase pg_cron.</p>
+      <dl class="pedd">
+        <dt>Problem</dt>
+        <dd>A mood diary for days you don't feel like writing — pick one color. Later: marketing four solo apps without a marketing team.</dd>
+        <dt>Engineering challenge</dt>
+        <dd>Attribution. The post → click → install funnel looked healthy, but almost every click was a crawler. User-agent rules broke whenever crawlers changed versions, and widening them would drop real users on Android Chrome's reduced user agent.</dd>
+        <dt>Design decision</dt>
+        <dd>Bots are flagged by timing and IP reputation (arrival within 60 s of posting, the same user agent reappearing within 120 s, IPs already seen as bots), and counting switched from a blacklist to a whitelist of real platforms, with past data corrected by migration. A multi-agent pipeline (Claude Agent SDK) writes the posts; publishing runs on Supabase pg_cron.</dd>
+        <dt>Evidence</dt>
+        <dd>59% of sign-ups write entries, averaging 31 entries each; 625 posts auto-published to Threads and Instagram since April 2026.</dd>
+      </dl>
       <ul class="chips"><li>Flutter</li><li>Supabase</li><li>Firebase</li><li>Claude Agent SDK</li></ul>
       <div class="links">
         <a href="https://apps.joon.is-a.dev/colorofdays/">Site</a>
@@ -173,7 +231,16 @@
 
     <article class="card">
       <header><h3>Discard</h3><span class="tag">Flutter · iOS / Android · coming soon</span></header>
-      <p>A museum of the things you let go: each discarded item becomes a numbered exhibit, with 30-day look-backs, spending and ownership stats, a year in review, and a pre-purchase check against what you've thrown out before. Local-first Drift storage syncs to Neon (Data API with Firebase JWTs, RLS) through incremental last-write-wins sync; photos go to Neon Storage via a signed-URL function guarded by App Check, and on-device subject cutouts (Vision / ML Kit) put items on a pedestal.</p>
+      <dl class="pedd">
+        <dt>Problem</dt>
+        <dd>What you throw away says as much about your habits as what you buy. Discard records each item like a numbered museum exhibit and shows your buying and owning patterns.</dd>
+        <dt>Engineering challenge</dt>
+        <dd>Local-first sync across devices: device clocks only store seconds, two devices can create the same exhibit number, and a sync's own writes could trigger the next sync forever.</dd>
+        <dt>Design decision</dt>
+        <dd>Drift is the source of truth; Neon Data API (Firebase JWT + RLS) syncs incrementally on a server-clock cursor instead of device time, and duplicate numbers are resolved by a rule every device computes identically. Photos never get direct storage access — a Neon Function issues signed URLs with size and count limits, behind App Check. Subject cutouts run on-device (Vision / ML Kit), so photos aren't sent anywhere to be processed.</dd>
+        <dt>Evidence</dt>
+        <dd>42 unit and migration tests covering sync, domain rules and schema upgrades.</dd>
+      </dl>
       <ul class="chips"><li>Flutter</li><li>Drift</li><li>Neon</li><li>Firebase Auth</li><li>Vision / ML Kit</li><li>home_widget</li></ul>
       <div class="links">
         <a href="https://apps.joon.is-a.dev/discard/">Site</a>
@@ -182,7 +249,16 @@
 
     <article class="card">
       <header><h3>Almost</h3><span class="tag">Flutter · iOS / Android · coming soon</span></header>
-      <p>A graveyard for things you almost did. Write down what you want to do and the app checks in when it's time: finished goals bloom as flowers in a garden, abandoned ones get a gravestone in a cemetery you can decorate and share. Custom-painted scenes, 4 languages, and a Neon Postgres backend where RLS, triggers and SECURITY DEFINER RPCs enforce ownership, limits, and community reporting for public cemeteries.</p>
+      <dl class="pedd">
+        <dt>Problem</dt>
+        <dd>Things you meant to do fade away quietly. Almost checks in when it's time: finished goals bloom as flowers in a garden, abandoned ones get a gravestone in a cemetery you can decorate and share.</dd>
+        <dt>Engineering challenge</dt>
+        <dd>There is no app server — the client talks to Postgres through Neon Data API, so ownership, limits and paid items must be enforced by the database. On a cold-started database a freshly issued token could leave the user id empty, and RLS silently returned no rows.</dd>
+        <dt>Design decision</dt>
+        <dd>Rules live in Postgres (RLS, triggers, CHECK constraints, SECURITY DEFINER RPCs for public cemeteries) rather than in a backend I'd have to run. RLS raises an error instead of returning nothing, and the client retries. Check-in reminders are rescheduled to the nearest 50 to stay under iOS's 64 pending-notification limit.</dd>
+        <dt>Evidence</dt>
+        <dd>A 16-step server E2E script exercises RLS, triggers and RPCs with several anonymous users; 57 Flutter tests, including one that checks the in-app catalog against the server seed.</dd>
+      </dl>
       <ul class="chips"><li>Flutter</li><li>CustomPainter</li><li>Neon</li><li>Postgres RLS</li><li>Firebase Auth</li></ul>
       <div class="links">
         <a href="https://apps.joon.is-a.dev/almost/">Site</a>
@@ -191,7 +267,16 @@
 
     <article class="card">
       <header><h3>joon-dev-web</h3><span class="tag">Web · infrastructure</span></header>
-      <p>The pnpm monorepo behind the app sites above: Vite and Next.js apps merged into one Firebase Hosting site, sitemaps / rewrites / Remote Config generated from a single config file, and GitHub Actions with lint, typecheck, PR preview channels and post-deploy smoke checks.</p>
+      <dl class="pedd">
+        <dt>Problem</dt>
+        <dd>Each app had its own hosting site, landing page and terms, and adding an app meant editing several config files by hand.</dd>
+        <dt>Engineering challenge</dt>
+        <dd>Serving Vite and Next.js apps under subpaths of one Firebase Hosting site — rewrites, cache headers, and apps opened without a trailing slash rendering a blank page.</dd>
+        <dt>Design decision</dt>
+        <dd>One <code>apps.config.json</code> generates the sitemap, Remote Config, and Hosting rewrites, headers and redirects, so none of them are edited by hand. Trailing-slash redirects use regex because Hosting's glob matching ignores the slash and would loop.</dd>
+        <dt>Evidence</dt>
+        <dd>Every push to master builds, deploys and runs a smoke check that requests every subpath for HTTP 200 and a page title.</dd>
+      </dl>
       <ul class="chips"><li>pnpm workspaces</li><li>Vite</li><li>Next.js</li><li>Firebase Hosting</li><li>GitHub Actions</li></ul>
       <div class="links">
         <a href="https://apps.joon.is-a.dev/">Live site</a>
@@ -203,7 +288,16 @@
     <h2>Team project</h2>
     <article class="card">
       <header><h3>moit (모잇)</h3><span class="tag">Flutter · iOS / Android / Web · 2024.10 – present</span></header>
-      <p>A marketplace for local classes and small-group meetups. I co-develop the app in a two-person shared codebase and build the web client solo.</p>
+      <dl class="pedd">
+        <dt>Problem</dt>
+        <dd>A marketplace for local classes and small-group meetups. I co-develop the app in a two-person shared codebase and build the web client solo.</dd>
+        <dt>Engineering challenge</dt>
+        <dd>Keeping the Next.js web and the Flutter app looking and behaving the same while the app kept changing.</dd>
+        <dt>Design decision</dt>
+        <dd>The app is the design source of truth: a sync script regenerates web CSS tokens from the Dart theme and fails CI when they drift. When whole screens still diverged, the Flutter web build was framed inside Next.js pages behind a single environment variable, so rolling back is a config change rather than a code deploy.</dd>
+        <dt>Evidence</dt>
+        <dd>Web first load cut from 28.9 MB to 15.7 MB by removing <code>dart:io</code> and unused fonts; an A/B bug that alternated variants for the same account was fixed by pinning each account to one variant.</dd>
+      </dl>
       <ul class="chips"><li>Flutter</li><li>Riverpod</li><li>Supabase</li><li>Next.js 16</li></ul>
     </article>
   </section>

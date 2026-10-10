@@ -1,0 +1,13 @@
+{
+  "name": "portfolio",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "sync:notion": "node scripts/sync-notion.mjs"
+  },
+  "devDependencies": {
+    "@notionhq/client": "^5.27.0",
+    "marked": "^18.1.0"
+  }
+}

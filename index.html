@@ -102,7 +102,7 @@
       <dt>DevOps</dt>
       <dd>GitHub Actions + Fastlane (TestFlight / Play Store auto-release), Firebase Hosting, Vercel, PHPUnit, Jest, Vitest</dd>
       <dt>AI</dt>
-      <dd>Gemini structured output, LLM pipelines with server-side evidence verification, multi-agent automation with the Claude Agent SDK</dd>
+      <dd>Gemini structured output, LLM pipelines with server-side evidence verification</dd>
     </dl>
   </section>
 
@@ -281,6 +281,21 @@
       <div class="links">
         <a href="https://apps.joon.is-a.dev/">Live site</a>
       </div>
+    </article>
+
+    <article class="card">
+      <header><h3>Marketing automation</h3><span class="tag">Side system · for my own apps</span></header>
+      <dl class="pedd">
+        <dt>Problem</dt>
+        <dd>Four solo-built apps need steady promotion with no marketing team, and I need to know which posts actually lead to installs.</dd>
+        <dt>Engineering challenge</dt>
+        <dd>Attribution. The post → click → install funnel looked healthy, but almost every click was a crawler. User-agent rules broke whenever crawlers changed versions, and widening them would drop real users on Android Chrome's reduced user agent.</dd>
+        <dt>Design decision</dt>
+        <dd>Four agents (Claude Agent SDK) split planning, writing and analysis; publishing runs server-side on Supabase pg_cron instead of GitHub Actions, five slots a day routed per app. Bots are flagged by timing and IP reputation (arrival within 60 s of posting, the same user agent reappearing within 120 s, IPs already seen as bots), counting switched from a blacklist to a whitelist of real platforms, and past data was corrected by migration.</dd>
+        <dt>Evidence</dt>
+        <dd>625 posts auto-published to Threads and Instagram since April 2026. Bot counts are reported separately rather than hidden — if they drop to zero, the tracking itself has broken.</dd>
+      </dl>
+      <ul class="chips"><li>Claude Agent SDK</li><li>Supabase pg_cron</li><li>Threads / Instagram API</li></ul>
     </article>
   </section>
 

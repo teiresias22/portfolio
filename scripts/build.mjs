@@ -19,8 +19,8 @@ const CSS = `/style.css?v=${createHash('sha1').update(readFileSync(new URL('../s
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;')
 
 function toHtml(body) {
-  // Notion-only rows (phone, birthdate) never reach the web.
-  body = body.split('\n').filter((l) => !(l.startsWith('|') && /\{\{\w+\}\}/.test(l))).join('\n')
+  // Notion-only blocks (profile table with phone/birthdate) never reach the web.
+  body = body.replace(/<!-- notion-only -->[\s\S]*?<!-- \/notion-only -->\n*(---\n+)?/g, '')
   // Shift headings so the top level in each document becomes <h2> (the page header owns <h1>).
   const depths = [...body.matchAll(/^(#{1,6}) /gm)].map((m) => m[1].length)
   const shift = 2 - Math.min(...depths)
@@ -53,14 +53,14 @@ function page(lang, { name, path }) {
 <body>
 <header class="top">
   <div class="wrap">
-    <div class="who"><h1 class="name"><a href="/${lang === 'ko' ? 'ko/' : ''}">${t.name}</a></h1><span class="role">${t.role}</span></div>
+    <div class="who"><h1 class="name"><a href="/${lang === 'ko' ? 'ko/' : ''}">${t.name}</a></h1><span class="role">${t.role}</span><span class="links"><a href="https://github.com/teiresias22">GitHub</a><a href="mailto:teiresias1987@gmail.com">Email</a></span></div>
     <nav>${nav}<a class="lang" href="${url(t.otherLang, path).replace(SITE, '')}" hreflang="${t.otherLang}" lang="${t.otherLang}">${t.other}</a></nav>
   </div>
 </header>
 <main class="wrap doc">
 ${toHtml(body)}
 </main>
-<footer class="wrap"><a href="https://github.com/teiresias22">GitHub</a> · <a href="mailto:teiresias1987@gmail.com">teiresias1987@gmail.com</a></footer>
+<footer class="wrap">© 2026 ${t.name} · <a href="https://github.com/teiresias22">GitHub</a> · <a href="mailto:teiresias1987@gmail.com">Email</a></footer>
 </body>
 </html>
 `

@@ -7,16 +7,6 @@ description: Cross-platform developer working across mobile, web and backend —
 
 ---
 
-## 👤 Profile
-
-| Item | Details |
-| --- | --- |
-| Name | Joonhwan Jeon |
-| Email | [teiresias1987@gmail.com](mailto:teiresias1987@gmail.com) |
-| GitHub | [github.com/teiresias22](https://github.com/teiresias22) |
-
----
-
 ## 🌱 How I became a developer
 
 > From travel to code — always finding the next road

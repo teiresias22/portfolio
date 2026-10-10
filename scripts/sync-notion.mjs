@@ -64,6 +64,8 @@ function blocks(tokens) {
         },
       }]
       case 'space': return []
+      case 'html': if (/^<!--[\s\S]*-->\s*$/.test(t.raw)) return [] // notion-only markers
+        throw new Error(`Unsupported HTML in markdown: ${t.raw}`)
       default: throw new Error(`Unsupported markdown block for Notion: ${t.type}`)
     }
   })

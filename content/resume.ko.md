@@ -7,6 +7,7 @@ notion: 363a3015-22b8-8145-9b66-c083ecf7b661
 
 ---
 
+<!-- notion-only -->
 ## 👤 인적사항
 
 | 항목 | 내용 |
@@ -17,6 +18,7 @@ notion: 363a3015-22b8-8145-9b66-c083ecf7b661
 | 연락처 | {{PHONE}} |
 | GitHub | [github.com/teiresias22](https://github.com/teiresias22) |
 
+<!-- /notion-only -->
 ---
 
 ## 🌱 개발자가 되기까지

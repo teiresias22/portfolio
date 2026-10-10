@@ -75,6 +75,10 @@ async function sync(name) {
   const filled = body.replace(PLACEHOLDER, (_, key) => {
     const v = process.env[`RESUME_${key}`]
     if (!v) missing.push(`RESUME_${key}`)
+    // A token pasted into the wrong secret would be published into the page.
+    if (v && (v === process.env.NOTION_TOKEN || /^(ntn_|secret_)/.test(v.trim()))) {
+      throw new Error(`RESUME_${key} looks like a Notion token — fix the secret before syncing`)
+    }
     return v ?? ''
   })
   if (missing.length && !dry) throw new Error(`${name}: missing env ${missing.join(', ')}`)

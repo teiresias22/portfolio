@@ -196,7 +196,7 @@ notion: 363a3015-22b8-81df-acde-dadc28a0814d
 | --- | --- |
 | 기간 | 2024.10 ~ 현재 (초기 3개월 MVP 이후 베타로 지속 개발 중) |
 | 역할 | 앱 2인 공동 개발 · 웹 단독 개발 |
-| 플랫폼 | iOS · Android · Web (Next.js · Flutter Web) |
+| 플랫폼 | iOS · Android · Web (Next.js · Flutter Web) · [App Store](https://apps.apple.com/app/id6754381639) · [Google Play](https://play.google.com/store/apps/details?id=com.crackers.moit) |
 | 주요 기술 | Flutter 3.44 · Riverpod codegen · go_router · Freezed · Supabase · Flutter Web · Next.js 16 · React 19 |
 
 > 동네 클래스와 반모임을 찾고 참여하는 커뮤니티 앱 — 2026년 클래스/반모임 마켓플레이스로 피봇했습니다.

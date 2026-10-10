@@ -196,7 +196,7 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 | --- | --- |
 | Period | 2024.10 – present (beta in continued development after a 3-month MVP) |
 | Role | App co-developed by two · web solo |
-| Platform | iOS · Android · Web (Next.js · Flutter Web) |
+| Platform | iOS · Android · Web (Next.js · Flutter Web) · [App Store](https://apps.apple.com/app/id6754381639) · [Google Play](https://play.google.com/store/apps/details?id=com.crackers.moit) |
 | Main tech | Flutter 3.44 · Riverpod codegen · go_router · Freezed · Supabase · Flutter Web · Next.js 16 · React 19 |
 
 > A community app for finding and joining local classes and small-group meetups — pivoted to a class / meetup marketplace in 2026.

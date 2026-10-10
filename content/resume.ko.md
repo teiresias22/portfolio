@@ -41,9 +41,9 @@ notion: 363a3015-22b8-8145-9b66-c083ecf7b661
 > 무슬림 여행자를 위한 **KoreHalal** 서비스의 앱 · 관리자/파트너 콘솔 · 사용자 웹 · 백엔드를 단독 담당(프론트 1 · 백엔드 1 · 디자이너 1 → 개발자 1 · 디자이너 1로 재편되며 백엔드까지 인수) — 싱가포르 · 말레이시아 · 인도네시아 · 한국 중심으로 **약 3,500명 설치 유지**(누적 최대 약 8,000명, Google Play 기준)
 
 - **Problem** — 개발팀이 개발자 1 · 디자이너 1로 줄면서 앱 · 관리자/파트너 콘솔 · 사용자 웹 · 백엔드를 혼자 맡게 됨 — 인수한 앱은 템플릿 기반 평면 구조, 백엔드에는 권한 · 결제 · 동시성 결함이 쌓여 있었음
-- **Engineering Challenge** — 네 표면(앱 · 콘솔 · 웹 · 서버)을 같은 동작으로 유지하면서 교차계정 조회(IDOR 6곳) · 0원 결제 · 더블 서브밋 같은 결함을 운영 중에 고치기, 5개 언어 + 아랍어 RTL 대응
-- **Design Decision** — 앱을 13개 도메인 레이어드 아키텍처(Riverpod · Freezed)로 전면 재구축(2025.01). 금액 · 주문 판정은 견적 API로 서버가 결정하고, 스코프 기준 소유권 가드 · idempotency 미들웨어 · refresh 토큰 회전(재사용 감지)을 도입, 사진은 Presigned URL로 S3 직행. 사내 영업 도구(해외 여행사 발굴 · 견적 빌더 · 푸시 캠페인, 2026.08 ~ 09)와 ICU Company 웹사이트([icucompany.com](https://icucompany.com))도 구축
-- **Evidence** — 약 3,500명 설치 유지(누적 최대 약 8,000명), 레거시 업로드 경로는 CloudWatch 트래픽 0 확인 후 제거, PHPUnit 659개 파일 병렬 pre-push 게이트 복구, 하드코딩 문구 293곳 다국어화 · 아이콘 컨트롤 100곳 접근성 보강, ICU 웹사이트 Lighthouse SEO 100점
+- **Engineering Challenge** — 네 표면(앱 · 콘솔 · 웹 · 서버)을 같은 동작으로 유지하면서 남의 데이터 조회(IDOR 6곳) · 0원 결제 · 중복 결제 요청 같은 결함을 운영 중에 고치기, 5개 언어 + 아랍어 RTL 대응
+- **Design Decision** — 앱을 13개 도메인 레이어드 아키텍처(Riverpod · Freezed)로 전면 재구축(2025.01). 금액 · 주문 판정은 견적 API로 서버가 결정하고, 데이터 주인 확인을 소속 범위 기준으로 바꾸고 중복 요청 방지 장치 · 로그인 토큰 교체(도난 감지)를 도입, 사진은 일회용 업로드 주소로 S3에 직접 올림. 사내 영업 도구(해외 여행사 발굴 · 견적 빌더 · 푸시 캠페인, 2026.08 ~ 09)와 ICU Company 웹사이트([icucompany.com](https://icucompany.com))도 구축
+- **Evidence** — 약 3,500명 설치 유지(누적 최대 약 8,000명), 레거시 업로드 경로는 CloudWatch 트래픽 0 확인 후 제거, 푸시 전 자동 테스트(PHPUnit 659개 파일) 복구, 하드코딩 문구 293곳 다국어화 · 아이콘 컨트롤 100곳 접근성 보강, ICU 웹사이트 Lighthouse SEO 100점
 
 ---
 
@@ -55,7 +55,7 @@ notion: 363a3015-22b8-8145-9b66-c083ecf7b661
 
 - **Problem** — iOS에만 있던 AI 상표 검색 앱(MarkView)을 Android로 넓히고, 변리사 매칭 앱(MarkTong)을 iOS로 출시해야 함
 - **Engineering Challenge** — Swift 앱의 UI 규격을 유지한 채 Flutter로 옮기면서 대용량 이미지 검색 성능 확보, MarkTong의 의뢰인/변리사 이중 역할과 실시간 채팅 · 안 읽음 뱃지
-- **Design Decision** — MVVM + Provider · go_router로 Flutter 전환을 주도(디자인 토큰 · 공통 컴포넌트를 먼저 정의), MarkTong은 역할별 가입 · 프로필 분리와 Firebase RTDB `last_read_index` 비교로 뱃지 산출
+- **Design Decision** — MVVM + Provider · go_router로 Flutter 전환을 주도(디자인 토큰 · 공통 컴포넌트를 먼저 정의), MarkTong은 역할별 가입 · 프로필 분리와 방마다 마지막 읽은 위치와 비교해 안 읽은 수를 뱃지로 표시
 - **Evidence** — 이미지 검색 성능 50% 개선 · CES 2023 전시, MarkTong(Swift 약 2.7만 LOC) App Store v2.0.1 배포
 
 ---

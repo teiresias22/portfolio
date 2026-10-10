@@ -27,9 +27,9 @@ description: Cross-platform developer working across mobile, web and backend —
 > Sole developer of the app, partner/admin console, user web and backend for **KoreHalal**, a travel service for Muslim travelers (the team went from frontend 1 · backend 1 · designer 1 to developer 1 · designer 1, and I took over the backend) — **about 3,500 active installs** (peak about 8,000 on Google Play), mainly in Singapore, Malaysia, Indonesia and Korea
 
 - **Problem** — When the team shrank to one developer and one designer, I took over the app, partner/admin console, user web and backend alone — the inherited app was a flat, template-based structure and the backend had accumulated authorization, payment and concurrency defects
-- **Engineering Challenge** — Keeping four surfaces (app, console, web, server) behaving the same while fixing defects in production — cross-account reads (IDOR in 6 routes), zero-amount payments, double submits — across 5 languages plus Arabic RTL
-- **Design Decision** — Rebuilt the app into a 13-domain layered architecture (Riverpod · Freezed) in 2025.01. Prices and order gates are decided by the server through quote APIs; added scope-based ownership guards, idempotency middleware and refresh-token rotation with reuse detection; photos go straight to S3 via presigned URLs. Also built internal sales tools (overseas travel-agency discovery, quote builder, push campaigns, 2026.08 – 09) and the ICU Company website ([icucompany.com](https://icucompany.com))
-- **Evidence** — About 3,500 active installs (peak about 8,000); the legacy upload route was removed only after CloudWatch showed zero traffic; PHPUnit (659 files) restored as a parallel pre-push gate; 293 hard-coded strings localized and 100 icon-only controls given accessible names; the ICU website scores Lighthouse SEO 100
+- **Engineering Challenge** — Keeping four surfaces (app, console, web, server) behaving the same while fixing defects in production — reading other people's data (IDOR in 6 routes), zero-amount payments, duplicate payment requests — across 5 languages plus Arabic RTL
+- **Design Decision** — Rebuilt the app into a 13-domain layered architecture (Riverpod · Freezed) in 2025.01. Prices and order gates are decided by the server through quote APIs; data ownership is now checked by what a user belongs to, with a guard against duplicate requests and login tokens replaced on every use (theft detection); photos upload straight to S3 through one-time upload addresses. Also built internal sales tools (overseas travel-agency discovery, quote builder, push campaigns, 2026.08 – 09) and the ICU Company website ([icucompany.com](https://icucompany.com))
+- **Evidence** — About 3,500 active installs (peak about 8,000); the legacy upload route was removed only after CloudWatch showed zero traffic; automatic tests before every push (PHPUnit, 659 files) restored; 293 hard-coded strings localized and 100 icon-only controls given accessible names; the ICU website scores Lighthouse SEO 100
 
 ---
 
@@ -41,7 +41,7 @@ description: Cross-platform developer working across mobile, web and backend —
 
 - **Problem** — MarkView, an AI trademark search app, existed only on iOS and had to reach Android; MarkTong, an attorney-matching app, had to ship on iOS
 - **Engineering Challenge** — Moving a Swift app to Flutter without losing its UI spec while keeping large image searches fast; MarkTong's two user roles (applicant / attorney) plus real-time chat with unread badges
-- **Design Decision** — Led the Flutter migration with MVVM + Provider · go_router, defining design tokens and shared components first; MarkTong split sign-up and profiles by role and computed badges by comparing `last_read_index` in Firebase RTDB
+- **Design Decision** — Led the Flutter migration with MVVM + Provider · go_router, defining design tokens and shared components first; MarkTong split sign-up and profiles by role and showed unread counts as badges by comparing each room's last-read position
 - **Evidence** — Image search 50% faster and shown at CES 2023; MarkTong (about 27k lines of Swift) released on the App Store (v2.0.1)
 
 ---

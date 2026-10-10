@@ -37,6 +37,8 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
 .top nav a:hover { background: var(--chip); color: var(--fg); text-decoration: none; }
 .top nav a[aria-current="page"] { color: var(--fg); background: var(--chip); font-weight: 600; }
 .top nav a.lang { border: 1px solid var(--line); }
+/* On phones the header wraps to three rows — let it scroll away instead of covering the page. */
+@media (max-width: 639px) { .top { position: static; } html { scroll-padding-top: 12px; } }
 
 /* Layout: contents beside the document on wide screens, collapsible above it otherwise */
 .layout { max-width: 1120px; margin: 0 auto; padding: 0 16px; }

@@ -42,7 +42,7 @@ notion: 363a3015-22b8-8145-9b66-c083ecf7b661
 
 - **Problem** — 개발팀이 개발자 1 · 디자이너 1로 줄면서 앱 · 관리자/파트너 콘솔 · 사용자 웹 · 백엔드를 혼자 맡게 됨 — 인수한 앱은 템플릿 기반 평면 구조, 백엔드에는 권한 · 결제 · 동시성 결함이 쌓여 있었음
 - **Engineering Challenge** — 네 표면(앱 · 콘솔 · 웹 · 서버)을 같은 동작으로 유지하면서 교차계정 조회(IDOR 6곳) · 0원 결제 · 더블 서브밋 같은 결함을 운영 중에 고치기, 5개 언어 + 아랍어 RTL 대응
-- **Design Decision** — 앱을 13개 도메인 레이어드 아키텍처(Riverpod · Freezed)로 전면 재구축(2025.01). 금액 · 주문 판정은 견적 API로 서버가 결정하고, 스코프 기준 소유권 가드 · idempotency 미들웨어 · refresh 토큰 회전(재사용 감지)을 도입, 사진은 Presigned URL로 S3 직행. 사내 영업 도구(해외 여행사 발굴 · 견적 빌더 · 푸시 캠페인, 2026.08 ~ 09)와 ICU Company 웹사이트([icucompany.com](https://icucompany.com))도 구축
+- **Design Decision** — 앱을 13개 도메인 레이어드 아키텍처(Riverpod · Freezed)로 전면 재구축(2025.01). 금액 · 주문 판정은 견적 API로 서버가 결정하고, 스코프 기준 소유권 가드 · idempotency 미들웨어 · refresh 토큰 회전(재사용 감지)을 도입, 사진은 Presigned URL로 S3 직행. 사내 영업 도구(해외 여행사 발굴 · 견적 빌더 · 푸시 캠페인, 2026.08 ~ 09)와 ICU Company 웹사이트([웹사이트](https://icucompany.com))도 구축
 - **Evidence** — 약 3,500명 설치 유지(누적 최대 약 8,000명), 레거시 업로드 경로는 CloudWatch 트래픽 0 확인 후 제거, PHPUnit 659개 파일 병렬 pre-push 게이트 복구, 하드코딩 문구 293곳 다국어화 · 아이콘 컨트롤 100곳 접근성 보강, ICU 웹사이트 Lighthouse SEO 100점
 
 ---

@@ -19,7 +19,7 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 
 | Surface | Period | Role | Main tech |
 | --- | --- | --- | --- |
-| App (iOS · Android) | 2024.08 – present | Sole frontend (rebuilt 2025.01) | Flutter · Dart · Riverpod · Freezed · Firebase · PayPal · PostHog · Microsoft Clarity |
+| App (iOS · Android) · [App Store](https://apps.apple.com/app/id6736513932) · [Google Play](https://play.google.com/store/apps/details?id=com.korehalal.app) | 2024.08 – present | Sole frontend (rebuilt 2025.01) | Flutter · Dart · Riverpod · Freezed · Firebase · PayPal · PostHog · Microsoft Clarity |
 | Partner/admin console (Flutter Web) | 2025.11 – present | Sole frontend | Flutter Web · Dart · GoRouter · Table Calendar · fl_chart |
 | User web (React) | 2026.02 – present | Sole frontend | React 19 · TypeScript · Zustand · PayPal SDK · i18next · Tailwind CSS 4 · Node.js 22 (Cloud Functions) |
 | Backend (AWS serverless) | 2026.05 – present | Took over, sole operator | PHP 8.3 · Laravel 10 · Laravel Vapor · AWS Lambda · API Gateway · Aurora/RDS (MySQL) · DynamoDB · SQS · S3 · CloudFront · Firebase RTDB · FCM |
@@ -109,7 +109,7 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 | --- | --- |
 | Period | 2025.09 – present |
 | Role | Sole frontend developer |
-| Platform | Web ([icucompany.com](https://icucompany.com)) |
+| Platform | Web · [Website](https://icucompany.com) |
 | Main tech | React 19 · TypeScript · Vite · Firebase Hosting · Node.js 20 (Cloud Functions) · Vitest |
 
 > Marketing / lead-generation website for ICU Company, an inbound travel agency specialized in halal travel — inquiry form, 4 SEO landing pages, multilingual hreflang
@@ -219,7 +219,7 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 | Item | Details |
 | --- | --- |
 | Period | 2024.03 – present |
-| Platform | iOS · Android (live) · site [apps.joon.is-a.dev/colorofdays](https://apps.joon.is-a.dev/colorofdays/) |
+| Platform | iOS · Android (live) · [App Store](https://apps.apple.com/app/id6443436725) · [Google Play](https://play.google.com/store/apps/details?id=com.colorofdays.color_of_days) · [Website](https://apps.joon.is-a.dev/colorofdays/) |
 | Main tech | Flutter · Riverpod · Freezed · Supabase (Edge Functions · pg_cron) · Firebase · home_widget · fl_chart · local_auth |
 
 > A mood diary that records each day as one of seven colors — yearly calendar, stats, recaps and home/lock-screen widgets; my longest-running personal app
@@ -236,7 +236,7 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 | Item | Details |
 | --- | --- |
 | Period | 2024.06 – present |
-| Platform | iOS · Android (Flutter, live) · site [apps.joon.is-a.dev/time-with-me](https://apps.joon.is-a.dev/time-with-me/) |
+| Platform | iOS · Android (Flutter, live) · [App Store](https://apps.apple.com/app/id6705135769) · [Google Play](https://play.google.com/store/apps/details?id=com.joonhwan.timewithme.time_with_me) · [Website](https://apps.joon.is-a.dev/time-with-me/) |
 | Main tech | Flutter · Supabase · Google Maps · home_widget · Firebase |
 
 > A shared calendar where friends, families and couples record memories together
@@ -253,7 +253,7 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 | Item | Details |
 | --- | --- |
 | Period | 2026.01 – present |
-| Platform | iOS · Android (live) · site [apps.joon.is-a.dev/yeowun](https://apps.joon.is-a.dev/yeowun/) |
+| Platform | iOS · Android (live) · [App Store](https://apps.apple.com/app/id6759911276) · [Google Play](https://play.google.com/store/apps/details?id=com.traceline.joon.trace_line) · [Website](https://apps.joon.is-a.dev/yeowun/) |
 | Main tech | Flutter · Supabase · PostGIS · Google Gemini AI · Firebase Hosting |
 
 > A location-based journal: photos and notes left at a place open for other users when they get nearby
@@ -270,7 +270,7 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 | Item | Details |
 | --- | --- |
 | Period | 2026.03 – present |
-| Platform | iOS · Android · Web (Flutter, live) · web [apps.joon.is-a.dev/gilmok](https://apps.joon.is-a.dev/gilmok/) |
+| Platform | iOS · Android · Web (Flutter, live) · [App Store](https://apps.apple.com/app/id6761645899) · [Google Play](https://play.google.com/store/apps/details?id=com.wayArchive.joonhwan.way_archive) · [Web](https://apps.joon.is-a.dev/gilmok/) |
 | Main tech | Flutter · Dart · Riverpod · Drift (SQLite) · Supabase · flutter_map · Firebase |
 
 > An offline-first map app that brings in places saved in Google My Maps and works without a network
@@ -287,7 +287,7 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 | Item | Details |
 | --- | --- |
 | Period | 2026.06 – present |
-| Platform | iOS · Android (Flutter, live) · site [apps.joon.is-a.dev/pick-and-go](https://apps.joon.is-a.dev/pick-and-go/) |
+| Platform | iOS · Android (Flutter, live) · [App Store](https://apps.apple.com/app/id6770894684) · [Google Play](https://play.google.com/store/apps/details?id=com.pickngo.joondev.pick_and_go) · [Website](https://apps.joon.is-a.dev/pick-and-go/) |
 | Main tech | Flutter · Dart · Riverpod · Freezed · go_router · Neon (serverless PostgreSQL) · Firebase |
 
 > Draws random trip courses you can actually reach, given your location, transport and time — like a game
@@ -304,7 +304,7 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 | Item | Details |
 | --- | --- |
 | Period | 2026.10 – present |
-| Platform | iOS · Android (Flutter, coming soon) · site [apps.joon.is-a.dev/discard](https://apps.joon.is-a.dev/discard/) |
+| Platform | iOS · Android (Flutter, coming soon) · [Website](https://apps.joon.is-a.dev/discard/) |
 | Main tech | Flutter · Riverpod · go_router · Drift (SQLite) · Neon (Data API · Storage · Functions) · Firebase (Auth · App Check · Analytics · Crashlytics) · Apple Vision / ML Kit · home_widget |
 
 > Records what you throw away like numbered museum exhibits and shows your buying and owning patterns
@@ -321,7 +321,7 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 | Item | Details |
 | --- | --- |
 | Period | 2026.10 – present |
-| Platform | iOS · Android (Flutter, coming soon) · site [apps.joon.is-a.dev/almost](https://apps.joon.is-a.dev/almost/) |
+| Platform | iOS · Android (Flutter, coming soon) · [Website](https://apps.joon.is-a.dev/almost/) |
 | Main tech | Flutter · Riverpod · go_router · CustomPainter · Neon (Postgres · Data API) · Firebase (Auth · Analytics · Crashlytics) · flutter_local_notifications |
 
 > Write down what you want to do and it checks in when it's time; finished goals become flowers in a garden, abandoned ones a gravestone in a cemetery
@@ -338,7 +338,7 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 | Item | Details |
 | --- | --- |
 | Period | 2026.09 – present |
-| Platform | Web ([nureongso.joon.is-a.dev](https://nureongso.joon.is-a.dev), live) |
+| Platform | Web (live) · [Website](https://nureongso.joon.is-a.dev) |
 | Main tech | Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS 4 · Supabase (PostgreSQL) · Python (httpx · psycopg · pdfplumber) · Gemini · GitHub Actions · Vercel |
 
 > Shows, side by side and from public records, what elected officials promised, how much they kept, and what they did in office — it carries only records published by official agencies, never opinions
@@ -355,7 +355,7 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 | Item | Details |
 | --- | --- |
 | Period | 2026.07 – present |
-| Platform | Web ([apps.joon.is-a.dev](https://apps.joon.is-a.dev/)) |
+| Platform | Web · [Website](https://apps.joon.is-a.dev/) |
 | Main tech | pnpm monorepo · Vite + React · Next.js 16 · TypeScript · Firebase Hosting · GitHub Actions |
 
 > A pnpm monorepo that merged every app's separate landing and terms sites into one Firebase Hosting site

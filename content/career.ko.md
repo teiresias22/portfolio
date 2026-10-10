@@ -19,7 +19,7 @@ notion: 363a3015-22b8-81df-acde-dadc28a0814d
 
 | 표면 | 기간 | 역할 | 주요 기술 |
 | --- | --- | --- | --- |
-| 앱 (iOS · Android) | 2024.08 ~ 현재 | 프론트 단독 (2025.01 재구축) | Flutter · Dart · Riverpod · Freezed · Firebase · PayPal · PostHog · Microsoft Clarity |
+| 앱 (iOS · Android) · [App Store](https://apps.apple.com/app/id6736513932) · [Google Play](https://play.google.com/store/apps/details?id=com.korehalal.app) | 2024.08 ~ 현재 | 프론트 단독 (2025.01 재구축) | Flutter · Dart · Riverpod · Freezed · Firebase · PayPal · PostHog · Microsoft Clarity |
 | 관리자/파트너 콘솔 (Flutter Web) | 2025.11 ~ 현재 | 프론트 단독 | Flutter Web · Dart · GoRouter · Table Calendar · fl_chart |
 | 사용자 웹 (React) | 2026.02 ~ 현재 | 프론트 단독 | React 19 · TypeScript · Zustand · PayPal SDK · i18next · Tailwind CSS 4 · Node.js 22 (Cloud Functions) |
 | 백엔드 (AWS 서버리스) | 2026.05 ~ 현재 | 인수 후 단독 운영 | PHP 8.3 · Laravel 10 · Laravel Vapor · AWS Lambda · API Gateway · Aurora/RDS (MySQL) · DynamoDB · SQS · S3 · CloudFront · Firebase RTDB · FCM |
@@ -109,7 +109,7 @@ notion: 363a3015-22b8-81df-acde-dadc28a0814d
 | --- | --- |
 | 기간 | 2025.09 ~ 현재 |
 | 역할 | 프론트 단독 개발자 |
-| 플랫폼 | Web ([icucompany.com](https://icucompany.com)) |
+| 플랫폼 | Web · [웹사이트](https://icucompany.com) |
 | 주요 기술 | React 19 · TypeScript · Vite · Firebase Hosting · Node.js 20 (Cloud Functions) · Vitest |
 
 > 할랄 특화 인바운드 여행사(ICU Company)의 마케팅/리드젠 웹사이트 — 문의 폼, SEO 랜딩 4종, 다국어 hreflang 대응
@@ -219,7 +219,7 @@ notion: 363a3015-22b8-81df-acde-dadc28a0814d
 | 항목 | 내용 |
 | --- | --- |
 | 기간 | 2024.03 ~ 현재 |
-| 플랫폼 | iOS · Android (실서비스 중) · 소개 페이지 [apps.joon.is-a.dev/colorofdays](https://apps.joon.is-a.dev/colorofdays/) |
+| 플랫폼 | iOS · Android (실서비스 중) · [App Store](https://apps.apple.com/app/id6443436725) · [Google Play](https://play.google.com/store/apps/details?id=com.colorofdays.color_of_days) · [소개 페이지](https://apps.joon.is-a.dev/colorofdays/) |
 | 주요 기술 | Flutter · Riverpod · Freezed · Supabase (Edge Functions · pg_cron) · Firebase · home_widget · fl_chart · local_auth |
 
 > 하루의 기분을 7가지 색 중 하나로 남기는 감정 기록 앱 — 연간 달력 · 통계 · 회고 · 홈/잠금화면 위젯, 가장 오래 운영한 개인 앱
@@ -236,7 +236,7 @@ notion: 363a3015-22b8-81df-acde-dadc28a0814d
 | 항목 | 내용 |
 | --- | --- |
 | 기간 | 2024.06 ~ 현재 |
-| 플랫폼 | iOS · Android (Flutter, 실서비스 중) · 소개 페이지 [apps.joon.is-a.dev/time-with-me](https://apps.joon.is-a.dev/time-with-me/) |
+| 플랫폼 | iOS · Android (Flutter, 실서비스 중) · [App Store](https://apps.apple.com/app/id6705135769) · [Google Play](https://play.google.com/store/apps/details?id=com.joonhwan.timewithme.time_with_me) · [소개 페이지](https://apps.joon.is-a.dev/time-with-me/) |
 | 주요 기술 | Flutter · Supabase · Google Maps · home_widget · Firebase |
 
 > 친구 · 가족 · 커플이 캘린더 하나를 공유하며 추억을 기록하는 앱
@@ -253,7 +253,7 @@ notion: 363a3015-22b8-81df-acde-dadc28a0814d
 | 항목 | 내용 |
 | --- | --- |
 | 기간 | 2026.01 ~ 현재 |
-| 플랫폼 | iOS · Android (실서비스 중) · 소개 페이지 [apps.joon.is-a.dev/yeowun](https://apps.joon.is-a.dev/yeowun/) |
+| 플랫폼 | iOS · Android (실서비스 중) · [App Store](https://apps.apple.com/app/id6759911276) · [Google Play](https://play.google.com/store/apps/details?id=com.traceline.joon.trace_line) · [소개 페이지](https://apps.joon.is-a.dev/yeowun/) |
 | 주요 기술 | Flutter · Supabase · PostGIS · Google Gemini AI · Firebase Hosting |
 
 > 장소에 남긴 사진 · 글을 다른 사용자가 근처에 갔을 때 열어보는 위치 기반 기록 앱
@@ -270,7 +270,7 @@ notion: 363a3015-22b8-81df-acde-dadc28a0814d
 | 항목 | 내용 |
 | --- | --- |
 | 기간 | 2026.03 ~ 현재 |
-| 플랫폼 | iOS · Android · Web (Flutter, 실서비스 중) · 웹 [apps.joon.is-a.dev/gilmok](https://apps.joon.is-a.dev/gilmok/) |
+| 플랫폼 | iOS · Android · Web (Flutter, 실서비스 중) · [App Store](https://apps.apple.com/app/id6761645899) · [Google Play](https://play.google.com/store/apps/details?id=com.wayArchive.joonhwan.way_archive) · [웹](https://apps.joon.is-a.dev/gilmok/) |
 | 주요 기술 | Flutter · Dart · Riverpod · Drift (SQLite) · Supabase · flutter_map · Firebase |
 
 > Google My Maps에 모아둔 장소를 가져와 네트워크 없이 쓰는 오프라인 우선 지도 앱
@@ -287,7 +287,7 @@ notion: 363a3015-22b8-81df-acde-dadc28a0814d
 | 항목 | 내용 |
 | --- | --- |
 | 기간 | 2026.06 ~ 현재 |
-| 플랫폼 | iOS · Android (Flutter, 실서비스 중) · 소개 페이지 [apps.joon.is-a.dev/pick-and-go](https://apps.joon.is-a.dev/pick-and-go/) |
+| 플랫폼 | iOS · Android (Flutter, 실서비스 중) · [App Store](https://apps.apple.com/app/id6770894684) · [Google Play](https://play.google.com/store/apps/details?id=com.pickngo.joondev.pick_and_go) · [소개 페이지](https://apps.joon.is-a.dev/pick-and-go/) |
 | 주요 기술 | Flutter · Dart · Riverpod · Freezed · go_router · Neon (Serverless PostgreSQL) · Firebase |
 
 > 위치 · 이동수단 · 시간으로 실제 갈 수 있는 랜덤 여행 코스를 게임처럼 뽑아주는 앱
@@ -304,7 +304,7 @@ notion: 363a3015-22b8-81df-acde-dadc28a0814d
 | 항목 | 내용 |
 | --- | --- |
 | 기간 | 2026.10 ~ 현재 |
-| 플랫폼 | iOS · Android (Flutter, 스토어 출시 예정) · 소개 페이지 [apps.joon.is-a.dev/discard](https://apps.joon.is-a.dev/discard/) |
+| 플랫폼 | iOS · Android (Flutter, 스토어 출시 예정) · [소개 페이지](https://apps.joon.is-a.dev/discard/) |
 | 주요 기술 | Flutter · Riverpod · go_router · Drift (SQLite) · Neon (Data API · Storage · Functions) · Firebase (Auth · App Check · Analytics · Crashlytics) · Apple Vision / ML Kit · home_widget |
 
 > 버린 물건을 번호 붙은 전시품처럼 기록해 나의 소비 · 소유 패턴을 보여주는 앱
@@ -321,7 +321,7 @@ notion: 363a3015-22b8-81df-acde-dadc28a0814d
 | 항목 | 내용 |
 | --- | --- |
 | 기간 | 2026.10 ~ 현재 |
-| 플랫폼 | iOS · Android (Flutter, 스토어 출시 예정) · 소개 페이지 [apps.joon.is-a.dev/almost](https://apps.joon.is-a.dev/almost/) |
+| 플랫폼 | iOS · Android (Flutter, 스토어 출시 예정) · [소개 페이지](https://apps.joon.is-a.dev/almost/) |
 | 주요 기술 | Flutter · Riverpod · go_router · CustomPainter · Neon (Postgres · Data API) · Firebase (Auth · Analytics · Crashlytics) · flutter_local_notifications |
 
 > 하고 싶은 일을 적어 두면 때가 되어 물어보고, 해낸 일은 꽃밭에 · 그만둔 일은 묘지에 남기는 앱
@@ -338,7 +338,7 @@ notion: 363a3015-22b8-81df-acde-dadc28a0814d
 | 항목 | 내용 |
 | --- | --- |
 | 기간 | 2026.09 ~ 현재 |
-| 플랫폼 | Web ([nureongso.joon.is-a.dev](https://nureongso.joon.is-a.dev), 운영 중) |
+| 플랫폼 | Web (운영 중) · [웹사이트](https://nureongso.joon.is-a.dev) |
 | 주요 기술 | Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS 4 · Supabase (PostgreSQL) · Python (httpx · psycopg · pdfplumber) · Gemini · GitHub Actions · Vercel |
 
 > 선출직이 무슨 공약을 했고 얼마나 지켰는지, 임기 동안 무엇을 했는지 공개 기록으로 나란히 보여주는 서비스 — 기관이 공개한 기록만 옮기고 의견은 싣지 않습니다
@@ -355,7 +355,7 @@ notion: 363a3015-22b8-81df-acde-dadc28a0814d
 | 항목 | 내용 |
 | --- | --- |
 | 기간 | 2026.07 ~ 현재 |
-| 플랫폼 | Web ([apps.joon.is-a.dev](https://apps.joon.is-a.dev/)) |
+| 플랫폼 | Web · [웹사이트](https://apps.joon.is-a.dev/) |
 | 주요 기술 | pnpm 모노레포 · Vite + React · Next.js 16 · TypeScript · Firebase Hosting · GitHub Actions |
 
 > 앱마다 따로 있던 랜딩 · 약관 사이트를 Firebase Hosting 하나로 합친 pnpm 모노레포

@@ -55,7 +55,7 @@ function page(lang, { name, path }) {
   const { meta, body } = load(name, lang)
   const t = UI[lang]
   const { html, toc } = toHtml(body, PAGES.find((p) => p.name === name).toc)
-  const tocHtml = `<nav class="toc" aria-label="${t.toc}"><details><summary>${t.toc}</summary><ol>${toc.map((h) => `<li class="l${h.n}"><a href="#${h.id}">${esc(h.text)}</a></li>`).join('')}</ol></details></nav>`
+  const tocHtml = `<nav class="toc" aria-label="${t.toc}"><details><summary>${t.toc}</summary><ol>${toc.map((h) => `<li class="l${h.n}"><a href="#${h.id}">${h.text}</a></li>`).join('')}</ol></details></nav>`
   const nav = PAGES.map((p) => {
     const href = `/${lang === 'ko' ? 'ko/' : ''}${p.path}`
     return `<a href="${href}"${p.name === name ? ' aria-current="page"' : ''}>${t[p.name]}</a>`

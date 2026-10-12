@@ -220,14 +220,14 @@ notion: 363a3015-22b8-81df-acde-dadc28a0814d
 | --- | --- |
 | 기간 | 2024.03 ~ 현재 |
 | 플랫폼 | iOS · Android (실서비스 중) · [App Store](https://apps.apple.com/app/id6443436725) · [Google Play](https://play.google.com/store/apps/details?id=com.colorofdays.color_of_days) · [소개 페이지](https://apps.joon.is-a.dev/colorofdays/) |
-| 주요 기술 | Flutter · Riverpod · Freezed · Supabase (Edge Functions · pg_cron) · Firebase · home_widget · fl_chart · local_auth |
+| 주요 기술 | Flutter · Riverpod · Freezed · Supabase (Edge Functions · pg_cron) · Firebase · home_widget · fl_chart · local_auth · HealthKit · Health Connect · watchOS · Wear OS |
 
-> 하루의 기분을 7가지 색 중 하나로 남기는 감정 기록 앱 — 연간 달력 · 통계 · 회고 · 홈/잠금화면 위젯, 가장 오래 운영한 개인 앱
+> 하루의 기분을 7가지 색 중 하나로 남기는 감정 기록 앱 — 연간 달력 · 통계 · 회고 · 홈/잠금화면 위젯 · 건강 데이터 연결 · 워치 기록, 가장 오래 운영한 개인 앱
 
 - **Problem** — 글 쓰기 부담스러운 날에도 색 하나만 고르면 남는 감정 기록 — 쌓인 기록은 1년치 흐름과 패턴으로 돌아와야 함
-- **Engineering Challenge** — 색 하나와 짧은 코멘트뿐인 기록에서 의미 있는 인사이트 만들기(태그에만 기대던 시절엔 800일 기록에도 「기록이 더 필요」만 떴음), 클라이언트 · 서버 두 곳에서 따로 계산돼 어긋나던 연속 기록(스트릭), 일기 원문을 지키면서 넣는 AI 회고
-- **Design Decision** — 인사이트 · 주간/월간 회고 · 태그 추천을 온디바이스 순수 함수로 분리해 단위 테스트로 고정, 색 · 요일 · 태그에서 관찰 문장을 뽑아 태그 없이도 동작. 스트릭 기준은 함수 하나로 통일하고, 끊길 스트릭을 저녁에 알리는 서버 알림(Edge Function + pg_cron)도 같은 규칙임을 테스트로 보장. AI 회고는 색 순서 · 태그 빈도만 보내고 일기 원문은 보내지 않으며, 실패하면 정적 문구로 대체 · Remote Config 킬스위치
-- **Evidence** — 가입자의 59%가 실제 기록 작성(작성자 1인당 평균 31건, 최다 855건), 앱을 열지 않고도 색을 고를 수 있는 인터랙티브 홈 위젯 · iOS 잠금화면 위젯
+- **Engineering Challenge** — 색 하나와 짧은 코멘트뿐인 기록에서 의미 있는 인사이트 만들기(태그에만 기대던 시절엔 800일 기록에도 「기록이 더 필요」만 떴음), 클라이언트 · 서버 두 곳에서 따로 계산돼 어긋나던 연속 기록(스트릭), 일기 원문을 지키면서 넣는 AI 회고, 수면 · 걸음 · 심박 같은 건강 데이터를 기분 옆에 보여 주되 기기 밖으로는 내보내지 않기
+- **Design Decision** — 인사이트 · 주간/월간 회고 · 태그 추천을 온디바이스 순수 함수로 분리해 단위 테스트로 고정, 색 · 요일 · 태그에서 관찰 문장을 뽑아 태그 없이도 동작. 스트릭 기준은 함수 하나로 통일하고, 끊길 스트릭을 저녁에 알리는 서버 알림(Edge Function + pg_cron)도 같은 규칙임을 테스트로 보장. AI 회고는 색 순서 · 태그 빈도만 보내고 일기 원문은 보내지 않으며, 실패하면 정적 문구로 대체 · Remote Config 킬스위치. 건강 데이터는 자체 MethodChannel로 HealthKit · Health Connect의 플랫폼 집계 API에서 일별 값만 읽어(iPhone + Watch 같은 소스 중복은 플랫폼이 제거) 원시 값은 서버 · 분석 SDK · 로그로 보내지 않고, 기분과의 관계는 Spearman 상관이 기준(짝 14일 이상, |ρ| ≥ max(0.3, 2/√n))을 넘을 때만 「패턴 발견」에 한 줄로 표시 — 색은 늘 사용자가 고름(자동 판정 · 의료 표현 배제). 워치는 Supabase 세션을 공유할 수 없어 폰이 발급한 기기 토큰(해시만 저장)으로 기록 RPC를 직접 호출해, 폰 앱이 꺼져 있어도 저장
+- **Evidence** — 가입자의 59%가 실제 기록 작성(작성자 1인당 평균 31건, 최다 855건), 앱을 열지 않고도 색을 고를 수 있는 인터랙티브 홈 위젯 · iOS 잠금화면 위젯, 2.3.0(2026.10)에서 건강 데이터 연결과 Apple Watch · Galaxy Watch 기록 출시
 
 ---
 
@@ -338,7 +338,7 @@ notion: 363a3015-22b8-81df-acde-dadc28a0814d
 | 항목 | 내용 |
 | --- | --- |
 | 기간 | 2026.09 ~ 현재 |
-| 플랫폼 | Web (운영 중) · [웹사이트](https://nureongso.joon.is-a.dev) |
+| 플랫폼 | Web (운영 중) · [웹사이트](https://nureongso.joon.is-a.dev) · [GitHub](https://github.com/teiresias22/nureongso) |
 | 주요 기술 | Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS 4 · Supabase (PostgreSQL) · Python (httpx · psycopg · pdfplumber) · Gemini · GitHub Actions · Vercel |
 
 > 선출직이 무슨 공약을 했고 얼마나 지켰는지, 임기 동안 무엇을 했는지 공개 기록으로 나란히 보여주는 서비스 — 기관이 공개한 기록만 옮기고 의견은 싣지 않습니다
@@ -372,12 +372,12 @@ notion: 363a3015-22b8-81df-acde-dadc28a0814d
 | 항목 | 내용 |
 | --- | --- |
 | 기간 | 2026.04 ~ 현재 (자동 발행 기준) |
-| 플랫폼 | Threads · Instagram (자체 앱 4개를 한 계정에서 운영) |
+| 플랫폼 | Threads · Instagram (자체 앱 5개를 한 계정에서 운영) |
 | 주요 기술 | Claude Agent SDK · Supabase (pg_cron · pg_net) · Threads / Instagram Graph API · UTM 리다이렉터 |
 
 > 마케팅 인력 없이 혼자 만든 앱들을 알리기 위한 멀티에이전트 게시 · 계측 시스템
 
-- **Problem** — 혼자 만든 앱 4개를 꾸준히 알려야 하고, 어떤 게시물이 실제 설치로 이어지는지 알아야 함
+- **Problem** — 혼자 만든 앱 5개를 꾸준히 알려야 하고, 어떤 게시물이 실제 설치로 이어지는지 알아야 함
 - **Engineering Challenge** — 어트리뷰션. 게시 → 클릭 → 설치 퍼널이 좋아 보였지만 클릭 대부분이 크롤러였고, UA 규칙은 크롤러가 버전을 바꿀 때마다 뚫렸으며 범위를 넓히면 축약 UA를 쓰는 실제 안드로이드 사용자가 빠짐
-- **Design Decision** — CMO · ContentWriter · PerformanceAnalyst · SocialMediaManager 4개 에이전트가 기획 · 작성 · 분석을 나누고, 발행은 GitHub Actions 대신 Supabase pg_cron + pg_net으로 서버에서 처리(하루 5개 슬롯, 앱별 라우팅). 봇 판정은 타이밍 · IP 평판(게시 60초 내 도착 · 같은 UA 120초 내 재등장 · 이미 봇으로 찍힌 IP)으로 바꾸고, 집계는 블랙리스트 → 실제 플랫폼 화이트리스트로 전환(크롤러는 UA를 계속 바꾸므로 블랙리스트는 항상 뒤처짐), 과거 데이터는 소급 정정
-- **Evidence** — 2026.04 이후 Threads · Instagram 625건 자동 발행. 봇 수치는 숨기지 않고 따로 표기해, 0이 되면 계측이 멈췄다는 신호로 사용
+- **Design Decision** — CMO · ContentWriter · PerformanceAnalyst · SocialMediaManager 4개 에이전트가 기획 · 작성 · 분석을 나누고, 발행은 GitHub Actions 대신 Supabase pg_cron + pg_net으로 서버에서 처리(앱별 슬롯 라우팅 — Threads 하루 3회 + Instagram 카드 · Reels, 국내 전용 Pick and Go는 한국어 전용 슬롯). 봇 판정은 타이밍 · IP 평판(게시 60초 내 도착 · 같은 UA 120초 내 재등장 · 이미 봇으로 찍힌 IP)으로 바꾸고, 집계는 블랙리스트 → 실제 플랫폼 화이트리스트로 전환(크롤러는 UA를 계속 바꾸므로 블랙리스트는 항상 뒤처짐), 과거 데이터는 소급 정정
+- **Evidence** — 2026.04부터 자동 발행 운영 중이며, 2026.10 Pick and Go를 더해 5개 앱으로 확장. 봇 수치는 숨기지 않고 따로 표기해, 0이 되면 계측이 멈췄다는 신호로 사용

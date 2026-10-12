@@ -220,14 +220,14 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 | --- | --- |
 | Period | 2024.03 – present |
 | Platform | iOS · Android (live) · [App Store](https://apps.apple.com/app/id6443436725) · [Google Play](https://play.google.com/store/apps/details?id=com.colorofdays.color_of_days) · [Website](https://apps.joon.is-a.dev/colorofdays/) |
-| Main tech | Flutter · Riverpod · Freezed · Supabase (Edge Functions · pg_cron) · Firebase · home_widget · fl_chart · local_auth |
+| Main tech | Flutter · Riverpod · Freezed · Supabase (Edge Functions · pg_cron) · Firebase · home_widget · fl_chart · local_auth · HealthKit · Health Connect · watchOS · Wear OS |
 
-> A mood diary that records each day as one of seven colors — yearly calendar, stats, recaps and home/lock-screen widgets; my longest-running personal app
+> A mood diary that records each day as one of seven colors — yearly calendar, stats, recaps, home/lock-screen widgets, health data and watch logging; my longest-running personal app
 
 - **Problem** — A mood record that only takes picking a color, even on days you don't feel like writing — and the entries should come back as a year of patterns
-- **Engineering Challenge** — Getting meaningful insight from entries that are just a color and a short note (when insights relied on tags, a user with 800 days of entries still saw "need more data"); a streak computed separately on client and server that could disagree; and an AI recap that must not send anyone's diary text
-- **Design Decision** — Insights, weekly/monthly recaps and tag suggestions are on-device pure functions pinned by unit tests; insights read color, weekday and tags, so they work without tags. One streak function is the single source, and the evening "your streak is about to break" push (Edge Function + pg_cron) is tested to follow the same rule. The AI recap sends only color sequences and tag counts, never diary text, falls back to static copy on failure, and sits behind a Remote Config kill switch
-- **Evidence** — 59% of sign-ups write entries (31 per writer on average, up to 855); interactive home-screen and iOS lock-screen widgets let users pick a color without opening the app
+- **Engineering Challenge** — Getting meaningful insight from entries that are just a color and a short note (when insights relied on tags, a user with 800 days of entries still saw "need more data"); a streak computed separately on client and server that could disagree; an AI recap that must not send anyone's diary text; and showing health data such as sleep, steps and heart rate next to the mood without it ever leaving the device
+- **Design Decision** — Insights, weekly/monthly recaps and tag suggestions are on-device pure functions pinned by unit tests; insights read color, weekday and tags, so they work without tags. One streak function is the single source, and the evening "your streak is about to break" push (Edge Function + pg_cron) is tested to follow the same rule. The AI recap sends only color sequences and tag counts, never diary text, falls back to static copy on failure, and sits behind a Remote Config kill switch. Health data comes through my own MethodChannel from the HealthKit / Health Connect aggregate APIs as daily values only (the platform removes duplicates such as iPhone + Watch), and raw values never go to the server, analytics SDKs or logs; a link to mood is shown as one line under "Patterns" only when a Spearman correlation clears the bar (14+ paired days, |ρ| ≥ max(0.3, 2/√n)) — the user always picks the color (no automatic judgment, no medical wording). Watches can't share the Supabase session, so they call the record RPC directly with a device token issued by the phone (only its hash is stored), and entries save even when the phone app is closed
+- **Evidence** — 59% of sign-ups write entries (31 per writer on average, up to 855); interactive home-screen and iOS lock-screen widgets let users pick a color without opening the app; 2.3.0 (October 2026) shipped health data and Apple Watch / Galaxy Watch logging
 
 ---
 
@@ -338,7 +338,7 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 | Item | Details |
 | --- | --- |
 | Period | 2026.09 – present |
-| Platform | Web (live) · [Website](https://nureongso.joon.is-a.dev) |
+| Platform | Web (live) · [Website](https://nureongso.joon.is-a.dev) · [GitHub](https://github.com/teiresias22/nureongso) |
 | Main tech | Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS 4 · Supabase (PostgreSQL) · Python (httpx · psycopg · pdfplumber) · Gemini · GitHub Actions · Vercel |
 
 > Shows, side by side and from public records, what elected officials promised, how much they kept, and what they did in office — it carries only records published by official agencies, never opinions
@@ -372,12 +372,12 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 | Item | Details |
 | --- | --- |
 | Period | 2026.04 – present (since automated publishing) |
-| Platform | Threads · Instagram (four of my apps on one account) |
+| Platform | Threads · Instagram (five of my apps on one account) |
 | Main tech | Claude Agent SDK · Supabase (pg_cron · pg_net) · Threads / Instagram Graph API · UTM redirector |
 
 > A multi-agent posting and tracking system for promoting apps I built alone, without a marketing team
 
-- **Problem** — Four solo-built apps need steady promotion, and I need to know which posts actually lead to installs
+- **Problem** — Five solo-built apps need steady promotion, and I need to know which posts actually lead to installs
 - **Engineering Challenge** — Attribution. The post → click → install funnel looked healthy, but most clicks were crawlers; user-agent rules broke whenever crawlers changed versions, and widening them would drop real Android users on Chrome's reduced user agent
-- **Design Decision** — Four agents (CMO · ContentWriter · PerformanceAnalyst · SocialMediaManager) split planning, writing and analysis, and publishing runs server-side on Supabase pg_cron + pg_net instead of GitHub Actions (five slots a day, routed per app). Bots are flagged by timing and IP reputation (arrival within 60 s of posting, the same user agent reappearing within 120 s, IPs already seen as bots), counting switched from a blacklist to a whitelist of real platforms (crawlers keep changing user agents, so a blacklist always lags), and past data was corrected
-- **Evidence** — 625 posts auto-published to Threads and Instagram since April 2026. Bot counts are reported separately rather than hidden — if they drop to zero, the tracking itself has stopped
+- **Design Decision** — Four agents (CMO · ContentWriter · PerformanceAnalyst · SocialMediaManager) split planning, writing and analysis, and publishing runs server-side on Supabase pg_cron + pg_net instead of GitHub Actions (slots routed per app — three Threads posts a day plus Instagram cards and Reels; Pick and Go, a Korea-only app, has its own Korean slot). Bots are flagged by timing and IP reputation (arrival within 60 s of posting, the same user agent reappearing within 120 s, IPs already seen as bots), counting switched from a blacklist to a whitelist of real platforms (crawlers keep changing user agents, so a blacklist always lags), and past data was corrected
+- **Evidence** — Publishing automatically since April 2026, extended to a fifth app (Pick and Go) in October 2026. Bot counts are reported separately rather than hidden — if they drop to zero, the tracking itself has stopped

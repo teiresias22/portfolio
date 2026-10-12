@@ -39,7 +39,7 @@
       <textarea name="message" rows="7" maxlength="4000" required data-t-ph="messagePh" placeholder="어떤 상황에서 무슨 일이 있었는지 적어주세요."></textarea>
     </label>
     <label><span data-t="email">답장 받을 이메일 (선택)</span>
-      <input name="email" type="email" autocomplete="email" maxlength="254">
+      <input name="email" type="email" autocomplete="email" maxlength="254" pattern="[^\s@]+@[^\s@]+\.[^\s@]+">
     </label>
     <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
     <p class="meta" id="meta" hidden></p>
@@ -87,7 +87,7 @@ f.addEventListener('submit', async (e) => {
   btn.disabled = false
   btn.textContent = t.send
   if (ok) {
-    f.reset()
+    f.message.value = '' // reset()은 쿼리로 고른 앱·유형까지 첫 옵션으로 되돌린다
     status.textContent = t.done
     return
   }

@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>앱 문의 · Joonhwan Jeon</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header class="top">
+  <div class="wrap"><div class="who"><p class="name"><a href="/">Joonhwan Jeon</a></p></div></div>
+</header>
+<!-- 앱 설정 메뉴가 ?app=&v=&os=&lang= 로 연다. 제출은 Supabase Edge Function `contact`(indie-marketing 레포) → Slack. -->
+<main class="doc contact">
+  <h2 data-t="title">앱 문의</h2>
+  <p class="lead" data-t="lead">버그 신고, 기능 제안, 궁금한 점을 보내주세요. 개발자에게 바로 전달됩니다.</p>
+  <form id="f" novalidate>
+    <label><span data-t="app">앱</span>
+      <select name="app" required>
+        <option value="colorofdays">Color of Days</option>
+        <option value="time-with-me">Time with Me</option>
+        <option value="yeowun">Yeowun (여운)</option>
+        <option value="gilmok">Gilmok (길목)</option>
+        <option value="pick-and-go">Pick and Go</option>
+        <option value="discard">Discard</option>
+        <option value="almost">Almost</option>
+        <option value="other" data-t="other">기타</option>
+      </select>
+    </label>
+    <label><span data-t="type">유형</span>
+      <select name="type">
+        <option value="question" data-t="question">문의</option>
+        <option value="bug" data-t="bug">버그 신고</option>
+        <option value="feature" data-t="feature">기능 제안</option>
+      </select>
+    </label>
+    <label><span data-t="message">내용</span>
+      <textarea name="message" rows="7" maxlength="4000" required data-t-ph="messagePh" placeholder="어떤 상황에서 무슨 일이 있었는지 적어주세요."></textarea>
+    </label>
+    <label><span data-t="email">답장 받을 이메일 (선택)</span>
+      <input name="email" type="email" autocomplete="email" maxlength="254">
+    </label>
+    <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <p class="meta" id="meta" hidden></p>
+    <button class="btn primary" type="submit" data-t="send">보내기</button>
+    <p class="status" id="status" role="status" aria-live="polite"></p>
+  </form>
+  <noscript><p><a href="mailto:teiresias1987@gmail.com">teiresias1987@gmail.com</a></p></noscript>
+</main>
+<script>
+const T = {
+  ko: { send: '보내기', sending: '보내는 중…', done: '보냈습니다. 고맙습니다! 이메일을 남기셨다면 답장드릴게요.', fail: '지금은 보낼 수 없어요. 메일로 보내주세요:', empty: '내용을 적어주세요.', badEmail: '이메일 주소를 확인해주세요.', with: '함께 전송' },
+  en: { title: 'App support', lead: 'Report a bug, suggest a feature or ask a question. It goes straight to the developer.', app: 'App', type: 'Type', other: 'Other', question: 'Question', bug: 'Bug report', feature: 'Feature request', message: 'Message', messagePh: 'What happened, and what were you doing at the time?', email: 'Email for a reply (optional)', send: 'Send', sending: 'Sending…', done: 'Sent. Thank you! If you left an email, I will reply.', fail: 'Could not send right now. Please email instead:', empty: 'Please write a message.', badEmail: 'Please check the email address.', with: 'Sent with' },
+}
+const q = new URLSearchParams(location.search)
+const sentLang = q.get('lang') || navigator.language || ''
+const lang = sentLang.toLowerCase().startsWith('ko') ? 'ko' : 'en'
+const t = T[lang]
+if (lang === 'en') {
+  document.documentElement.lang = 'en'
+  document.title = 'App support · Joonhwan Jeon'
+  for (const el of document.querySelectorAll('[data-t]')) el.textContent = t[el.dataset.t]
+  for (const el of document.querySelectorAll('[data-t-ph]')) el.placeholder = t[el.dataset.tPh]
+}
+
+const f = document.getElementById('f')
+const status = document.getElementById('status')
+if ([...f.app.options].some((o) => o.value === q.get('app'))) f.app.value = q.get('app')
+if (['question', 'bug', 'feature'].includes(q.get('type'))) f.type.value = q.get('type')
+const meta = [q.get('v') && 'v' + q.get('v'), q.get('os')].filter(Boolean).join(' · ')
+if (meta) Object.assign(document.getElementById('meta'), { hidden: false, textContent: `${t.with}: ${meta}` })
+
+f.addEventListener('submit', async (e) => {
+  e.preventDefault()
+  const message = f.message.value.trim()
+  if (!message) return (status.textContent = t.empty, f.message.focus())
+  if (f.email.value && !f.email.checkValidity()) return (status.textContent = t.badEmail, f.email.focus())
+  const btn = f.querySelector('button')
+  btn.disabled = true
+  btn.textContent = t.sending
+  status.textContent = ''
+  const body = { app: f.app.value, type: f.type.value, message, email: f.email.value.trim(), website: f.website.value, v: q.get('v'), os: q.get('os'), lang: sentLang }
+  const ok = await fetch('https://uvonbpeniprufdpmbhse.supabase.co/functions/v1/contact', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+  }).then((r) => r.ok, () => false)
+  btn.disabled = false
+  btn.textContent = t.send
+  if (ok) {
+    f.reset()
+    status.textContent = t.done
+    return
+  }
+  // 서버 실패(웹훅 미설정 포함) → 쓴 내용을 담은 메일 링크로 대체.
+  const subject = `[${f.app.selectedOptions[0].text}] ${f.type.selectedOptions[0].text}`
+  const a = Object.assign(document.createElement('a'), {
+    href: `mailto:teiresias1987@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message + (meta ? `\n\n${meta}` : ''))}`,
+    textContent: 'teiresias1987@gmail.com',
+  })
+  status.replaceChildren(t.fail + ' ', a)
+})
+</script>
+</body>
+</html>

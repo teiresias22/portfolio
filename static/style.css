@@ -116,6 +116,20 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
 .foot-bottom a:hover { color: var(--fg); }
 @media (max-width: 639px) { .foot-bottom { justify-content: center; text-align: center; } }
 
+/* Contact form (/contact) */
+.contact { max-width: 592px; padding: 32px 16px 48px; }
+.contact h2 { margin: 0 0 6px; font-size: 1.55rem; letter-spacing: -0.015em; }
+.contact .lead { color: var(--muted); margin: 0 0 24px; }
+.contact form { display: grid; gap: 16px; }
+.contact label { display: grid; gap: 6px; font-weight: 600; font-size: .9rem; color: var(--label); }
+.contact select, .contact textarea, .contact input { width: 100%; font: inherit; font-weight: 400; color: var(--fg); background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; min-height: 44px; }
+.contact textarea { resize: vertical; line-height: 1.55; }
+.contact .meta { margin: 0; color: var(--muted); font-size: .85rem; }
+.contact .btn { justify-self: start; cursor: pointer; font: inherit; font-weight: 600; }
+.contact .btn:disabled { opacity: .6; cursor: progress; }
+.contact .status { margin: 0; min-height: 1.7em; }
+.contact .hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+
 /* Print / Save as PDF */
 @media print {
   :root { --bg: #fff; --fg: #000; --muted: #333; --line: #ccc; --card: #fff; --chip: #f2f2f2; --accent: #000; --label: #000; }

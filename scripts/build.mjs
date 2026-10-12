@@ -10,8 +10,8 @@ const PAGES = [
   { name: 'career', path: 'career/', toc: 3 },
 ]
 const UI = {
-  en: { toc: 'Contents', skip: 'Skip to content', name: 'Joonhwan Jeon', role: 'Cross-platform developer · Flutter · Swift · React · Laravel', resume: 'Resume', career: 'Career', other: '한국어', otherLang: 'ko', contact: 'Get in touch', contactSub: 'For questions or opportunities, email is the fastest way to reach me.', apps: 'My apps', updated: 'Updated', top: 'Back to top' },
-  ko: { toc: '목차', skip: '본문 바로가기', name: '전준환', role: '크로스플랫폼 개발자 · Flutter · Swift · React · Laravel', resume: '이력서', career: '경력기술서', other: 'English', otherLang: 'en', contact: '연락하기', contactSub: '문의나 제안은 이메일로 주시면 가장 빠르게 답변드립니다.', apps: '내 앱 모음', updated: '최종 업데이트', top: '맨 위로' },
+  en: { toc: 'Contents', skip: 'Skip to content', name: 'Joonhwan Jeon', role: 'Cross-platform developer · Flutter · Swift · React · Laravel', resume: 'Resume', career: 'Career', other: '한국어', otherLang: 'ko', contact: 'Get in touch', support: 'App support', contactSub: 'For questions or opportunities, email is the fastest way to reach me.', apps: 'My apps', updated: 'Updated', top: 'Back to top' },
+  ko: { toc: '목차', skip: '본문 바로가기', name: '전준환', role: '크로스플랫폼 개발자 · Flutter · Swift · React · Laravel', resume: '이력서', career: '경력기술서', other: 'English', otherLang: 'en', contact: '연락하기', support: '앱 문의', contactSub: '문의나 제안은 이메일로 주시면 가장 빠르게 답변드립니다.', apps: '내 앱 모음', updated: '최종 업데이트', top: '맨 위로' },
 }
 const url = (lang, path) => `${SITE}/${lang === 'ko' ? 'ko/' : ''}${path}`
 // Cache-bust the stylesheet: the URL changes whenever its content does.
@@ -99,6 +99,7 @@ ${html}
         <a class="btn primary" href="mailto:teiresias1987@gmail.com">Email</a>
         <a class="btn" href="https://github.com/teiresias22">GitHub</a>
         <a class="btn" href="https://apps.joon.is-a.dev/">${t.apps}</a>
+        <a class="btn" href="/contact${lang === 'ko' ? '?lang=ko' : ''}">${t.support}</a>
       </div>
     </section>
     <div class="foot-bottom">
@@ -122,5 +123,7 @@ for (const lang of ['en', 'ko']) {
   }
 }
 copyFileSync(new URL('../static/style.css', import.meta.url), new URL('style.css', out))
+// App support form, opened by the apps' settings menus. GitHub Pages serves contact.html at /contact.
+writeFileSync(new URL('contact.html', out), readFileSync(new URL('../static/contact.html', import.meta.url), 'utf8').replace('/style.css', CSS))
 copyFileSync(new URL('../CNAME', import.meta.url), new URL('CNAME', out))
 console.log('built dist/')

@@ -107,7 +107,10 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
 .foot-cta h2 { margin: 0 0 6px; font-size: 1.3rem; letter-spacing: -0.01em; }
 .foot-cta p { margin: 0; color: var(--muted); word-break: keep-all; }
 .foot-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 20px; }
-.btn { display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border: 1px solid var(--line); border-radius: 10px; color: var(--fg); font-weight: 600; font-size: .95rem; transition: background-color .15s, border-color .15s; }
+/* 휴대폰: 아이콘+글자 버튼 셋이 한 줄에 안 들어가 2+1로 갈리므로 세로로 쌓는다 */
+@media (max-width: 479px) { .foot-links { flex-direction: column; max-width: 320px; margin-inline: auto; } .foot-links .btn { justify-content: center; } }
+.btn { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 18px; border: 1px solid var(--line); border-radius: 10px; color: var(--fg); font-weight: 600; font-size: .95rem; transition: background-color .15s, border-color .15s; }
+.btn svg { width: 18px; height: 18px; flex: none; }
 .btn:hover { background: var(--chip); text-decoration: none; }
 .btn.primary { background: var(--fg); border-color: var(--fg); color: var(--bg); }
 .btn.primary:hover { background: color-mix(in srgb, var(--fg) 85%, var(--bg)); }

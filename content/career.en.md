@@ -103,7 +103,7 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 
 ---
 
-## ICU Company website (marketing / lead generation)
+## ICU Company website — marketing · lead-generation site
 
 | Item | Details |
 | --- | --- |
@@ -171,7 +171,7 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 
 ---
 
-## Travel Buddy (hackathon)
+## Travel Buddy — hackathon AI travel-companion · itinerary app
 
 | Item | Details |
 | --- | --- |
@@ -190,7 +190,7 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 
 ---
 
-## moit
+## moit — neighborhood class · meetup community app
 
 | Item | Details |
 | --- | --- |
@@ -214,7 +214,7 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 
 ---
 
-## Color of Days
+## Color of Days — a mood journal, one color a day
 
 | Item | Details |
 | --- | --- |
@@ -231,7 +231,7 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 
 ---
 
-## Time with Me
+## Time with Me — shared calendar · memory journal app
 
 | Item | Details |
 | --- | --- |
@@ -248,7 +248,7 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 
 ---
 
-## Yeowun
+## Yeowun — location-based notes left at places
 
 | Item | Details |
 | --- | --- |
@@ -265,7 +265,7 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 
 ---
 
-## Gilmok
+## Gilmok — offline-first map app
 
 | Item | Details |
 | --- | --- |
@@ -282,7 +282,7 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 
 ---
 
-## Pick and Go
+## Pick and Go — random trip courses you can actually reach
 
 | Item | Details |
 | --- | --- |
@@ -350,7 +350,7 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 
 ---
 
-## joon-dev web (personal project hub)
+## joon-dev web — personal project hub
 
 | Item | Details |
 | --- | --- |
@@ -367,7 +367,7 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 
 ---
 
-## Multi-app marketing automation (separate system for promoting my own apps)
+## Multi-app marketing automation — separate system for promoting my own apps
 
 | Item | Details |
 | --- | --- |

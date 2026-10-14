@@ -11,8 +11,8 @@ const PAGES = [
   { name: 'career', path: 'career/', toc: 3 },
 ]
 const UI = {
-  en: { toc: 'Contents', skip: 'Skip to content', name: 'Joonhwan Jeon', role: 'Cross-platform developer · Flutter · Swift · React · Laravel', resume: 'Resume', career: 'Career', other: '한국어', otherLang: 'ko', contact: 'Get in touch', contactSub: 'For questions or opportunities, email is the fastest way to reach me.', updated: 'Updated', top: 'Back to top', locale: 'en_US', jobTitle: 'Cross-platform developer' },
-  ko: { toc: '목차', skip: '본문 바로가기', name: '전준환', role: '크로스플랫폼 개발자 · Flutter · Swift · React · Laravel', resume: '이력서', career: '경력기술서', other: 'English', otherLang: 'en', contact: '연락하기', contactSub: '문의나 제안은 이메일로 주시면 가장 빠르게 답변드립니다.', updated: '최종 업데이트', top: '맨 위로', locale: 'ko_KR', jobTitle: '크로스플랫폼 개발자' },
+  en: { toc: 'Contents', skip: 'Skip to content', name: 'Joonhwan Jeon', role: 'Cross-platform developer · Flutter · Swift · React · Laravel', resume: 'Resume', career: 'Career', other: '한국어', otherLang: 'ko', contact: 'Get in touch', contactSub: 'For questions or opportunities, email is the fastest way to reach me.', updated: 'Updated', top: 'Back to top', newTab: '(opens in a new tab)', locale: 'en_US', jobTitle: 'Cross-platform developer' },
+  ko: { toc: '목차', skip: '본문 바로가기', name: '전준환', role: '크로스플랫폼 개발자 · Flutter · Swift · React · Laravel', resume: '이력서', career: '경력기술서', other: 'English', otherLang: 'en', contact: '연락하기', contactSub: '문의나 제안은 이메일로 주시면 가장 빠르게 답변드립니다.', updated: '최종 업데이트', top: '맨 위로', newTab: '(새 창에서 열림)', locale: 'ko_KR', jobTitle: '크로스플랫폼 개발자' },
 }
 // Header and footer show these in the same order. Email stays the highlighted button (fastest reply).
 // Footer buttons pair each label with a Remix Icon (line) — the same set the app pages' footers use.
@@ -28,6 +28,13 @@ const ICONS = `<link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#111113" media="(prefers-color-scheme: dark)">`
+const NEW_TAB = 'target="_blank" rel="noopener"'
+const linkAttrs = (href) => (href.startsWith('http') ? ` ${NEW_TAB}` : '')
+// Contents entries written as "Name — description" show the name with the description beneath it.
+const tocEntry = (text) => {
+  const [name, ...rest] = text.split(' — ')
+  return rest.length ? `<span class="tn">${name}</span><span class="td">${rest.join(' — ')}</span>` : text
+}
 const icon = (d) => `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="${d}"/></svg>`
 const url = (lang, path) => `${SITE}/${lang === 'ko' ? 'ko/' : ''}${path}`
 // Cache-bust the stylesheet: the URL changes whenever its content does.
@@ -47,7 +54,7 @@ const EMOJI = /^(?:\p{Extended_Pictographic}|\uFE0F|\u200D)+\s*/u
 const FACTS = 'Problem|Engineering Challenge|Design Decision|Evidence'
 const slug = (s) => s.replace(/<[^>]+>/g, '').toLowerCase().replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-|-$/g, '')
 
-function toHtml(body, tocDepth) {
+function toHtml(body, tocDepth, t) {
   // Notion-only blocks (profile table with phone/birthdate) never reach the web.
   body = body.replace(/<!-- notion-only -->[\s\S]*?<!-- \/notion-only -->\n*(---\n+)?/g, '')
   // Shift headings so the top level in each document becomes <h2> (the page header owns <h1>).
@@ -76,6 +83,8 @@ function toHtml(body, tocDepth) {
       const labels = [...table.match(/<thead>[\s\S]*?<\/thead>/)[0].matchAll(/<th[^>]*>([\s\S]*?)<\/th>/g)].map((m) => esc(m[1].replace(/<[^>]+>/g, '').trim()))
       return table.replace(/<tr>[\s\S]*?<\/tr>/g, (row) => { let i = 0; return row.replace(/<td(?=[ >])/g, () => `<td data-label="${labels[i++] ?? ''}"`) })
     })
+    // Web links open in a new tab, so the resume stays where the reader left it.
+    .replace(/<a href="(https?:[^"]+)">([\s\S]*?)<\/a>/g, (_, href, text) => `<a href="${href}" ${NEW_TAB}>${text}<span class="sr"> ${t.newTab}</span></a>`)
     .replace(/<table>/g, '<div class="table-wrap"><table>')
     .replace(/<\/table>/g, '</table></div>')
   return { html, toc }
@@ -138,8 +147,8 @@ function page(lang, { name, path }) {
   const { meta, body } = load(name, lang)
   const t = UI[lang]
   const date = updated(name, lang)
-  const { html, toc } = toHtml(body, PAGES.find((p) => p.name === name).toc)
-  const tocHtml = `<nav class="toc" id="toc" aria-label="${t.toc}"><details><summary>${t.toc}</summary><ol>${toc.map((h) => `<li class="l${h.n}"><a href="#${h.id}">${h.text}</a></li>`).join('')}</ol></details></nav>`
+  const { html, toc } = toHtml(body, PAGES.find((p) => p.name === name).toc, t)
+  const tocHtml = `<nav class="toc" id="toc" aria-label="${t.toc}"><details><summary>${t.toc}</summary><ol>${toc.map((h) => `<li class="l${h.n}"><a href="#${h.id}">${tocEntry(h.text)}</a></li>`).join('')}</ol></details></nav>`
   const nav = PAGES.map((p) => {
     const href = `/${lang === 'ko' ? 'ko/' : ''}${p.path}`
     return `<a href="${href}"${p.name === name ? ' aria-current="page"' : ''}>${t[p.name]}</a>`
@@ -174,7 +183,7 @@ ${ICONS}
 <a class="skip" href="#main">${t.skip}</a>
 <header class="top">
   <div class="wrap">
-    <div class="who"><h1 class="name"><a href="/${lang === 'ko' ? 'ko/' : ''}">${t.name}</a></h1><span class="role">${t.role}</span><span class="links">${CONTACTS.map((c) => `<a href="${c.href}" data-print="${c.print}">${c.label}</a>`).join('')}</span></div>
+    <div class="who"><h1 class="name"><a href="/${lang === 'ko' ? 'ko/' : ''}">${t.name}</a></h1><span class="role">${t.role}</span><span class="links">${CONTACTS.map((c) => `<a href="${c.href}"${linkAttrs(c.href)} data-print="${c.print}">${c.label}</a>`).join('')}</span></div>
     <nav aria-label="Pages">${nav}<a class="lang" href="${url(t.otherLang, path).replace(SITE, '')}" hreflang="${t.otherLang}" lang="${t.otherLang}">${t.other}</a></nav>
   </div>
 </header>
@@ -192,7 +201,7 @@ ${html}
       <h2 id="contact">${t.contact}</h2>
       <p>${t.contactSub}</p>
       <div class="foot-links">
-        ${CONTACTS.map((c) => `<a class="btn${c.primary ? ' primary' : ''}" href="${c.href}">${icon(c.icon)}${c.label}</a>`).join('\n        ')}
+        ${CONTACTS.map((c) => `<a class="btn${c.primary ? ' primary' : ''}" href="${c.href}"${linkAttrs(c.href)}>${icon(c.icon)}${c.label}</a>`).join('\n        ')}
       </div>
     </section>
     <div class="foot-bottom">

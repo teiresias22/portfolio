@@ -1,6 +1,7 @@
 // content/*.md → dist/ (GitHub Pages). English at /, Korean at /ko/.
 import { mkdirSync, writeFileSync, copyFileSync, rmSync, readFileSync } from 'node:fs'
 import { createHash } from 'node:crypto'
+import { execFileSync } from 'node:child_process'
 import { marked } from 'marked'
 import { load } from './content.mjs'
 
@@ -10,8 +11,8 @@ const PAGES = [
   { name: 'career', path: 'career/', toc: 3 },
 ]
 const UI = {
-  en: { toc: 'Contents', skip: 'Skip to content', name: 'Joonhwan Jeon', role: 'Cross-platform developer · Flutter · Swift · React · Laravel', resume: 'Resume', career: 'Career', other: '한국어', otherLang: 'ko', contact: 'Get in touch', contactSub: 'For questions or opportunities, email is the fastest way to reach me.', updated: 'Updated', top: 'Back to top', locale: 'en_US' },
-  ko: { toc: '목차', skip: '본문 바로가기', name: '전준환', role: '크로스플랫폼 개발자 · Flutter · Swift · React · Laravel', resume: '이력서', career: '경력기술서', other: 'English', otherLang: 'en', contact: '연락하기', contactSub: '문의나 제안은 이메일로 주시면 가장 빠르게 답변드립니다.', updated: '최종 업데이트', top: '맨 위로', locale: 'ko_KR' },
+  en: { toc: 'Contents', skip: 'Skip to content', name: 'Joonhwan Jeon', role: 'Cross-platform developer · Flutter · Swift · React · Laravel', resume: 'Resume', career: 'Career', other: '한국어', otherLang: 'ko', contact: 'Get in touch', contactSub: 'For questions or opportunities, email is the fastest way to reach me.', updated: 'Updated', top: 'Back to top', locale: 'en_US', jobTitle: 'Cross-platform developer' },
+  ko: { toc: '목차', skip: '본문 바로가기', name: '전준환', role: '크로스플랫폼 개발자 · Flutter · Swift · React · Laravel', resume: '이력서', career: '경력기술서', other: 'English', otherLang: 'en', contact: '연락하기', contactSub: '문의나 제안은 이메일로 주시면 가장 빠르게 답변드립니다.', updated: '최종 업데이트', top: '맨 위로', locale: 'ko_KR', jobTitle: '크로스플랫폼 개발자' },
 }
 // Header and footer show these in the same order. Email stays the highlighted button (fastest reply).
 // Footer buttons pair each label with a Remix Icon (line) — the same set the app pages' footers use.
@@ -31,8 +32,15 @@ const icon = (d) => `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="t
 const url = (lang, path) => `${SITE}/${lang === 'ko' ? 'ko/' : ''}${path}`
 // Cache-bust the stylesheet: the URL changes whenever its content does.
 const CSS = `/style.css?v=${createHash('sha1').update(readFileSync(new URL('../static/style.css', import.meta.url))).digest('hex').slice(0, 8)}`
-// Build date in KST, shown as the document's last update.
-const UPDATED = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10)
+// Last update = the last commit that touched the page's Markdown (KST), so a style-only deploy
+// doesn't move it. Falls back to today when git history isn't there (needs fetch-depth: 0 in CI).
+const TODAY = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10)
+function updated(name, lang) {
+  try {
+    const d = execFileSync('git', ['log', '-1', '--format=%cd', '--date=format-local:%Y-%m-%d', '--', `content/${name}.${lang}.md`], { cwd: new URL('..', import.meta.url), env: { ...process.env, TZ: 'Asia/Seoul' }, encoding: 'utf8' }).trim()
+    return d || TODAY
+  } catch { return TODAY }
+}
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;')
 
 const EMOJI = /^(?:\p{Extended_Pictographic}|\uFE0F|\u200D)+\s*/u
@@ -82,11 +90,13 @@ function toHtml(body, tocDepth) {
 //   scrolled out of view a floating button leads back to it (hidden again over the footer).
 const TOC_SCRIPT = `(() => {
   const root = document.documentElement, header = document.querySelector('.top')
-  const toc = document.querySelector('.toc'), details = toc.querySelector('details')
+  const toc = document.querySelector('.toc'), details = toc.querySelector('details'), summary = details.querySelector('summary')
   const fab = document.querySelector('.toc-fab'), links = [...toc.querySelectorAll('a')]
   const heads = links.map((a) => document.getElementById(decodeURIComponent(a.hash.slice(1))))
   const wide = matchMedia('(min-width: 1100px)')
-  const layout = () => { details.open = wide.matches; spy() }
+  // On wide screens the summary is only a label: out of the tab order, and the list can't be folded.
+  const layout = () => { details.open = wide.matches; summary.tabIndex = wide.matches ? -1 : 0; spy() }
+  details.addEventListener('toggle', () => { if (wide.matches && !details.open) details.open = true })
   new ResizeObserver(() => root.style.setProperty('--header-h', header.offsetHeight + 'px')).observe(header)
   let current, queued, foot
   function spy() {
@@ -113,9 +123,21 @@ const TOC_SCRIPT = `(() => {
   layout()
 })()`
 
+// Structured data for search engines: who the pages are about.
+function person(lang) {
+  const t = UI[lang]
+  return JSON.stringify({
+    '@context': 'https://schema.org', '@type': 'Person',
+    name: t.name, alternateName: UI[t.otherLang].name, jobTitle: t.jobTitle, url: url(lang, ''),
+    image: `${SITE}/og-${lang}.png`, email: 'teiresias1987@gmail.com', sameAs: ['https://github.com/teiresias22'],
+    knowsAbout: ['Flutter', 'Swift', 'React', 'Laravel'],
+  }).replace(/</g, '\\u003c')
+}
+
 function page(lang, { name, path }) {
   const { meta, body } = load(name, lang)
   const t = UI[lang]
+  const date = updated(name, lang)
   const { html, toc } = toHtml(body, PAGES.find((p) => p.name === name).toc)
   const tocHtml = `<nav class="toc" id="toc" aria-label="${t.toc}"><details><summary>${t.toc}</summary><ol>${toc.map((h) => `<li class="l${h.n}"><a href="#${h.id}">${h.text}</a></li>`).join('')}</ol></details></nav>`
   const nav = PAGES.map((p) => {
@@ -146,6 +168,7 @@ ${ICONS}
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="${t.name} — ${t.role}">
 <meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">${person(lang)}</script>
 </head>
 <body id="top">
 <a class="skip" href="#main">${t.skip}</a>
@@ -173,13 +196,54 @@ ${html}
       </div>
     </section>
     <div class="foot-bottom">
-      <span>© 2026 ${t.name} · ${t.updated} <time datetime="${UPDATED}">${UPDATED}</time></span>
+      <span>© ${date.slice(0, 4)} ${t.name} · ${t.updated} <time datetime="${date}">${date}</time></span>
       <a href="#top">${t.top} ↑</a>
     </div>
   </div>
 </footer>
 </body>
 </html>
+`
+}
+
+// Not-found page, served by GitHub Pages for any missing path — so every URL in it is absolute.
+function notFound() {
+  return `<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>404 · ${UI.en.name}</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="${CSS}">
+${ICONS}
+</head>
+<body>
+<header class="top">
+  <div class="wrap"><div class="who"><p class="name"><a href="/">${UI.en.name}</a></p></div></div>
+</header>
+<main class="doc notfound">
+  <p class="code">404</p>
+  <h1>페이지를 찾을 수 없습니다</h1>
+  <p lang="en">This page doesn't exist — it may have moved.</p>
+  <div class="foot-links">
+    <a class="btn primary" href="/ko/">${UI.ko.resume}</a>
+    <a class="btn" href="/" lang="en">${UI.en.resume}</a>
+  </div>
+</main>
+</body>
+</html>
+`
+}
+
+// Sitemap: each page with its language alternates and last content update.
+function sitemap() {
+  const alt = (path) => ['en', 'ko'].map((l) => `<xhtml:link rel="alternate" hreflang="${l}" href="${url(l, path)}"/>`).join('')
+  const urls = PAGES.flatMap((p) => ['en', 'ko'].map((l) => `<url><loc>${url(l, p.path)}</loc><lastmod>${updated(p.name, l)}</lastmod>${alt(p.path)}</url>`))
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+${urls.join('\n')}
+</urlset>
 `
 }
 
@@ -192,6 +256,9 @@ for (const lang of ['en', 'ko']) {
     writeFileSync(new URL('index.html', dir), page(lang, p))
   }
 }
+writeFileSync(new URL('404.html', out), notFound())
+writeFileSync(new URL('sitemap.xml', out), sitemap())
+writeFileSync(new URL('robots.txt', out), `User-agent: *\nAllow: /\n\nSitemap: ${SITE}/sitemap.xml\n`)
 for (const f of ['style.css', ...ASSETS]) copyFileSync(new URL(`../static/${f}`, import.meta.url), new URL(f, out))
 // App support form, opened by the apps' settings menus. GitHub Pages serves contact.html at /contact.
 writeFileSync(new URL('contact.html', out), readFileSync(new URL('../static/contact.html', import.meta.url), 'utf8').replace('/style.css', CSS).replace('<!-- icons -->', ICONS))

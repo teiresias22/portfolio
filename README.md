@@ -11,6 +11,8 @@ Resume and career pages for Joonhwan Jeon. **`content/` is the single source** f
 
 Edit the Markdown and push to `main`. GitHub Actions builds the site to GitHub Pages and, when a `*.ko.md` file changed, rewrites the matching Notion page. **Don't edit the Notion pages directly** — the next sync overwrites them. Keep the English and Korean files in step when you change content.
 
+Each page's "Updated" date is the last commit that touched its Markdown, so style-only deploys don't change it. The build also writes `404.html`, `sitemap.xml` and `robots.txt`.
+
 Rows with `{{PLACEHOLDER}}` values (phone, birthdate) are Notion-only: the web build drops them, and the real values come from repository secrets so they never live in this public repo.
 
 ## Secrets

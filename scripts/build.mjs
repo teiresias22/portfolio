@@ -61,6 +61,42 @@ function toHtml(body, tocDepth) {
   return { html, toc }
 }
 
+// Contents behaviour. Runs right after the contents so the sidebar never flashes closed.
+// - Open in the sidebar on wide screens, collapsed above the document otherwise — re-applied when the
+//   width crosses the breakpoint (the wide summary can't be clicked, so a closed one would hide the list).
+// - --header-h follows the real sticky header, which wraps to more than one row.
+// - The section being read is marked and kept visible in the sidebar.
+// - On narrow screens the list folds away when a link is picked, before the jump lands.
+const TOC_SCRIPT = `(() => {
+  const root = document.documentElement, header = document.querySelector('.top')
+  const toc = document.querySelector('.toc'), details = toc.querySelector('details')
+  const links = [...toc.querySelectorAll('a')]
+  const heads = links.map((a) => document.getElementById(decodeURIComponent(a.hash.slice(1))))
+  const wide = matchMedia('(min-width: 1100px)')
+  const layout = () => { details.open = wide.matches; spy() }
+  new ResizeObserver(() => root.style.setProperty('--header-h', header.offsetHeight + 'px')).observe(header)
+  let current, queued
+  function spy() {
+    queued = false
+    const line = Math.max(0, header.getBoundingClientRect().bottom) + 24
+    let i = heads.findLastIndex((h) => h.getBoundingClientRect().top <= line)
+    if (innerHeight + scrollY >= root.scrollHeight - 2) i = heads.length - 1
+    const a = links[i]
+    if (a !== current) { current?.removeAttribute('aria-current'); a?.setAttribute('aria-current', 'location'); current = a }
+    if (a && wide.matches) {
+      const top = a.offsetTop, bottom = top + a.offsetHeight
+      if (top < toc.scrollTop + 32) toc.scrollTop = top - 32
+      else if (bottom > toc.scrollTop + toc.clientHeight - 32) toc.scrollTop = bottom - toc.clientHeight + 32
+    }
+  }
+  const queue = () => { if (!queued) { queued = true; requestAnimationFrame(spy) } }
+  wide.addEventListener('change', layout)
+  addEventListener('scroll', queue, { passive: true })
+  addEventListener('resize', queue)
+  toc.addEventListener('click', (e) => { if (e.target.closest('a') && !wide.matches) details.open = false })
+  layout()
+})()`
+
 function page(lang, { name, path }) {
   const { meta, body } = load(name, lang)
   const t = UI[lang]
@@ -97,7 +133,7 @@ ${tocHtml}
 ${html}
 </main>
 </div>
-<script>if (matchMedia('(min-width: 1100px)').matches) document.querySelector('.toc details').open = true</script>
+<script>${TOC_SCRIPT}</script>
 <footer class="foot">
   <div class="wrap">
     <section class="foot-cta" aria-labelledby="contact">

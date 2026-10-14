@@ -99,9 +99,8 @@ notion: 363a3015-22b8-8145-9b66-c083ecf7b661
 | [여운 (Yeowun)](https://apps.joon.is-a.dev/yeowun/) — 장소에 남기는 위치 기반 기록 앱 | 2026.01 ~ | 실서비스 | Flutter · Gemini AI · PostGIS · 백그라운드 지오펜싱 |
 | [길목 (Gilmok)](https://apps.joon.is-a.dev/gilmok/) — 오프라인 우선 지도 앱 | 2026.03 ~ | 실서비스 | Flutter · Drift · Supabase · flutter_map · 오프라인 우선 |
 | [Pick and Go](https://apps.joon.is-a.dev/pick-and-go/) — 갈 수 있는 랜덤 여행 코스 뽑기 앱 | 2026.06 ~ | 실서비스 | Flutter · Riverpod · Neon · Gamification |
-| [Discard](https://apps.joon.is-a.dev/discard/) — 내가 버린 것들의 박물관 | 2026.10 ~ | 스토어 심사 제출 | Flutter · Drift · Neon (Data API · Storage · Functions) · Firebase Auth/App Check · Vision/ML Kit 누끼 · home_widget |
-| [Almost](https://apps.joon.is-a.dev/almost/) — 하려다 만 것들의 묘지 | 2026.10 ~ | 스토어 출시 예정 | Flutter · CustomPainter 장면 렌더링 · Neon (Postgres RLS · 트리거 · RPC) · Firebase Auth · 4개 언어 |
-| ShapeLog — 사진 속 동그라미를 맞춰 잇는 매치컷 영상 앱 | 2026.10 ~ | 스토어 출시 예정 | Flutter · dart:ui · FFmpeg · 순수 Dart Hough 원 감지 · 기기 내 처리 |
+| [Discard](https://apps.joon.is-a.dev/discard/) — 내가 버린 것들의 박물관 | 2026.10 ~ | iOS 출시 · Android 심사 중 | Flutter · Drift · Neon (Data API · Storage · Functions) · Firebase Auth/App Check · Vision/ML Kit 누끼 · home_widget |
+| [Almost](https://apps.joon.is-a.dev/almost/) — 하려다 만 것들의 묘지 | 2026.10 ~ | iOS 출시 · Android 심사 중 | Flutter · CustomPainter 장면 렌더링 · Neon (Postgres RLS · 트리거 · RPC) · Firebase Auth · 4개 언어 |
 | [누렁소검은소](https://nureongso.joon.is-a.dev) — 선출직 공약 · 의정활동 공개 기록 ([GitHub](https://github.com/teiresias22/nureongso)) | 2026.09 ~ | 운영 중 (웹) | Next.js 16 · Supabase · Python 공공데이터 수집 파이프라인 · LLM 공약 판정 · Vercel |
 | [joon-dev 웹](https://apps.joon.is-a.dev/) — 개인 프로젝트 허브 | 2026.07 ~ | 운영 중 | pnpm 모노레포 · Vite/Next.js · Firebase Hosting · GitHub Actions |
 | 멀티앱 마케팅 자동화 — 자체 앱 홍보용 별도 시스템 | 2026.04 ~ | 운영 중 | Claude Agent SDK · Supabase pg_cron · Threads/Instagram Graph API · 어트리뷰션 계측 |
@@ -112,7 +111,7 @@ notion: 363a3015-22b8-8145-9b66-c083ecf7b661
 
 ### 주력
 
-- **Flutter / Dart** — 5개 앱 실서비스 운영, iOS · Android · Web 동시 대응 (home_widget · WidgetKit 홈/잠금화면 위젯, local_auth 생체인증, app_links 딥링크, Tooltip · Semantics 기반 스크린리더 접근성)
+- **Flutter / Dart** — 7개 앱 실서비스 운영, iOS · Android · Web 동시 대응 (home_widget · WidgetKit 홈/잠금화면 위젯, local_auth 생체인증, app_links 딥링크, Tooltip · Semantics 기반 스크린리더 접근성)
 - **Riverpod · Freezed** (hooks_riverpod · riverpod_generator) — 상태관리 · 불변 모델 코드 제너레이션
 - **React 19 · TypeScript** — MVVM 레이어링 SPA (Zustand · Tailwind CSS 4 · Zod · Next.js 16), **Flutter Web** 관리자 플랫폼 — ARIA 기반 접근성 · 아랍어 RTL · **Jest · Vitest** 유닛 테스트 포함
 - **Supabase** — PostgreSQL · Auth · RLS · Storage · Edge Functions · PostGIS

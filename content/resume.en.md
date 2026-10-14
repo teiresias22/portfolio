@@ -84,9 +84,8 @@ description: Cross-platform developer working across mobile, web and backend —
 | [Yeowun](https://apps.joon.is-a.dev/yeowun/) — location-based notes left at places | 2026.01 – | Live | Flutter · Gemini AI · PostGIS · background geofencing |
 | [Gilmok](https://apps.joon.is-a.dev/gilmok/) — offline-first map app | 2026.03 – | Live | Flutter · Drift · Supabase · flutter_map · offline-first |
 | [Pick and Go](https://apps.joon.is-a.dev/pick-and-go/) — random trip courses you can actually reach | 2026.06 – | Live | Flutter · Riverpod · Neon · gamification |
-| [Discard](https://apps.joon.is-a.dev/discard/) — a museum of the things I let go | 2026.10 – | In store review | Flutter · Drift · Neon (Data API · Storage · Functions) · Firebase Auth/App Check · Vision/ML Kit cutouts · home_widget |
-| [Almost](https://apps.joon.is-a.dev/almost/) — a graveyard for things you almost did | 2026.10 – | Coming soon | Flutter · CustomPainter scenes · Neon (Postgres RLS · triggers · RPC) · Firebase Auth · 4 languages |
-| ShapeLog — match-cut videos from the circles in your photos | 2026.10 – | Coming soon | Flutter · dart:ui · FFmpeg · pure-Dart Hough circle detection · on-device |
+| [Discard](https://apps.joon.is-a.dev/discard/) — a museum of the things I let go | 2026.10 – | iOS live · Android in review | Flutter · Drift · Neon (Data API · Storage · Functions) · Firebase Auth/App Check · Vision/ML Kit cutouts · home_widget |
+| [Almost](https://apps.joon.is-a.dev/almost/) — a graveyard for things you almost did | 2026.10 – | iOS live · Android in review | Flutter · CustomPainter scenes · Neon (Postgres RLS · triggers · RPC) · Firebase Auth · 4 languages |
 | [Nureongso](https://nureongso.joon.is-a.dev) — elected officials' pledges and public record ([GitHub](https://github.com/teiresias22/nureongso)) | 2026.09 – | Live (web) | Next.js 16 · Supabase · Python public-data pipeline · LLM pledge judging · Vercel |
 | [joon-dev web](https://apps.joon.is-a.dev/) — personal project hub | 2026.07 – | Live | pnpm monorepo · Vite/Next.js · Firebase Hosting · GitHub Actions |
 | Multi-app marketing automation — separate system for promoting my own apps | 2026.04 – | Running | Claude Agent SDK · Supabase pg_cron · Threads/Instagram Graph API · attribution tracking |
@@ -97,7 +96,7 @@ description: Cross-platform developer working across mobile, web and backend —
 
 ### Core
 
-- **Flutter / Dart** — 5 apps live, shipping to iOS, Android and Web (home_widget · WidgetKit home/lock-screen widgets, local_auth biometrics, app_links deep links, screen-reader accessibility with Tooltip · Semantics)
+- **Flutter / Dart** — 7 apps live, shipping to iOS, Android and Web (home_widget · WidgetKit home/lock-screen widgets, local_auth biometrics, app_links deep links, screen-reader accessibility with Tooltip · Semantics)
 - **Riverpod · Freezed** (hooks_riverpod · riverpod_generator) — state management and immutable-model code generation
 - **React 19 · TypeScript** — MVVM-layered SPAs (Zustand · Tailwind CSS 4 · Zod · Next.js 16), **Flutter Web** admin platform — ARIA accessibility, Arabic RTL, **Jest · Vitest** unit tests
 - **Supabase** — PostgreSQL · Auth · RLS · Storage · Edge Functions · PostGIS

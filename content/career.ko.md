@@ -211,7 +211,7 @@ notion: 363a3015-22b8-81df-acde-dadc28a0814d
 
 # 🌟 개인 프로젝트 (1인 개발)
 
-> 기획 · 설계 · 디자인 · 개발 · 배포를 1인으로 진행했습니다. 현재 **5개 앱이 App Store · Play Store에서 실서비스 중**이고 3개 앱(Discard · Almost · ShapeLog)이 출시를 앞두고 있습니다. 각 프로젝트의 **Next**는 메인 브랜치에 반영됐거나 계획된 다음 업데이트입니다. 앱 수보다 **여러 앱을 혼자서도 유지 가능한 상태로 묶는 것**에 무게를 둡니다 — 랜딩 · 약관은 `joon-dev` 모노레포에서 자동 생성 · 배포, 배포는 태그 푸시 한 번으로 iOS · Android 동시 출시. 앱 홍보용 마케팅 자동화는 마지막 항목에 별도로 정리했습니다.
+> 기획 · 설계 · 디자인 · 개발 · 배포를 1인으로 진행했습니다. 현재 **7개 앱이 App Store · Play Store에서 실서비스 중**입니다(Discard · Almost는 iOS 출시, Android 심사 중). 앱 수보다 **여러 앱을 혼자서도 유지 가능한 상태로 묶는 것**에 무게를 둡니다 — 랜딩 · 약관은 `joon-dev` 모노레포에서 자동 생성 · 배포, 배포는 태그 푸시 한 번으로 iOS · Android 동시 출시. 앱 홍보용 마케팅 자동화는 마지막 항목에 별도로 정리했습니다.
 
 ---
 
@@ -228,8 +228,7 @@ notion: 363a3015-22b8-81df-acde-dadc28a0814d
 - **Problem** — 글 쓰기 부담스러운 날에도 색 하나만 고르면 남는 감정 기록 — 쌓인 기록은 1년치 흐름과 패턴으로 돌아와야 함
 - **Engineering Challenge** — 색 하나와 짧은 코멘트뿐인 기록에서 의미 있는 인사이트 만들기(태그에만 기대던 시절엔 800일 기록에도 「기록이 더 필요」만 떴음), 클라이언트 · 서버 두 곳에서 따로 계산돼 어긋나던 연속 기록(스트릭), 일기 원문을 지키면서 넣는 AI 회고, 수면 · 걸음 · 심박 같은 건강 데이터를 기분 옆에 보여 주되 기기 밖으로는 내보내지 않기
 - **Design Decision** — 인사이트 · 주간/월간 회고 · 태그 추천을 온디바이스 순수 함수로 분리해 단위 테스트로 고정, 색 · 요일 · 태그에서 관찰 문장을 뽑아 태그 없이도 동작. 스트릭 기준은 함수 하나로 통일하고, 끊길 스트릭을 저녁에 알리는 서버 알림(Edge Function + pg_cron)도 같은 규칙임을 테스트로 보장. AI 회고는 색 순위(0~6) · 기본 태그 빈도만 보내고 일기 원문 · 직접 만든 태그는 보내지 않으며, 실패하면 정적 문구로 대체 · Remote Config 킬스위치. 건강 데이터는 자체 MethodChannel로 HealthKit · Health Connect의 플랫폼 집계 API에서 일별 값만 읽어(iPhone + Watch 같은 소스 중복은 플랫폼이 제거) 원시 값은 서버 · 분석 SDK · 로그로 보내지 않고, 기분과의 관계는 Spearman 상관이 기준(짝 14일 이상, |ρ| ≥ max(0.3, 2/√n))을 넘을 때만 「패턴 발견」에 한 줄로 표시 — 색은 늘 사용자가 고름(자동 판정 · 의료 표현 배제). 워치는 Supabase 세션을 공유할 수 없어 폰이 발급한 기기 토큰(해시만 저장)으로 기록 RPC를 직접 호출해, 폰 앱이 꺼져 있어도 저장
-- **Evidence** — 가입자의 59%가 실제 기록 작성(작성자 1인당 평균 31건, 최다 855건), 앱을 열지 않고도 색을 고를 수 있는 인터랙티브 홈 위젯 · iOS 잠금화면 위젯, 2.3.0(2026.10, iOS)에서 건강 데이터 연결과 Apple Watch · Galaxy Watch 기록 출시 — Android는 Health Connect 권한을 걸음 · 수면으로 좁혀 2.4.0과 함께 재제출
-- **Next** — 2.4.0(개발 완료, 2026.11 제출 목표): 위젯 · Siri에서 앱을 열지 않고 바로 기록(워치와 같은 기기 토큰 RPC 재사용), 연간 레이어 뷰 개편, 12월에 열리는 연말 「Year in Color」 공유 카드, 같은 날 동시 저장 경합을 upsert로 해소. 이후 2.5.0 기록 내보내기(CSV · JSON), 2.6.0 가족 · 친구 색 공유(옵트인) 계획
+- **Evidence** — 가입자의 59%가 실제 기록 작성(작성자 1인당 평균 31건, 최다 855건), 앱을 열지 않고도 색을 고를 수 있는 인터랙티브 홈 위젯 · iOS 잠금화면 위젯, 2.3.0(2026.10)에서 건강 데이터 연결(Android는 Health Connect 권한을 걸음 · 수면으로 최소화)과 Apple Watch · Galaxy Watch 기록, 2.4.0에서 위젯 · Siri로 앱을 열지 않고 바로 기록(워치와 같은 기기 토큰 RPC 재사용) · 연간 레이어 뷰 개편 · 연말 「Year in Color」 공유 카드 출시, 같은 날 동시 저장 경합은 upsert로 해소
 
 ---
 
@@ -246,8 +245,7 @@ notion: 363a3015-22b8-81df-acde-dadc28a0814d
 - **Problem** — 함께 쓰는 캘린더가 필요하지만, 예약 내용을 손으로 옮겨 적는 게 번거로움
 - **Engineering Challenge** — 형식 없는 예약 문자를 믿을 만한 일정으로 바꾸기, 그리고 반복 · 다중일 · 연말연시에 걸친 기념일이 화면마다 다른 날짜에 뜨던 문제
 - **Design Decision** — 문자를 공유 시트로 넘기면 Edge Function이 Gemini 구조화 출력으로 파싱하고, 예약 여부 · 신뢰도 0.5 이상 · 시각 파싱이 모두 통과할 때만 프리필. 백그라운드 문자 감지는 플랫폼 정책 · 프라이버시 때문에 배제. 반복 일정은 한 행만 저장하고 표시 시점에 계산하며, 4곳에 중복된 판정을 `occursOn` 하나로 통합
-- **Evidence** — App Store · Play Store 실서비스, 도메인 이전 전에 보낸 초대 링크도 계속 열림
-- **Next** — 다음 업데이트(메인 반영 완료): 일정 검색, 공간 전체 사진 앨범, 초대 미리보기와 Android 설치 리퍼러로 초대 이어받기, Remote Config로 단계 공개할 일정 사진 공유 · 날짜 투표 · 댓글 @멘션 푸시(서버 반영 완료). 이후 만료형 초대 토큰 · 주/월 반복 · ICS 내보내기 계획
+- **Evidence** — App Store · Play Store 실서비스, 도메인 이전 전에 보낸 초대 링크도 계속 열림. 일정 검색 · 공간 전체 사진 앨범 · 일정 사진 공유 · 날짜 투표 · 댓글 @멘션 푸시를 Remote Config로 단계 공개, 초대 미리보기와 Android 설치 리퍼러로 설치 후에도 초대를 이어받음
 
 ---
 
@@ -264,8 +262,7 @@ notion: 363a3015-22b8-81df-acde-dadc28a0814d
 - **Problem** — 여행지의 실제 장소에 기록을 남기고, 그 근처에 온 사람만 열어볼 수 있게 하기
 - **Engineering Challenge** — iOS가 백그라운드에서 감시할 수 있는 영역은 20개가 한도인데, 주변 기록은 얼마든지 있을 수 있음
 - **Design Decision** — 가장 가까운 18개 + 반경 3km 「재중심」 지오펜스 1개만 감시하고, 그 경계를 벗어나면 목록을 갱신. 배터리를 쓰고 심사에서 설명하기 어려운 상시 백그라운드 GPS 대신 선택. 여정은 수동 입력 대신 사진 EXIF 좌표 + 근접 군집화 · PostGIS로 복원
-- **Evidence** — App Store · Play Store 실서비스, 회고 하이라이트는 Gemini로 생성하고 도시 배지 이미지는 Gemini 이미지 모델이 안 되면 FLUX.1로 대체 생성
-- **Next** — 다음 업데이트(메인 반영 완료): 한국어 · 영어 · 스페인어 · 일본어 4개 언어(푸시 · AI 하이라이트 포함), 지도 목록 모드 · 장소 검색 · 마커 군집화, 회고 공유 카드 3종, 사진 분류 수정 · 실행 취소. 출시 후 최소 버전을 올리고 서버 보안 RPC를 단계 적용. 이후 공간 슬롯 인앱 결제 · 실시간 협업 · 홈 위젯 계획
+- **Evidence** — App Store · Play Store 실서비스, 회고 하이라이트는 Gemini로 생성하고 도시 배지 이미지는 Gemini 이미지 모델이 안 되면 FLUX.1로 대체 생성. 한국어 · 영어 · 스페인어 · 일본어 4개 언어(푸시 · AI 하이라이트 포함), 지도 목록 모드 · 장소 검색 · 마커 군집화, 회고 공유 카드 3종
 
 ---
 
@@ -274,7 +271,7 @@ notion: 363a3015-22b8-81df-acde-dadc28a0814d
 | 항목 | 내용 |
 | --- | --- |
 | 기간 | 2026.03 ~ 현재 |
-| 플랫폼 | iOS · Android (Flutter, 실서비스 중) · [App Store](https://apps.apple.com/app/id6761645899) · [Google Play](https://play.google.com/store/apps/details?id=com.wayArchive.joonhwan.way_archive) · [소개 페이지](https://apps.joon.is-a.dev/gilmok/) |
+| 플랫폼 | iOS · Android · Web (Flutter, 실서비스 중) · [App Store](https://apps.apple.com/app/id6761645899) · [Google Play](https://play.google.com/store/apps/details?id=com.wayArchive.joonhwan.way_archive) · [웹](https://apps.joon.is-a.dev/gilmok/) |
 | 주요 기술 | Flutter · Dart · Riverpod · go_router · Drift (SQLite) · Supabase · flutter_map · vector_map_tiles (OpenFreeMap) · Firebase |
 
 > Google My Maps · 네이버 지도에 모아둔 장소를 가져와 네트워크 없이 쓰는 오프라인 우선 지도 앱
@@ -282,8 +279,7 @@ notion: 363a3015-22b8-81df-acde-dadc28a0814d
 - **Problem** — My Maps에 모아둔 장소가 정작 데이터가 안 터지는 해외에서 쓸모가 없음
 - **Engineering Challenge** — URL 하나로 지도를 통째로 가져와 재동기화하고, 오프라인 타일 위에 수천 개 마커를 폰에서 끊김 없이 그리기
 - **Design Decision** — Drift(SQLite)를 원본, Supabase는 선택적 동기화로 두어 네트워크 없이 모든 기능이 동작(클라우드 우선이면 가장 필요한 곳에서 실패). 마커를 전부 그리는 대신 supercluster 군집화, 타일 캐시를 제어하려고 flutter_map을 래퍼 없이 직접 사용
-- **Evidence** — App Store · Play Store 실서비스, 사용자 지도 한 장에 최대 2,798개(누적 8,002개) 마커를 성능 저하 없이 렌더링
-- **Next** — 다음 업데이트(메인 반영 완료, 테스트 348개 통과): 한국어 · 영어 · 스페인어 · 일본어 4개 언어, 전체 지도 검색, KML · GeoJSON · CSV 내보내기와 백업 · 병합 복원, GPX · KML · KMZ 가져오기, 마커 사진, 스마트 컬렉션 · 여행 모드, Android 홈 위젯, 읽기 전용 지도 공유 링크(웹 뷰어는 joon-dev에 배포 완료, Remote Config로 공개)
+- **Evidence** — App Store · Play Store 실서비스, 사용자 지도 한 장에 최대 2,798개(누적 8,002개) 마커를 성능 저하 없이 렌더링. 4개 언어, 전체 지도 검색, KML · GeoJSON · CSV 내보내기와 백업 · 병합 복원, GPX · KML · KMZ 가져오기, 마커 사진 · 스마트 컬렉션 · 여행 모드, Android 홈 위젯, 읽기 전용 지도 공유 링크(테스트 348개)
 
 ---
 
@@ -300,8 +296,7 @@ notion: 363a3015-22b8-81df-acde-dadc28a0814d
 - **Problem** — 랜덤 여행 추천은 재밌지만, 가진 시간과 이동수단으로 못 가는 곳이 나오면 쓸모가 없음
 - **Engineering Challenge** — 같은 환승역이 노선마다 다른 이름이라 지하철 직통 · 1회 환승 경로 계산이 깨짐
 - **Design Decision** — 먼저 거르고 뽑기: 이동수단별 거리 범위로 후보를 제한한 뒤 추첨해 모든 결과가 도달 가능(뽑고 나서 다시 뽑는 방식은 추첨을 낭비하고 반복에 빠질 수 있음). 역 이름은 경로 계산 전에 정규화
-- **Evidence** — App Store · Play Store 실서비스, 룰렛 · 사다리 · 카드 뽑기 UI와 번갈아 뽑는 커플 모드. 1.1.0(2026.10)에서 돌아오는 길 · 영업시간 · 막차 안전장치를 넣고, 앱의 DB 직접 연결을 Firebase 익명 토큰 + Neon Data API · RLS로 교체
-- **Next** — 「실행 가능한 코스」(메인 반영 완료, 테스트 309개 통과): 시간표 기반 제약 코스 엔진과 Top 3 · 트레이드오프 비교, 정보 상태 표시(실시간 · 시간표 · 추정), 코스 진행을 Android 알림 · iOS Live Activity로 표시. 이후 프리미엄 결제 · 홈 위젯 · 지역 확장 계획
+- **Evidence** — App Store · Play Store 실서비스, 룰렛 · 사다리 · 카드 뽑기 UI와 번갈아 뽑는 커플 모드. 1.1.0(2026.10)에서 돌아오는 길 · 영업시간 · 막차 안전장치를 넣고, 앱의 DB 직접 연결을 Firebase 익명 토큰 + Neon Data API · RLS로 교체. 이어서 시간표 기반 제약 코스 엔진(Top 3 · 트레이드오프 비교, 실시간 · 시간표 · 추정 정보 표시)과 코스 진행 Android 알림 · iOS Live Activity 추가(테스트 309개)
 
 ---
 
@@ -310,7 +305,7 @@ notion: 363a3015-22b8-81df-acde-dadc28a0814d
 | 항목 | 내용 |
 | --- | --- |
 | 기간 | 2026.10 ~ 현재 |
-| 플랫폼 | iOS · Android (Flutter, 1.0.0 스토어 심사 제출) · [소개 페이지](https://apps.joon.is-a.dev/discard/) |
+| 플랫폼 | iOS (출시) · Android (심사 중) · Flutter · [App Store](https://apps.apple.com/app/id6819698341) · [소개 페이지](https://apps.joon.is-a.dev/discard/) |
 | 주요 기술 | Flutter · Riverpod · go_router · Drift (SQLite) · Neon (Data API · Storage · Functions) · Firebase (Auth · App Check · Analytics · Crashlytics · Remote Config) · Apple Vision / ML Kit · home_widget |
 
 > 버린 물건을 번호 붙은 전시품처럼 기록해 나의 소비 · 소유 패턴을 보여주는 앱
@@ -318,8 +313,7 @@ notion: 363a3015-22b8-81df-acde-dadc28a0814d
 - **Problem** — 무엇을 버리는지도 무엇을 사는지만큼 습관을 말해 주지만, 그 패턴을 볼 방법이 없음
 - **Engineering Challenge** — 여러 기기 간 로컬 우선 동기화: 기기 시각은 초 단위라 같은 초의 수정을 못 가리고, 두 기기가 같은 전시 번호를 만들 수 있으며, 동기화가 쓴 내용이 다음 동기화를 부르는 무한 반복
 - **Design Decision** — Drift를 원본으로 두고 Neon Data API(Firebase JWT + RLS)로 기기 시각이 아닌 서버 시계 커서 기준 증분 동기화, 겹친 번호는 모든 기기가 같은 답을 내는 규칙으로 재번호. 사진은 저장소에 직접 접근시키지 않고 Neon Function이 용량 · 개수 한도와 App Check를 거쳐 서명 URL 발급. 누끼는 기기 안에서(Vision / ML Kit) 처리해 사진을 외부로 보내지 않음
-- **Evidence** — 동기화 · 도메인 규칙 · 스키마 업그레이드를 검증하는 단위 · 마이그레이션 테스트 132개
-- **Next** — 1.1.0(메인 반영 완료, 서버 마이그레이션 적용): 아직 가진 물건을 두는 「수장고」, 사용 기록 · 하루당 비용 · 재구매 감지, 선물 · 수리 이벤트와 사용 확인 알림, 한국어 · 영어 · 스페인어 · 일본어와 기기 지역 기준 통화. 출시 후 Remote Config로 단계 공개
+- **Evidence** — 동기화 · 도메인 규칙 · 스키마 업그레이드를 검증하는 단위 · 마이그레이션 테스트 132개. 1.1.0에서 아직 가진 물건을 두는 「수장고」, 사용 기록 · 하루당 비용 · 재구매 감지, 선물 · 수리 이벤트, 4개 언어와 기기 지역 기준 통화 추가
 
 ---
 
@@ -328,7 +322,7 @@ notion: 363a3015-22b8-81df-acde-dadc28a0814d
 | 항목 | 내용 |
 | --- | --- |
 | 기간 | 2026.10 ~ 현재 |
-| 플랫폼 | iOS · Android (Flutter, 스토어 출시 예정) · [소개 페이지](https://apps.joon.is-a.dev/almost/) |
+| 플랫폼 | iOS (출시) · Android (심사 중) · Flutter · [App Store](https://apps.apple.com/app/id6820918569) · [소개 페이지](https://apps.joon.is-a.dev/almost/) |
 | 주요 기술 | Flutter · Riverpod · go_router · CustomPainter · Neon (Postgres · Data API) · Firebase (Auth · Analytics · Crashlytics · Remote Config) · flutter_local_notifications |
 
 > 하고 싶은 일을 적어 두면 때가 되어 물어보고, 해낸 일은 꽃밭에 · 그만둔 일은 묘지에 남기는 앱
@@ -336,26 +330,7 @@ notion: 363a3015-22b8-81df-acde-dadc28a0814d
 - **Problem** — 하려던 일은 조용히 잊혀 감. 때가 되면 물어보고, 해낸 일은 꽃으로 · 그만둔 일은 묘비로 남겨 돌아보게 하기
 - **Engineering Challenge** — 앱 서버가 없음: 클라이언트가 Neon Data API로 Postgres와 바로 통신하므로 소유권 · 한도 · 유료 아이템을 DB가 지켜야 함. 콜드 스타트 직후 갓 발급된 토큰에선 사용자 id가 비어 RLS가 조용히 빈 결과를 돌려줌
 - **Design Decision** — 직접 운영해야 하는 백엔드 대신 규칙을 Postgres에 둠(RLS · 트리거 · CHECK, 공개 묘지는 SECURITY DEFINER RPC). RLS는 빈 결과 대신 오류를 내고 클라이언트가 재시도. 확인 알림은 iOS 대기 한도(64) 안에서 가까운 50개만 재예약
-- **Evidence** — 익명 사용자 여럿으로 RLS · 트리거 · RPC를 검증하는 16단계 서버 E2E, 앱 카탈로그와 서버 시드를 대조하는 테스트를 포함한 Flutter 테스트 111개
-- **Next** — 다음 업데이트(메인 반영 완료, Remote Config 기본 꺼짐): 목표 이벤트 기록과 「포기의 패턴」 화면, 동기 × 결과 분석, 시작까지 걸린 기간의 중앙값(Kaplan–Meier), 연간 회고 카드 공유. 이후 실제 인앱 결제 계획
-
----
-
-## ShapeLog — 사진 속 동그라미를 맞춰 잇는 매치컷 영상 앱
-
-| 항목 | 내용 |
-| --- | --- |
-| 기간 | 2026.10 ~ 현재 |
-| 플랫폼 | iOS · Android (Flutter, 스토어 출시 예정) |
-| 주요 기술 | Flutter · dart:ui · FFmpeg (하드웨어 인코딩) · 순수 Dart Hough 원 감지 · image_picker · video_player |
-
-> 서로 다른 사진 속 동그라미를 찾아 같은 자리 · 크기에 맞추고, 음악 박자에 맞춰 이어 붙인 매치컷 영상을 만드는 앱 — 로그인 · 서버 없이 기기 안에서 처리
-
-- **Problem** — 매치컷 영상은 지금 Lightroom · CapCut에서 사진을 한 장씩 손으로 확대 · 이동해 만듦
-- **Engineering Challenge** — 서로 다른 사진(EXIF 회전 포함)에서 같은 원을 찾아 위치 · 크기를 맞추고, 박자에 맞춘 프레임을 폰에서 바로 영상으로 만들기
-- **Design Decision** — 자동 감지(순수 Dart Hough) → 후보 탭 → 핀치 미세조정 3단계로 수작업을 줄이고, 확신도가 높은 후보만 자동 적용 · 나머지는 「확인 필요」로 모아 넘김. 컷 길이는 초가 아니라 BPM 단위, 프레임은 dart:ui로 그려 FFmpeg 하드웨어 인코더로 인코딩, 저장은 프로젝트당 JSON 1개
-- **Evidence** — 합성 사진 10장(EXIF 회전 포함)에서 원 중심 오차 1% 미만 · 반지름 오차 0.5% 미만으로 전부 자동 적용
-- **Next** — 1.0 스토어 제출 후 v1.1 사각형, v1.2 얼굴(Vision / ML Kit) 감지 추가 계획
+- **Evidence** — 익명 사용자 여럿으로 RLS · 트리거 · RPC를 검증하는 16단계 서버 E2E, 앱 카탈로그와 서버 시드를 대조하는 테스트를 포함한 Flutter 테스트 111개. 목표 이벤트 기록과 「포기의 패턴」 화면, 동기 × 결과 분석, 시작까지 걸린 기간의 중앙값(Kaplan–Meier), 연간 회고 카드 공유
 
 ---
 
@@ -373,7 +348,6 @@ notion: 363a3015-22b8-81df-acde-dadc28a0814d
 - **Engineering Challenge** — 빠짐없고 정확한 데이터 확보. 인증키 없이 호출하면 페이지 인자를 무시하고 같은 5행을 총건수만 정상으로 돌려주는 API, 의원 코드 없이 이름(한자 · 띄어쓰기 · 괄호 표기 혼재)만 주는 출결 · 겸직 데이터
 - **Design Decision** — LLM은 「이 공약과 이 기록이 같은 일인가」만 판단하고, 이행 여부는 공개된 SQL 규칙표가 결정 — 다시 돌려도 같은 답이 나오고 누구나 검증 가능. 측정할 근거가 없는 공약은 억지로 판정하지 않고 판단불가로 남김(국회의원 공약 중 입법형은 약 10%)
 - **Evidence** — 선거공보 1,683건에서 공약 21,336건 추출, 국회의원 3,239명 · 단체장 · 교육감 259명 기록을 GitHub Actions로 정기 갱신, 소스와 판정 규칙 공개. 공동발의 네트워크 그래프, 출결 · 재산 · 겸직 · 해외출장 · 연구단체 기록, 같은 선거구 후보 간 공약 비교 제공
-- **Next** — 같은 선거구 후보 공약 매칭을 매일 상위 모델로 다시 돌려 이전 결과를 교체하는 중
 
 ---
 
@@ -391,7 +365,6 @@ notion: 363a3015-22b8-81df-acde-dadc28a0814d
 - **Engineering Challenge** — Vite · Next.js 앱을 한 Firebase Hosting 사이트의 서브패스로 서빙 — rewrites · 캐시 헤더, 끝 슬래시 없이 들어오면 빈 화면이 뜨는 문제
 - **Design Decision** — `apps.config.json` 하나에서 sitemap · Remote Config · Hosting rewrites/headers/redirects를 생성해 손으로 고치는 파일을 없앰. 끝 슬래시 리다이렉트는 glob이 슬래시를 무시해 무한 리다이렉트가 되므로 regex 사용
 - **Evidence** — master 푸시마다 빌드 · 배포 후 smoke-check가 모든 서브패스의 HTTP 200 + title을 확인, PR마다 Firebase 미리보기 채널. 앱 페이지의 스토어 버전 · 릴리스 노트는 App Store 조회로 채우고, 길목의 읽기 전용 지도 공유 뷰어(/s/:token)도 여기서 서빙
-- **Next** — 앱별로 따로 있던 옛 Firebase Hosting 사이트 6개 정리(리다이렉트 배포 완료, 남은 앱 출시 후 종료), Discard · Almost · ShapeLog 페이지는 출시와 함께 공개
 
 ---
 
@@ -409,4 +382,3 @@ notion: 363a3015-22b8-81df-acde-dadc28a0814d
 - **Engineering Challenge** — 어트리뷰션. 게시 → 클릭 → 설치 퍼널이 좋아 보였지만 클릭 대부분이 크롤러였고, UA 규칙은 크롤러가 버전을 바꿀 때마다 뚫렸으며 범위를 넓히면 축약 UA를 쓰는 실제 안드로이드 사용자가 빠짐
 - **Design Decision** — CMO · ContentWriter · PerformanceAnalyst · SocialMediaManager 4개 에이전트가 기획 · 작성 · 분석을 나누고, 발행은 GitHub Actions 대신 Supabase pg_cron + pg_net으로 서버에서 처리(앱별 슬롯 라우팅 — Threads 하루 4회 + Instagram 지역별 카드 · 캐러셀 · Reels, 국내 전용 프로젝트 3개는 한국어 슬롯을 번갈아 사용). 봇 판정은 타이밍 · IP 평판(게시 60초 내 도착 · 같은 UA 120초 내 재등장 · 이미 봇으로 찍힌 IP)으로 바꾸고, 집계는 블랙리스트 → 실제 플랫폼 화이트리스트로 전환(크롤러는 UA를 계속 바꾸므로 블랙리스트는 항상 뒤처짐), 과거 데이터는 소급 정정
 - **Evidence** — 2026.04부터 자동 발행 운영 중이며, 2026.10 8개 프로젝트로 확장하고 앱마다 9:16 숏폼 영상을 매일 자동 렌더링. 자기 클릭 · 테스트 설치는 따로 분류하고(디버그 빌드 · 30분 내 3건 이상 연속 설치 자동 표시) 봇 클릭에 부풀려진 가중치를 소급 정정. 봇 수치는 숨기지 않고 따로 표기해, 0이 되면 계측이 멈췄다는 신호로 사용
-- **Next** — Threads 키워드 검색 기반 답글 참여는 Meta 권한 심사(사업자 인증) 대기로 보류, X는 API 크레딧 소진으로 휴면(인프라 유지)

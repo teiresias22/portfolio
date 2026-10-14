@@ -54,7 +54,7 @@ function updated(name, lang) {
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;')
 
 const EMOJI = /^(?:\p{Extended_Pictographic}|\uFE0F|\u200D)+\s*/u
-const FACTS = 'Problem|Engineering Challenge|Design Decision|Evidence|Next'
+const FACTS = 'Problem|Engineering Challenge|Design Decision|Evidence'
 const slug = (s) => s.replace(/<[^>]+>/g, '').toLowerCase().replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-|-$/g, '')
 
 function toHtml(body, tocDepth, t) {
@@ -77,7 +77,7 @@ function toHtml(body, tocDepth, t) {
       if (n <= tocDepth) toc.push({ n: Number(n), id, text: inner.replace(/<code>[\s\S]*?<\/code>/g, '').replace(/<[^>]+>/g, '').trim() })
       return `<h${n} id="${id}"><a class="anchor" href="#${id}">${inner}</a></h${n}>`
     })
-    // Problem / Challenge / Decision / Evidence / Next lists get a label column.
+    // Problem / Challenge / Decision / Evidence lists get a label column.
     .replace(new RegExp(`<li><strong>(${FACTS})</strong> — `, 'g'), '<li class="fact"><span class="k">$1</span><span class="v">')
     .replace(/(<li class="fact">[\s\S]*?)<\/li>/g, '$1</span></li>')
     .replace(/<ul>\n<li class="fact">/g, '<ul class="facts">\n<li class="fact">')

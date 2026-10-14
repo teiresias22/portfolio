@@ -99,8 +99,9 @@ notion: 363a3015-22b8-8145-9b66-c083ecf7b661
 | [여운 (Yeowun)](https://apps.joon.is-a.dev/yeowun/) — 장소에 남기는 위치 기반 기록 앱 | 2026.01 ~ | 실서비스 | Flutter · Gemini AI · PostGIS · 백그라운드 지오펜싱 |
 | [길목 (Gilmok)](https://apps.joon.is-a.dev/gilmok/) — 오프라인 우선 지도 앱 | 2026.03 ~ | 실서비스 | Flutter · Drift · Supabase · flutter_map · 오프라인 우선 |
 | [Pick and Go](https://apps.joon.is-a.dev/pick-and-go/) — 갈 수 있는 랜덤 여행 코스 뽑기 앱 | 2026.06 ~ | 실서비스 | Flutter · Riverpod · Neon · Gamification |
-| [Discard](https://apps.joon.is-a.dev/discard/) — 내가 버린 것들의 박물관 | 2026.10 ~ | 스토어 출시 예정 | Flutter · Drift · Neon (Data API · Storage · Functions) · Firebase Auth/App Check · Vision/ML Kit 누끼 · home_widget |
+| [Discard](https://apps.joon.is-a.dev/discard/) — 내가 버린 것들의 박물관 | 2026.10 ~ | 스토어 심사 제출 | Flutter · Drift · Neon (Data API · Storage · Functions) · Firebase Auth/App Check · Vision/ML Kit 누끼 · home_widget |
 | [Almost](https://apps.joon.is-a.dev/almost/) — 하려다 만 것들의 묘지 | 2026.10 ~ | 스토어 출시 예정 | Flutter · CustomPainter 장면 렌더링 · Neon (Postgres RLS · 트리거 · RPC) · Firebase Auth · 4개 언어 |
+| ShapeLog — 사진 속 동그라미를 맞춰 잇는 매치컷 영상 앱 | 2026.10 ~ | 스토어 출시 예정 | Flutter · dart:ui · FFmpeg · 순수 Dart Hough 원 감지 · 기기 내 처리 |
 | [누렁소검은소](https://nureongso.joon.is-a.dev) — 선출직 공약 · 의정활동 공개 기록 ([GitHub](https://github.com/teiresias22/nureongso)) | 2026.09 ~ | 운영 중 (웹) | Next.js 16 · Supabase · Python 공공데이터 수집 파이프라인 · LLM 공약 판정 · Vercel |
 | [joon-dev 웹](https://apps.joon.is-a.dev/) — 개인 프로젝트 허브 | 2026.07 ~ | 운영 중 | pnpm 모노레포 · Vite/Next.js · Firebase Hosting · GitHub Actions |
 | 멀티앱 마케팅 자동화 — 자체 앱 홍보용 별도 시스템 | 2026.04 ~ | 운영 중 | Claude Agent SDK · Supabase pg_cron · Threads/Instagram Graph API · 어트리뷰션 계측 |
@@ -146,7 +147,7 @@ notion: 363a3015-22b8-8145-9b66-c083ecf7b661
 
 ### 마케팅 자동화 (자체 앱 홍보용 별도 시스템)
 
-- **Claude Code Agent SDK** — 자체 앱 5개 마케팅 자동화, 멀티에이전트 오케스트레이션 + Supabase pg_cron 게시 파이프라인, **Threads · Instagram Graph API**
+- **Claude Code Agent SDK** — 자체 프로젝트 8개(앱 7 · 웹 1) 마케팅 자동화, 멀티에이전트 오케스트레이션 + Supabase pg_cron 게시 파이프라인, **Threads · Instagram Graph API**
 - **어트리뷰션 계측 설계** — UTM 리다이렉터 기반 게시 → 클릭 → 설치 퍼널을 구축한 뒤, 봇 판정을 UA 문자열에서 **타이밍 · IP 평판 기반으로 재설계**해, 크롤러가 진성 클릭으로 새던 **자사 지표를 직접 부정하고 과거 데이터까지 소급 정정**(집계도 블랙리스트 → 화이트리스트로 전환)
 
 ### 지도 · 인증 · 결제

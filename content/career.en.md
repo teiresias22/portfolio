@@ -210,7 +210,7 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 
 # 🌟 Personal projects (solo)
 
-> Planning, design, development and release all done alone. **5 apps are live on the App Store and Google Play**, and 2 more are coming soon. I care less about the number of apps than about **keeping many apps maintainable by one person** — landing pages and terms are generated and deployed from the `joon-dev` monorepo, and one tag push ships iOS and Android together. The marketing automation that promotes the apps is listed separately at the end.
+> Planning, design, development and release all done alone. **5 apps are live on the App Store and Google Play**, and 3 more (Discard · Almost · ShapeLog) are about to launch. Each project's **Next** is the next update — already merged to the main branch or planned. I care less about the number of apps than about **keeping many apps maintainable by one person** — landing pages and terms are generated and deployed from the `joon-dev` monorepo, and one tag push ships iOS and Android together. The marketing automation that promotes the apps is listed separately at the end.
 
 ---
 
@@ -220,14 +220,15 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 | --- | --- |
 | Period | 2024.03 – present |
 | Platform | iOS · Android (live) · [App Store](https://apps.apple.com/app/id6443436725) · [Google Play](https://play.google.com/store/apps/details?id=com.colorofdays.color_of_days) · [Website](https://apps.joon.is-a.dev/colorofdays/) |
-| Main tech | Flutter · Riverpod · Freezed · Supabase (Edge Functions · pg_cron) · Firebase · home_widget · fl_chart · local_auth · HealthKit · Health Connect · watchOS · Wear OS |
+| Main tech | Flutter · Riverpod · Freezed · Supabase (Edge Functions · pg_cron) · Firebase · Gemini · home_widget · fl_chart · local_auth · HealthKit · Health Connect · watchOS · Wear OS · App Intents |
 
 > A mood diary that records each day as one of seven colors — yearly calendar, stats, recaps, home/lock-screen widgets, health data and watch logging; my longest-running personal app
 
 - **Problem** — A mood record that only takes picking a color, even on days you don't feel like writing — and the entries should come back as a year of patterns
 - **Engineering Challenge** — Getting meaningful insight from entries that are just a color and a short note (when insights relied on tags, a user with 800 days of entries still saw "need more data"); a streak computed separately on client and server that could disagree; an AI recap that must not send anyone's diary text; and showing health data such as sleep, steps and heart rate next to the mood without it ever leaving the device
-- **Design Decision** — Insights, weekly/monthly recaps and tag suggestions are on-device pure functions pinned by unit tests; insights read color, weekday and tags, so they work without tags. One streak function is the single source, and the evening "your streak is about to break" push (Edge Function + pg_cron) is tested to follow the same rule. The AI recap sends only color sequences and tag counts, never diary text, falls back to static copy on failure, and sits behind a Remote Config kill switch. Health data comes through my own MethodChannel from the HealthKit / Health Connect aggregate APIs as daily values only (the platform removes duplicates such as iPhone + Watch), and raw values never go to the server, analytics SDKs or logs; a link to mood is shown as one line under "Patterns" only when a Spearman correlation clears the bar (14+ paired days, |ρ| ≥ max(0.3, 2/√n)) — the user always picks the color (no automatic judgment, no medical wording). Watches can't share the Supabase session, so they call the record RPC directly with a device token issued by the phone (only its hash is stored), and entries save even when the phone app is closed
-- **Evidence** — 59% of sign-ups write entries (31 per writer on average, up to 855); interactive home-screen and iOS lock-screen widgets let users pick a color without opening the app; 2.3.0 (October 2026) shipped health data and Apple Watch / Galaxy Watch logging
+- **Design Decision** — Insights, weekly/monthly recaps and tag suggestions are on-device pure functions pinned by unit tests; insights read color, weekday and tags, so they work without tags. One streak function is the single source, and the evening "your streak is about to break" push (Edge Function + pg_cron) is tested to follow the same rule. The AI recap sends only color ranks (0–6) and built-in tag counts, never diary text or custom tags, falls back to static copy on failure, and sits behind a Remote Config kill switch. Health data comes through my own MethodChannel from the HealthKit / Health Connect aggregate APIs as daily values only (the platform removes duplicates such as iPhone + Watch), and raw values never go to the server, analytics SDKs or logs; a link to mood is shown as one line under "Patterns" only when a Spearman correlation clears the bar (14+ paired days, |ρ| ≥ max(0.3, 2/√n)) — the user always picks the color (no automatic judgment, no medical wording). Watches can't share the Supabase session, so they call the record RPC directly with a device token issued by the phone (only its hash is stored), and entries save even when the phone app is closed
+- **Evidence** — 59% of sign-ups write entries (31 per writer on average, up to 855); interactive home-screen and iOS lock-screen widgets let users pick a color without opening the app; 2.3.0 (October 2026, iOS) shipped health data and Apple Watch / Galaxy Watch logging — on Android, Health Connect access was narrowed to steps and sleep for resubmission with 2.4.0
+- **Next** — 2.4.0 (built; store submission targeted for November 2026): record straight from the widget or Siri without opening the app (reusing the watch's device-token RPC), a redesigned yearly layer view, a year-end "Year in Color" share card that opens in December, and a same-day concurrent-save race fixed with an upsert. Then 2.5.0 data export (CSV · JSON) and 2.6.0 opt-in color sharing with family and friends
 
 ---
 
@@ -237,7 +238,7 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 | --- | --- |
 | Period | 2024.06 – present |
 | Platform | iOS · Android (Flutter, live) · [App Store](https://apps.apple.com/app/id6705135769) · [Google Play](https://play.google.com/store/apps/details?id=com.joonhwan.timewithme.time_with_me) · [Website](https://apps.joon.is-a.dev/time-with-me/) |
-| Main tech | Flutter · Supabase · Google Maps · home_widget · Firebase |
+| Main tech | Flutter · Riverpod · go_router · Supabase (Realtime · Edge Functions) · Gemini · Google Maps · home_widget · Firebase |
 
 > A shared calendar where friends, families and couples record memories together
 
@@ -245,6 +246,7 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 - **Engineering Challenge** — Turning free-form booking messages into reliable events, and anniversaries (yearly, multi-day, across New Year) that showed up on different dates on different screens
 - **Design Decision** — The user shares the message to the app; an Edge Function parses it with Gemini structured output and pre-fills only when the reservation flag, confidence ≥ 0.5 and the time parse all pass. Background SMS detection was ruled out for platform policy and privacy. Recurring events are stored as one row and computed at display time, with one `occursOn` function replacing four duplicated checks
 - **Evidence** — Live on the App Store and Google Play; invite links sent before a domain migration still open the app
+- **Next** — Next update (merged to main): event search, a space-wide photo album, invite previews with Android install-referrer handoff, and event photos, date polls and comment @mentions with push, rolled out through Remote Config (server side already applied). Then expiring invite tokens, weekly/monthly repeats and ICS export
 
 ---
 
@@ -254,14 +256,15 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 | --- | --- |
 | Period | 2026.01 – present |
 | Platform | iOS · Android (live) · [App Store](https://apps.apple.com/app/id6759911276) · [Google Play](https://play.google.com/store/apps/details?id=com.traceline.joon.trace_line) · [Website](https://apps.joon.is-a.dev/yeowun/) |
-| Main tech | Flutter · Supabase · PostGIS · Google Gemini AI · Firebase Hosting |
+| Main tech | Flutter · Supabase · PostGIS · native_geofence · Google Gemini AI · Firebase · PostHog |
 
 > A location-based journal: photos and notes left at a place open for other users when they get nearby
 
 - **Problem** — Let travelers leave records at real places that only people who come nearby can open
 - **Engineering Challenge** — iOS can monitor only 20 regions in the background, while any number of notes can be around the user
 - **Design Decision** — Monitor the 18 nearest notes plus one 3 km "re-centering" geofence; leaving it refreshes the set. Chosen over continuous background GPS, which drains battery and is hard to justify in review. Journeys are rebuilt from photo EXIF GPS with proximity clustering and PostGIS instead of manual entry
-- **Evidence** — Live on the App Store and Google Play, with Gemini-generated travel badges and recaps
+- **Evidence** — Live on the App Store and Google Play; recap highlights are written by Gemini, and city badge images fall back from Gemini image models to FLUX.1
+- **Next** — Next update (merged to main): Korean, English, Spanish and Japanese (pushes and AI highlights included), map list mode, place search and marker clustering, three recap share cards, and photo-classification edits with undo. After release the minimum version goes up and server security RPCs roll out in stages. Then in-app purchase for space slots, real-time collaboration and a home widget
 
 ---
 
@@ -270,15 +273,16 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 | Item | Details |
 | --- | --- |
 | Period | 2026.03 – present |
-| Platform | iOS · Android · Web (Flutter, live) · [App Store](https://apps.apple.com/app/id6761645899) · [Google Play](https://play.google.com/store/apps/details?id=com.wayArchive.joonhwan.way_archive) · [Web](https://apps.joon.is-a.dev/gilmok/) |
-| Main tech | Flutter · Dart · Riverpod · Drift (SQLite) · Supabase · flutter_map · Firebase |
+| Platform | iOS · Android (Flutter, live) · [App Store](https://apps.apple.com/app/id6761645899) · [Google Play](https://play.google.com/store/apps/details?id=com.wayArchive.joonhwan.way_archive) · [Website](https://apps.joon.is-a.dev/gilmok/) |
+| Main tech | Flutter · Dart · Riverpod · go_router · Drift (SQLite) · Supabase · flutter_map · vector_map_tiles (OpenFreeMap) · Firebase |
 
-> An offline-first map app that brings in places saved in Google My Maps and works without a network
+> An offline-first map app that brings in places saved in Google My Maps or Naver Map and works without a network
 
 - **Problem** — Places saved in My Maps are useless abroad, exactly where there's no data connection
 - **Engineering Challenge** — Importing whole maps from one URL and re-syncing them, and drawing thousands of markers smoothly on a phone over offline tiles
 - **Design Decision** — Drift (SQLite) is the source of truth and Supabase only an optional sync layer, so every feature works without a network (a cloud-first design would fail where it's needed most). Supercluster clustering instead of drawing every marker, and flutter_map driven directly, without wrappers, to control tile caching
 - **Evidence** — Live on the App Store and Google Play; users' maps hold up to 2,798 markers on a single map (8,002 in total) and render without slowdown
+- **Next** — Next update (merged to main, 348 tests passing): Korean, English, Spanish and Japanese, search across all maps, KML · GeoJSON · CSV export with backup and merge-restore, GPX · KML · KMZ import, marker photos, smart collections and trip mode, an Android home widget, and read-only map share links (the web viewer is already deployed on joon-dev, opened through Remote Config)
 
 ---
 
@@ -288,14 +292,15 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 | --- | --- |
 | Period | 2026.06 – present |
 | Platform | iOS · Android (Flutter, live) · [App Store](https://apps.apple.com/app/id6770894684) · [Google Play](https://play.google.com/store/apps/details?id=com.pickngo.joondev.pick_and_go) · [Website](https://apps.joon.is-a.dev/pick-and-go/) |
-| Main tech | Flutter · Dart · Riverpod · Freezed · go_router · Neon (serverless PostgreSQL) · Firebase |
+| Main tech | Flutter · Dart · Riverpod · go_router · Neon (Data API · RLS) · Firebase (Auth · Remote Config · Crashlytics) · AdMob |
 
 > Draws random trip courses you can actually reach, given your location, transport and time — like a game
 
 - **Problem** — Random trip ideas are fun until they land somewhere you can't reach with the time and transport you have
 - **Engineering Challenge** — The same transfer station is named differently on different subway lines, which breaks direct and one-transfer route finding
 - **Design Decision** — Filter first, then draw: candidates are limited to per-transport distance ranges before the random pick, so every result is reachable (drawing first and re-rolling wastes draws and can loop). Station names are normalized before routes are computed
-- **Evidence** — Live on the App Store and Google Play, with roulette / ladder / card-draw UI and a couple mode for taking turns
+- **Evidence** — Live on the App Store and Google Play, with roulette / ladder / card-draw UI and a couple mode for taking turns. 1.1.0 (October 2026) added return-trip, closing-time and last-train guards, and replaced the app's direct DB connection with Firebase anonymous tokens + Neon Data API and RLS
+- **Next** — "Courses you can actually do" (merged to main, 309 tests passing): a timetable-aware constraint engine with a top 3 and trade-offs, information status labels (live · timetable · estimated), and course progress as an Android notification and an iOS Live Activity. Then premium purchase, a home widget and more regions
 
 ---
 
@@ -304,15 +309,16 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 | Item | Details |
 | --- | --- |
 | Period | 2026.10 – present |
-| Platform | iOS · Android (Flutter, coming soon) · [Website](https://apps.joon.is-a.dev/discard/) |
-| Main tech | Flutter · Riverpod · go_router · Drift (SQLite) · Neon (Data API · Storage · Functions) · Firebase (Auth · App Check · Analytics · Crashlytics) · Apple Vision / ML Kit · home_widget |
+| Platform | iOS · Android (Flutter, 1.0.0 submitted for store review) · [Website](https://apps.joon.is-a.dev/discard/) |
+| Main tech | Flutter · Riverpod · go_router · Drift (SQLite) · Neon (Data API · Storage · Functions) · Firebase (Auth · App Check · Analytics · Crashlytics · Remote Config) · Apple Vision / ML Kit · home_widget |
 
 > Records what you throw away like numbered museum exhibits and shows your buying and owning patterns
 
 - **Problem** — What you throw away says as much about your habits as what you buy, but there's no way to see that pattern
 - **Engineering Challenge** — Local-first sync across devices: device clocks only store seconds and can't order edits within the same second, two devices can create the same exhibit number, and a sync's own writes could trigger the next sync forever
 - **Design Decision** — Drift is the source of truth; Neon Data API (Firebase JWT + RLS) syncs incrementally on a server-clock cursor instead of device time, and duplicate numbers are resolved by a rule every device computes identically. Photos never get direct storage access — a Neon Function issues signed URLs after size/count limits and App Check. Subject cutouts run on-device (Vision / ML Kit), so photos aren't sent anywhere to be processed
-- **Evidence** — 42 unit and migration tests covering sync, domain rules and schema upgrades
+- **Evidence** — 132 unit and migration tests covering sync, domain rules and schema upgrades
+- **Next** — 1.1.0 (merged to main, server migrations applied): a "storage room" for things you still own, usage logging, cost per day and rebuy detection, gift and repair events with usage-check reminders, and Korean, English, Spanish and Japanese with currency from the device region. Rolled out through Remote Config after release
 
 ---
 
@@ -322,14 +328,33 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 | --- | --- |
 | Period | 2026.10 – present |
 | Platform | iOS · Android (Flutter, coming soon) · [Website](https://apps.joon.is-a.dev/almost/) |
-| Main tech | Flutter · Riverpod · go_router · CustomPainter · Neon (Postgres · Data API) · Firebase (Auth · Analytics · Crashlytics) · flutter_local_notifications |
+| Main tech | Flutter · Riverpod · go_router · CustomPainter · Neon (Postgres · Data API) · Firebase (Auth · Analytics · Crashlytics · Remote Config) · flutter_local_notifications |
 
 > Write down what you want to do and it checks in when it's time; finished goals become flowers in a garden, abandoned ones a gravestone in a cemetery
 
 - **Problem** — Things you meant to do fade away quietly. Check in when it's time, and keep finished goals as flowers and abandoned ones as gravestones to look back on
 - **Engineering Challenge** — There is no app server: the client talks to Postgres through Neon Data API, so the database must enforce ownership, limits and paid items. On a cold-started database a freshly issued token could leave the user id empty, and RLS silently returned no rows
 - **Design Decision** — Rules live in Postgres (RLS, triggers, CHECK constraints, SECURITY DEFINER RPCs for public cemeteries) instead of a backend I'd have to run. RLS raises an error instead of returning nothing, and the client retries. Check-in reminders are rescheduled to the nearest 50 to stay under iOS's 64 pending-notification limit
-- **Evidence** — A 16-step server E2E script exercises RLS, triggers and RPCs with several anonymous users; 57 Flutter tests, including one that checks the in-app catalog against the server seed
+- **Evidence** — A 16-step server E2E script exercises RLS, triggers and RPCs with several anonymous users; 111 Flutter tests, including one that checks the in-app catalog against the server seed
+- **Next** — Next update (merged to main, off by default in Remote Config): goal event history and a "patterns of giving up" screen, motive × outcome analysis, median time-to-start (Kaplan–Meier), and a shareable year-recap card. Then real in-app purchases
+
+---
+
+## ShapeLog — match-cut videos from the circles in your photos
+
+| Item | Details |
+| --- | --- |
+| Period | 2026.10 – present |
+| Platform | iOS · Android (Flutter, coming soon) |
+| Main tech | Flutter · dart:ui · FFmpeg (hardware encoding) · pure-Dart Hough circle detection · image_picker · video_player |
+
+> Finds circles in different photos, pins them to the same position and size, and cuts the photos together on the music's beat into a match-cut video — on device, with no login or server
+
+- **Problem** — Match-cut videos are made today by zooming and moving each photo by hand in Lightroom or CapCut
+- **Engineering Challenge** — Finding the same circle across different photos (EXIF rotation included), lining up position and size, and rendering beat-timed frames into a video on the phone
+- **Design Decision** — Three steps cut the manual work: auto-detect (pure-Dart Hough), tap a candidate, pinch to fine-tune. Only high-confidence candidates apply automatically; the rest are queued as "needs a check". Cut length is set in beats (BPM), not seconds; frames are drawn with dart:ui and encoded by FFmpeg's hardware encoders; each project is a single JSON file
+- **Evidence** — On 10 synthetic photos (EXIF rotation included), every circle was applied automatically with centre error under 1% and radius error under 0.5%
+- **Next** — After the 1.0 store submission: squares in v1.1, then faces (Vision / ML Kit) in v1.2
 
 ---
 
@@ -346,7 +371,8 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 - **Problem** — Campaign booklets alone don't tell voters what an incumbent did last term, and pledges and records are scattered across six agencies as APIs, spreadsheets and PDFs
 - **Engineering Challenge** — Getting complete, correct data: an API that, called without a key, ignores paging and keeps returning the same 5 rows with a normal total count; attendance and side-job data that identify members only by name, mixed with hanja, spacing and bracket variants
 - **Design Decision** — The LLM only judges "is this record the same thing as this pledge?"; whether a pledge is fulfilled is decided by a published SQL rule table — reruns give the same answer and anyone can audit it. Pledges with nothing measurable are left as "cannot judge" instead of being forced into a verdict (only about 10% of lawmakers' pledges are legislative)
-- **Evidence** — 21,336 pledges extracted from 1,683 election bulletins; records for 3,239 lawmakers and 259 governors, mayors and superintendents refreshed by scheduled GitHub Actions; source code and judging rules are public
+- **Evidence** — 21,336 pledges extracted from 1,683 election bulletins; records for 3,239 lawmakers and 259 governors, mayors and superintendents refreshed by scheduled GitHub Actions; source code and judging rules are public. Also a co-sponsorship network graph; attendance, assets, outside jobs, overseas trips and research groups; and pledge comparison between candidates in the same district
+- **Next** — Re-running same-district candidate pledge matching daily with a stronger model to replace the earlier results
 
 ---
 
@@ -358,12 +384,13 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 | Platform | Web · [Website](https://apps.joon.is-a.dev/) |
 | Main tech | pnpm monorepo · Vite + React · Next.js 16 · TypeScript · Firebase Hosting · GitHub Actions |
 
-> A pnpm monorepo that merged every app's separate landing and terms sites into one Firebase Hosting site
+> A pnpm monorepo that merged every app's separate landing and terms sites into one Firebase Hosting site — 9 apps and 1 external project, Korean and English pages, and a showreel video per app
 
 - **Problem** — Each app had its own hosting site, landing page and terms, and adding an app meant editing several config files by hand
 - **Engineering Challenge** — Serving Vite and Next.js apps under subpaths of one Firebase Hosting site — rewrites, cache headers, and a blank page when an app was opened without a trailing slash
 - **Design Decision** — One `apps.config.json` generates the sitemap, Remote Config and Hosting rewrites/headers/redirects, so none of them are edited by hand. Trailing-slash redirects use regex because Hosting's glob matching ignores the slash and would loop
-- **Evidence** — Every push to master builds, deploys and runs a smoke check that requests every subpath for HTTP 200 and a page title
+- **Evidence** — Every push to master builds, deploys and runs a smoke check that requests every subpath for HTTP 200 and a page title; every PR gets a Firebase preview channel. App pages fill in store versions and release notes from the App Store lookup, and Gilmok's read-only map share viewer (/s/:token) is served here too
+- **Next** — Retiring the six old per-app Firebase Hosting sites (redirects deployed; shut down once the remaining apps ship), and opening the Discard, Almost and ShapeLog pages as each launches
 
 ---
 
@@ -372,12 +399,13 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 | Item | Details |
 | --- | --- |
 | Period | 2026.04 – present (since automated publishing) |
-| Platform | Threads · Instagram (five of my apps on one account) |
-| Main tech | Claude Agent SDK · Supabase (pg_cron · pg_net) · Threads / Instagram Graph API · UTM redirector |
+| Platform | Threads · Instagram (eight of my projects — 7 apps and 1 web service — on one account) |
+| Main tech | Claude Agent SDK · Supabase (pg_cron · pg_net) · Threads / Instagram Graph API · UTM redirector · GitHub Actions + ffmpeg (short videos · Reels) · Gemini (backup writer) |
 
 > A multi-agent posting and tracking system for promoting apps I built alone, without a marketing team
 
-- **Problem** — Five solo-built apps need steady promotion, and I need to know which posts actually lead to installs
+- **Problem** — Eight solo-built apps and services need steady promotion, and I need to know which posts actually lead to installs
 - **Engineering Challenge** — Attribution. The post → click → install funnel looked healthy, but most clicks were crawlers; user-agent rules broke whenever crawlers changed versions, and widening them would drop real Android users on Chrome's reduced user agent
-- **Design Decision** — Four agents (CMO · ContentWriter · PerformanceAnalyst · SocialMediaManager) split planning, writing and analysis, and publishing runs server-side on Supabase pg_cron + pg_net instead of GitHub Actions (slots routed per app — three Threads posts a day plus Instagram cards and Reels; Pick and Go, a Korea-only app, has its own Korean slot). Bots are flagged by timing and IP reputation (arrival within 60 s of posting, the same user agent reappearing within 120 s, IPs already seen as bots), counting switched from a blacklist to a whitelist of real platforms (crawlers keep changing user agents, so a blacklist always lags), and past data was corrected
-- **Evidence** — Publishing automatically since April 2026, extended to a fifth app (Pick and Go) in October 2026. Bot counts are reported separately rather than hidden — if they drop to zero, the tracking itself has stopped
+- **Design Decision** — Four agents (CMO · ContentWriter · PerformanceAnalyst · SocialMediaManager) split planning, writing and analysis, and publishing runs server-side on Supabase pg_cron + pg_net instead of GitHub Actions (slots routed per app — four Threads posts a day plus regional Instagram cards, carousels and Reels; three Korea-only projects take turns in a Korean slot). Bots are flagged by timing and IP reputation (arrival within 60 s of posting, the same user agent reappearing within 120 s, IPs already seen as bots), counting switched from a blacklist to a whitelist of real platforms (crawlers keep changing user agents, so a blacklist always lags), and past data was corrected
+- **Evidence** — Publishing automatically since April 2026, extended to eight projects in October 2026, with a 9:16 short video rendered automatically for every app each day. Self-clicks and test installs are classified separately (debug builds and bursts of 3+ installs within 30 minutes are flagged automatically), and weights inflated by bot clicks were corrected retroactively. Bot counts are reported separately rather than hidden — if they drop to zero, the tracking itself has stopped
+- **Next** — Reply engagement through Threads keyword search is on hold pending Meta's permission review (business verification); X is dormant after API credits ran out, with the infrastructure kept

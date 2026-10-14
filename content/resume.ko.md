@@ -1,5 +1,6 @@
 ---
 title: 전준환 | 이력서
+description: 모바일 · 웹 · 백엔드를 넘나드는 크로스플랫폼 개발자 — Flutter, Swift, React, Laravel.
 notion: 363a3015-22b8-8145-9b66-c083ecf7b661
 ---
 

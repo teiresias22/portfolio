@@ -28,10 +28,12 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
 .top { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: saturate(1.4) blur(8px); border-bottom: 1px solid var(--line); }
 .top .wrap { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; padding-top: 10px; padding-bottom: 10px; }
 .who { display: flex; flex-direction: column; }
-.name { margin: 0; font-size: 1.1rem; line-height: 1.3; letter-spacing: -0.01em; }
+.name { margin: 0; font-size: 1.1rem; font-weight: 700; line-height: 1.3; letter-spacing: -0.01em; }
 .name a { color: var(--fg); }
 .role { color: var(--muted); font-size: .8rem; }
 .links { display: flex; gap: 14px; font-size: .85rem; margin-top: 2px; }
+/* Taller hit area (WCAG 2.2 target size) without changing the header's height. */
+.links a { padding: 3px 0; margin: -3px 0; }
 .top nav { display: flex; flex-wrap: wrap; gap: 4px; }
 .top nav a { display: inline-flex; align-items: center; min-height: 36px; padding: 0 12px; border-radius: 8px; color: var(--muted); font-size: .9rem; transition: background-color .15s, color .15s; }
 .top nav a:hover { background: var(--chip); color: var(--fg); text-decoration: none; }
@@ -53,7 +55,13 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
 .toc .l2:not(:first-child) { margin-top: 6px; }
 .toc .l3 a { padding-left: 18px; }
 .toc a[aria-current] { background: var(--chip); color: var(--fg); box-shadow: inset 2px 0 var(--accent); }
+/* Narrow screens: once the contents scroll away, a button leads back to them. */
+.toc-fab { position: fixed; right: 16px; bottom: 16px; z-index: 15; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 16px; border-radius: 999px; background: var(--fg); color: var(--bg); font-weight: 600; font-size: .9rem; box-shadow: 0 4px 16px rgb(0 0 0 / .18); }
+.toc-fab svg { width: 18px; height: 18px; flex: none; }
+.toc-fab:hover { text-decoration: none; }
+.toc-fab[hidden] { display: none; }
 @media (min-width: 1100px) {
+  .toc-fab { display: none; }
   .layout { display: grid; grid-template-columns: 240px minmax(0, 760px); gap: 48px; justify-content: center; }
   .toc { position: sticky; top: calc(var(--header-h) + 16px); align-self: start; max-height: calc(100vh - var(--header-h) - 32px); overflow-y: auto; overscroll-behavior: contain; margin-top: 32px; }
   .toc details { background: none; border: 0; padding: 0; }
@@ -100,6 +108,18 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
 .doc th, .doc td { text-align: left; vertical-align: top; padding: 9px 12px; border-bottom: 1px solid var(--line); }
 .doc th { background: var(--chip); font-weight: 600; white-space: nowrap; }
 .doc tr:last-child td { border-bottom: 0; }
+/* Phones: a 600px table would be cut off, so each row becomes a card of label · value lines. */
+@media screen and (max-width: 639px) {
+  .table-wrap { overflow: visible; }
+  .doc table, .doc tbody, .doc tr { display: block; min-width: 0; }
+  .doc thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .doc tr { padding: 12px 16px; border-bottom: 1px solid var(--line); }
+  .doc tr:last-child { border-bottom: 0; }
+  .doc td { display: grid; grid-template-columns: 5.5rem minmax(0, 1fr); gap: 12px; padding: 2px 0; border: 0; }
+  .doc td::before { content: attr(data-label); color: var(--muted); font-size: .8rem; font-weight: 600; padding-top: .15rem; }
+  .doc td:first-child { display: block; margin-bottom: 4px; font-weight: 600; }
+  .doc td:first-child::before { content: none; }
+}
 
 /* Footer */
 .foot { margin-top: 24px; border-top: 1px solid var(--line); background: var(--card); }
@@ -122,7 +142,7 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
 
 /* Contact form (/contact) */
 .contact { max-width: 592px; margin: 0 auto; padding: 32px 16px 48px; }
-.contact h2 { margin: 0 0 6px; font-size: 1.55rem; letter-spacing: -0.015em; }
+.contact h1 { margin: 0 0 6px; font-size: 1.55rem; letter-spacing: -0.015em; }
 .contact .lead { color: var(--muted); margin: 0 0 24px; }
 .contact form { display: grid; gap: 16px; }
 .contact label { display: grid; gap: 6px; font-weight: 600; font-size: .9rem; color: var(--label); }
@@ -139,7 +159,10 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
   :root { --bg: #fff; --fg: #000; --muted: #333; --line: #ccc; --card: #fff; --chip: #f2f2f2; --accent: #000; --label: #000; }
   body { font-size: 11pt; line-height: 1.5; }
   .top { position: static; backdrop-filter: none; }
-  .top nav, .toc, .skip, .foot { display: none; }
+  .top nav, .toc, .toc-fab, .skip, .foot { display: none; }
+  /* On paper the contact labels alone are useless — print where they lead. */
+  .links { flex-wrap: wrap; gap: 2px 16px; }
+  .links a[data-print]::after { content: ": " attr(data-print); }
   .layout { display: block; }
   .doc { max-width: none; padding: 0; }
   .doc h2, .doc h3, .doc h4 { break-after: avoid; }

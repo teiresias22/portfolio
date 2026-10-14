@@ -75,35 +75,35 @@ notion: 363a3015-22b8-8145-9b66-c083ecf7b661
 
 | 프로젝트 | 기간 | 주요 기술 |
 | --- | --- | --- |
-| KoreHalal App | 2024.08 ~ (2025.01 재구축) | Flutter · PayPal · PostHog |
-| ICU Company 웹사이트 | 2025.09 ~ | React 19 · Vite · Firebase Hosting |
-| KoreHalal 관리자/파트너 콘솔 | 2025.11 ~ | Flutter Web · GoRouter |
-| KoreHalal 사용자 웹 | 2026.02 ~ | React 19 · Zustand · PayPal SDK |
-| KoreHalal 백엔드 | 2026.05 ~ | Laravel 10 · AWS Lambda · Vapor · MySQL |
-| MarkView | 2023.03 ~ 2024.01 | Swift → Flutter · Provider · Firebase |
-| MarkTong (마크통) | 2022.11 ~ 2023.03 | Swift · UIKit · Firebase · MessageKit · 아임포트 |
+| KoreHalal App — 무슬림 여행자 서비스 앱 | 2024.08 ~ (2025.01 재구축) | Flutter · PayPal · PostHog |
+| ICU Company 웹사이트 — 마케팅 · 리드젠 사이트 | 2025.09 ~ | React 19 · Vite · Firebase Hosting |
+| KoreHalal 관리자/파트너 콘솔 — 운영 · 입점 업체용 웹 콘솔 | 2025.11 ~ | Flutter Web · GoRouter |
+| KoreHalal 사용자 웹 — 앱과 짝을 이루는 사용자용 웹 | 2026.02 ~ | React 19 · Zustand · PayPal SDK |
+| KoreHalal 백엔드 — 서버리스 API 서버 | 2026.05 ~ | Laravel 10 · AWS Lambda · Vapor · MySQL |
+| MarkView — AI 기반 이미지 & 텍스트 상표 검색 | 2023.03 ~ 2024.01 | Swift → Flutter · Provider · Firebase |
+| MarkTong (마크통) — 변리사 매칭 플랫폼 iOS 앱 | 2022.11 ~ 2023.03 | Swift · UIKit · Firebase · MessageKit · 아임포트 |
 
 ### 팀 / 사이드 프로젝트
 
 | 프로젝트 | 기간 | 주요 기술 |
 | --- | --- | --- |
-| 모잇 (moit) | 2024.10 ~ | Flutter · Riverpod · go_router · Supabase · Flutter Web · Next.js 16 (앱 2인 공동 · 웹 단독) |
-| Travel Buddy (해커톤) | 2024.08 | Flutter · Riverpod · Supabase Edge Functions · 벡터 임베딩 |
+| 모잇 (moit) — 동네 클래스 · 반모임 커뮤니티 앱 | 2024.10 ~ | Flutter · Riverpod · go_router · Supabase · Flutter Web · Next.js 16 (앱 2인 공동 · 웹 단독) |
+| Travel Buddy — 해커톤 AI 여행 동행 · 일정 앱 | 2024.08 | Flutter · Riverpod · Supabase Edge Functions · 벡터 임베딩 |
 
 ### 개인 프로젝트 (1인 개발)
 
 | 프로젝트 | 기간 | 상태 | 주요 기술 |
 | --- | --- | --- | --- |
-| [Color of Days](https://apps.joon.is-a.dev/colorofdays/) | 2024.03 ~ | 실서비스 | Flutter · Riverpod · Supabase (Edge Functions · pg_cron) · home_widget · 온디바이스 인사이트 · HealthKit/Health Connect · 워치 |
-| [Time with Me](https://apps.joon.is-a.dev/time-with-me/) | 2024.06 ~ | 실서비스 | Flutter · Supabase · Google Maps · home_widget |
-| [여운 (Yeowun)](https://apps.joon.is-a.dev/yeowun/) | 2026.01 ~ | 실서비스 | Flutter · Gemini AI · PostGIS · 백그라운드 지오펜싱 |
-| [길목 (Gilmok)](https://apps.joon.is-a.dev/gilmok/) | 2026.03 ~ | 실서비스 | Flutter · Drift · Supabase · flutter_map · 오프라인 우선 |
-| [Pick and Go](https://apps.joon.is-a.dev/pick-and-go/) | 2026.06 ~ | 실서비스 | Flutter · Riverpod · Neon · Gamification |
-| [Discard](https://apps.joon.is-a.dev/discard/) | 2026.10 ~ | 스토어 출시 예정 | Flutter · Drift · Neon (Data API · Storage · Functions) · Firebase Auth/App Check · Vision/ML Kit 누끼 · home_widget |
-| [Almost](https://apps.joon.is-a.dev/almost/) | 2026.10 ~ | 스토어 출시 예정 | Flutter · CustomPainter 장면 렌더링 · Neon (Postgres RLS · 트리거 · RPC) · Firebase Auth · 4개 언어 |
-| [누렁소검은소](https://nureongso.joon.is-a.dev) · [GitHub](https://github.com/teiresias22/nureongso) | 2026.09 ~ | 운영 중 (웹) | Next.js 16 · Supabase · Python 공공데이터 수집 파이프라인 · LLM 공약 판정 · Vercel |
-| [joon-dev 웹](https://apps.joon.is-a.dev/) | 2026.07 ~ | 운영 중 | pnpm 모노레포 · Vite/Next.js · Firebase Hosting · GitHub Actions |
-| 멀티앱 마케팅 자동화 (별도 시스템) | 2026.04 ~ | 운영 중 | Claude Agent SDK · Supabase pg_cron · Threads/Instagram Graph API · 어트리뷰션 계측 |
+| [Color of Days](https://apps.joon.is-a.dev/colorofdays/) — 하루를 색으로 남기는 감정 기록 앱 | 2024.03 ~ | 실서비스 | Flutter · Riverpod · Supabase (Edge Functions · pg_cron) · home_widget · 온디바이스 인사이트 · HealthKit/Health Connect · 워치 |
+| [Time with Me](https://apps.joon.is-a.dev/time-with-me/) — 함께 쓰는 공유 캘린더 · 추억 기록 앱 | 2024.06 ~ | 실서비스 | Flutter · Supabase · Google Maps · home_widget |
+| [여운 (Yeowun)](https://apps.joon.is-a.dev/yeowun/) — 장소에 남기는 위치 기반 기록 앱 | 2026.01 ~ | 실서비스 | Flutter · Gemini AI · PostGIS · 백그라운드 지오펜싱 |
+| [길목 (Gilmok)](https://apps.joon.is-a.dev/gilmok/) — 오프라인 우선 지도 앱 | 2026.03 ~ | 실서비스 | Flutter · Drift · Supabase · flutter_map · 오프라인 우선 |
+| [Pick and Go](https://apps.joon.is-a.dev/pick-and-go/) — 갈 수 있는 랜덤 여행 코스 뽑기 앱 | 2026.06 ~ | 실서비스 | Flutter · Riverpod · Neon · Gamification |
+| [Discard](https://apps.joon.is-a.dev/discard/) — 내가 버린 것들의 박물관 | 2026.10 ~ | 스토어 출시 예정 | Flutter · Drift · Neon (Data API · Storage · Functions) · Firebase Auth/App Check · Vision/ML Kit 누끼 · home_widget |
+| [Almost](https://apps.joon.is-a.dev/almost/) — 하려다 만 것들의 묘지 | 2026.10 ~ | 스토어 출시 예정 | Flutter · CustomPainter 장면 렌더링 · Neon (Postgres RLS · 트리거 · RPC) · Firebase Auth · 4개 언어 |
+| [누렁소검은소](https://nureongso.joon.is-a.dev) — 선출직 공약 · 의정활동 공개 기록 ([GitHub](https://github.com/teiresias22/nureongso)) | 2026.09 ~ | 운영 중 (웹) | Next.js 16 · Supabase · Python 공공데이터 수집 파이프라인 · LLM 공약 판정 · Vercel |
+| [joon-dev 웹](https://apps.joon.is-a.dev/) — 개인 프로젝트 허브 | 2026.07 ~ | 운영 중 | pnpm 모노레포 · Vite/Next.js · Firebase Hosting · GitHub Actions |
+| 멀티앱 마케팅 자동화 — 자체 앱 홍보용 별도 시스템 | 2026.04 ~ | 운영 중 | Claude Agent SDK · Supabase pg_cron · Threads/Instagram Graph API · 어트리뷰션 계측 |
 
 ---
 

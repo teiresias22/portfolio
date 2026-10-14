@@ -60,35 +60,35 @@ description: Cross-platform developer working across mobile, web and backend —
 
 | Project | Period | Main tech |
 | --- | --- | --- |
-| KoreHalal App | 2024.08 – (rebuilt 2025.01) | Flutter · PayPal · PostHog |
-| ICU Company website | 2025.09 – | React 19 · Vite · Firebase Hosting |
-| KoreHalal partner/admin console | 2025.11 – | Flutter Web · GoRouter |
-| KoreHalal user web | 2026.02 – | React 19 · Zustand · PayPal SDK |
-| KoreHalal backend | 2026.05 – | Laravel 10 · AWS Lambda · Vapor · MySQL |
-| MarkView | 2023.03 – 2024.01 | Swift → Flutter · Provider · Firebase |
-| MarkTong | 2022.11 – 2023.03 | Swift · UIKit · Firebase · MessageKit · Iamport |
+| KoreHalal App — app for Muslim travelers | 2024.08 – (rebuilt 2025.01) | Flutter · PayPal · PostHog |
+| ICU Company website — marketing · lead-generation site | 2025.09 – | React 19 · Vite · Firebase Hosting |
+| KoreHalal partner/admin console — web console for operators and partner businesses | 2025.11 – | Flutter Web · GoRouter |
+| KoreHalal user web — the web counterpart of the app | 2026.02 – | React 19 · Zustand · PayPal SDK |
+| KoreHalal backend — serverless API server | 2026.05 – | Laravel 10 · AWS Lambda · Vapor · MySQL |
+| MarkView — AI image & text trademark search | 2023.03 – 2024.01 | Swift → Flutter · Provider · Firebase |
+| MarkTong — patent-attorney matching iOS app | 2022.11 – 2023.03 | Swift · UIKit · Firebase · MessageKit · Iamport |
 
 ### Team / side projects
 
 | Project | Period | Main tech |
 | --- | --- | --- |
-| moit | 2024.10 – | Flutter · Riverpod · go_router · Supabase · Flutter Web · Next.js 16 (app co-developed by two · web solo) |
-| Travel Buddy (hackathon) | 2024.08 | Flutter · Riverpod · Supabase Edge Functions · vector embeddings |
+| moit — neighborhood class · meetup community app | 2024.10 – | Flutter · Riverpod · go_router · Supabase · Flutter Web · Next.js 16 (app co-developed by two · web solo) |
+| Travel Buddy — hackathon AI travel-companion · itinerary app | 2024.08 | Flutter · Riverpod · Supabase Edge Functions · vector embeddings |
 
 ### Personal projects (solo)
 
 | Project | Period | Status | Main tech |
 | --- | --- | --- | --- |
-| [Color of Days](https://apps.joon.is-a.dev/colorofdays/) | 2024.03 – | Live | Flutter · Riverpod · Supabase (Edge Functions · pg_cron) · home_widget · on-device insights · HealthKit/Health Connect · watch |
-| [Time with Me](https://apps.joon.is-a.dev/time-with-me/) | 2024.06 – | Live | Flutter · Supabase · Google Maps · home_widget |
-| [Yeowun](https://apps.joon.is-a.dev/yeowun/) | 2026.01 – | Live | Flutter · Gemini AI · PostGIS · background geofencing |
-| [Gilmok](https://apps.joon.is-a.dev/gilmok/) | 2026.03 – | Live | Flutter · Drift · Supabase · flutter_map · offline-first |
-| [Pick and Go](https://apps.joon.is-a.dev/pick-and-go/) | 2026.06 – | Live | Flutter · Riverpod · Neon · gamification |
-| [Discard](https://apps.joon.is-a.dev/discard/) | 2026.10 – | Coming soon | Flutter · Drift · Neon (Data API · Storage · Functions) · Firebase Auth/App Check · Vision/ML Kit cutouts · home_widget |
-| [Almost](https://apps.joon.is-a.dev/almost/) | 2026.10 – | Coming soon | Flutter · CustomPainter scenes · Neon (Postgres RLS · triggers · RPC) · Firebase Auth · 4 languages |
-| [Nureongso](https://nureongso.joon.is-a.dev) · [GitHub](https://github.com/teiresias22/nureongso) | 2026.09 – | Live (web) | Next.js 16 · Supabase · Python public-data pipeline · LLM pledge judging · Vercel |
-| [joon-dev web](https://apps.joon.is-a.dev/) | 2026.07 – | Live | pnpm monorepo · Vite/Next.js · Firebase Hosting · GitHub Actions |
-| Multi-app marketing automation (separate system) | 2026.04 – | Running | Claude Agent SDK · Supabase pg_cron · Threads/Instagram Graph API · attribution tracking |
+| [Color of Days](https://apps.joon.is-a.dev/colorofdays/) — a mood journal, one color a day | 2024.03 – | Live | Flutter · Riverpod · Supabase (Edge Functions · pg_cron) · home_widget · on-device insights · HealthKit/Health Connect · watch |
+| [Time with Me](https://apps.joon.is-a.dev/time-with-me/) — shared calendar · memory journal app | 2024.06 – | Live | Flutter · Supabase · Google Maps · home_widget |
+| [Yeowun](https://apps.joon.is-a.dev/yeowun/) — location-based notes left at places | 2026.01 – | Live | Flutter · Gemini AI · PostGIS · background geofencing |
+| [Gilmok](https://apps.joon.is-a.dev/gilmok/) — offline-first map app | 2026.03 – | Live | Flutter · Drift · Supabase · flutter_map · offline-first |
+| [Pick and Go](https://apps.joon.is-a.dev/pick-and-go/) — random trip courses you can actually reach | 2026.06 – | Live | Flutter · Riverpod · Neon · gamification |
+| [Discard](https://apps.joon.is-a.dev/discard/) — a museum of the things I let go | 2026.10 – | Coming soon | Flutter · Drift · Neon (Data API · Storage · Functions) · Firebase Auth/App Check · Vision/ML Kit cutouts · home_widget |
+| [Almost](https://apps.joon.is-a.dev/almost/) — a graveyard for things you almost did | 2026.10 – | Coming soon | Flutter · CustomPainter scenes · Neon (Postgres RLS · triggers · RPC) · Firebase Auth · 4 languages |
+| [Nureongso](https://nureongso.joon.is-a.dev) — elected officials' pledges and public record ([GitHub](https://github.com/teiresias22/nureongso)) | 2026.09 – | Live (web) | Next.js 16 · Supabase · Python public-data pipeline · LLM pledge judging · Vercel |
+| [joon-dev web](https://apps.joon.is-a.dev/) — personal project hub | 2026.07 – | Live | pnpm monorepo · Vite/Next.js · Firebase Hosting · GitHub Actions |
+| Multi-app marketing automation — separate system for promoting my own apps | 2026.04 – | Running | Claude Agent SDK · Supabase pg_cron · Threads/Instagram Graph API · attribution tracking |
 
 ---
 

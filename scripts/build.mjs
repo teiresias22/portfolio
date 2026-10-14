@@ -82,10 +82,13 @@ function toHtml(body, tocDepth, t) {
     .replace(/<table>[\s\S]*?<\/table>/g, (table) => {
       const labels = [...table.match(/<thead>[\s\S]*?<\/thead>/)[0].matchAll(/<th[^>]*>([\s\S]*?)<\/th>/g)].map((m) => esc(m[1].replace(/<[^>]+>/g, '').trim()))
       return table.replace(/<tr>[\s\S]*?<\/tr>/g, (row) => { let i = 0; return row.replace(/<td(?=[ >])/g, () => `<td data-label="${labels[i++] ?? ''}"`) })
+        // A first cell written "Name — description" (project lists) shows the description beneath the name.
+        .replace(/(<tr>\s*<td[^>]*>)((?:(?!<\/td>)[\s\S])*?) — ((?:(?!<\/td>)[\s\S])*?)<\/td>/g, '$1<span class="pn">$2</span><span class="pd">$3</span></td>')
+        .replace(/^<table>(?=[\s\S]*class="pn")/, '<table class="projects">')
     })
     // Web links open in a new tab, so the resume stays where the reader left it.
     .replace(/<a href="(https?:[^"]+)">([\s\S]*?)<\/a>/g, (_, href, text) => `<a href="${href}" ${NEW_TAB}>${text}<span class="sr"> ${t.newTab}</span></a>`)
-    .replace(/<table>/g, '<div class="table-wrap"><table>')
+    .replace(/<table( class="projects")?>/g, '<div class="table-wrap"><table$1>')
     .replace(/<\/table>/g, '</table></div>')
   return { html, toc }
 }

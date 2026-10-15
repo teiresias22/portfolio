@@ -11,8 +11,8 @@ const PAGES = [
   { name: 'career', path: 'career/', toc: 3 },
 ]
 const UI = {
-  en: { toc: 'Contents', skip: 'Skip to content', name: 'Joonhwan Jeon', role: 'Cross-platform developer · Flutter · Swift · React · Laravel', resume: 'Resume', career: 'Career', other: '한국어', otherLang: 'ko', contact: 'Get in touch', contactSub: 'For questions or opportunities, email is the fastest way to reach me.', updated: 'Updated', top: 'Back to top', newTab: '(opens in a new tab)', locale: 'en_US', jobTitle: 'Cross-platform developer' },
-  ko: { toc: '목차', skip: '본문 바로가기', name: '전준환', role: '크로스플랫폼 개발자 · Flutter · Swift · React · Laravel', resume: '이력서', career: '경력기술서', other: 'English', otherLang: 'en', contact: '연락하기', contactSub: '문의나 제안은 이메일로 주시면 가장 빠르게 답변드립니다.', updated: '최종 업데이트', top: '맨 위로', newTab: '(새 창에서 열림)', locale: 'ko_KR', jobTitle: '크로스플랫폼 개발자' },
+  en: { toc: 'Contents', sub: 'subsections', skip: 'Skip to content', name: 'Joonhwan Jeon', role: 'Cross-platform developer · Flutter · Swift · React · Laravel', resume: 'Resume', career: 'Career', other: '한국어', otherLang: 'ko', contact: 'Get in touch', contactSub: 'For questions or opportunities, email is the fastest way to reach me.', updated: 'Updated', top: 'Back to top', newTab: '(opens in a new tab)', locale: 'en_US', jobTitle: 'Cross-platform developer' },
+  ko: { toc: '목차', sub: '하위 항목', skip: '본문 바로가기', name: '전준환', role: '크로스플랫폼 개발자 · Flutter · Swift · React · Laravel', resume: '이력서', career: '경력기술서', other: 'English', otherLang: 'en', contact: '연락하기', contactSub: '문의나 제안은 이메일로 주시면 가장 빠르게 답변드립니다.', updated: '최종 업데이트', top: '맨 위로', newTab: '(새 창에서 열림)', locale: 'ko_KR', jobTitle: '크로스플랫폼 개발자' },
 }
 // Header and footer show these in the same order. Email stays the highlighted button (fastest reply).
 // Footer buttons pair each label with a Remix Icon (line) — the same set the app pages' footers use.
@@ -37,6 +37,21 @@ const linkAttrs = (href) => (href.startsWith('http') ? ` ${NEW_TAB}` : '')
 const tocEntry = (text) => {
   const [name, ...rest] = text.split(' — ')
   return rest.length ? `<span class="tn">${name}</span><span class="td">${rest.join(' — ')}</span>` : text
+}
+// Top-level entries hold their sub-entries in a nested list with a fold button, so a long list
+// (career) can be shortened to the companies. The script folds every group but the one being read.
+function tocTree(toc, t) {
+  const item = (h) => `<a href="#${h.id}">${tocEntry(h.text)}</a>`
+  const groups = []
+  for (const h of toc) {
+    if (h.n === 2 || !groups.length) groups.push({ h, kids: [] })
+    else groups.at(-1).kids.push(h)
+  }
+  return groups.map(({ h, kids }) => {
+    if (!kids.length) return `<li class="l${h.n}">${item(h)}</li>`
+    const id = `toc-${h.id}`
+    return `<li class="l${h.n} group"><div class="row">${item(h)}<button type="button" class="fold" aria-expanded="true" aria-controls="${id}" aria-label="${h.text.split(' — ')[0]} ${t.sub}"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 13.17L16.95 8.22L18.36 9.64L12 16L5.64 9.64L7.05 8.22L12 13.17Z"/></svg></button></div><ol id="${id}">${kids.map((k) => `<li class="l${k.n}">${item(k)}</li>`).join('')}</ol></li>`
+  }).join('')
 }
 const icon = (d) => `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="${d}"/></svg>`
 const url = (lang, path) => `${SITE}/${lang === 'ko' ? 'ko/' : ''}${path}`
@@ -97,23 +112,35 @@ function toHtml(body, tocDepth, t) {
 }
 
 // Contents behaviour. Runs right after the contents so the sidebar never flashes closed.
-// - Open in the sidebar on wide screens, collapsed above the document otherwise — re-applied when the
-//   width crosses the breakpoint (the wide summary can't be clicked, so a closed one would hide the list).
+// - Beside the document on wide screens, collapsed above it otherwise. On wide screens the reader can
+//   fold the whole list away; that choice is remembered. Narrow screens always start folded.
+// - Groups (a company and its projects) fold one by one. All start folded except the one being read,
+//   which opens as the reader scrolls into it and folds again on leaving unless the reader opened it.
 // - --header-h follows the real sticky header, which wraps to more than one row.
 // - The section being read is marked and kept visible in the sidebar.
 // - On narrow screens the list folds away when a link is picked, before the jump lands, and once it has
 //   scrolled out of view a floating button leads back to it (hidden again over the footer).
 const TOC_SCRIPT = `(() => {
   const root = document.documentElement, header = document.querySelector('.top')
-  const toc = document.querySelector('.toc'), details = toc.querySelector('details'), summary = details.querySelector('summary')
+  const toc = document.querySelector('.toc'), details = toc.querySelector('details')
   const fab = document.querySelector('.toc-fab'), links = [...toc.querySelectorAll('a')]
   const heads = links.map((a) => document.getElementById(decodeURIComponent(a.hash.slice(1))))
-  const wide = matchMedia('(min-width: 1100px)')
-  // On wide screens the summary is only a label: out of the tab order, and the list can't be folded.
-  const layout = () => { details.open = wide.matches; summary.tabIndex = wide.matches ? -1 : 0; spy() }
-  details.addEventListener('toggle', () => { if (wide.matches && !details.open) details.open = true })
+  const wide = matchMedia('(min-width: 960px)')
+  const pref = { get() { try { return localStorage.getItem('toc') !== 'closed' } catch { return true } },
+    set(open) { try { localStorage.setItem('toc', open ? 'open' : 'closed') } catch {} } }
+  const fold = (g, open) => { g.querySelector('.fold').setAttribute('aria-expanded', open); g.querySelector('ol').hidden = !open }
+  const groups = [...toc.querySelectorAll('.group')]
+  groups.forEach((g) => fold(g, false))
+  let auto // group opened by scrolling, not by the reader
+  toc.addEventListener('click', (e) => {
+    const b = e.target.closest('.fold')
+    if (b) { const g = b.closest('.group'); fold(g, b.getAttribute('aria-expanded') !== 'true'); if (g === auto) auto = null; spy(); return }
+    if (e.target.closest('a') && !wide.matches) details.open = false
+  })
+  const layout = () => { details.open = wide.matches && pref.get(); spy() }
+  details.addEventListener('toggle', () => { if (wide.matches) pref.set(details.open) })
   new ResizeObserver(() => root.style.setProperty('--header-h', header.offsetHeight + 'px')).observe(header)
-  let current, queued, foot
+  let current, group, queued, foot
   function spy() {
     queued = false
     const line = Math.max(0, header.getBoundingClientRect().bottom) + 24
@@ -121,7 +148,14 @@ const TOC_SCRIPT = `(() => {
     if (innerHeight + scrollY >= root.scrollHeight - 2) i = heads.length - 1
     const a = links[i]
     if (a !== current) { current?.removeAttribute('aria-current'); a?.setAttribute('aria-current', 'location'); current = a }
-    if (a && wide.matches) {
+    const g = a?.closest('.group') ?? null
+    if (g !== group) {
+      group?.classList.remove('active')
+      if (auto && auto !== g) { fold(auto, false); auto = null }
+      if (g) { g.classList.add('active'); if (g.querySelector('ol').hidden) { fold(g, true); auto = g } }
+      group = g
+    }
+    if (a && wide.matches && details.open && a.offsetHeight) {
       const top = a.offsetTop, bottom = top + a.offsetHeight
       if (top < toc.scrollTop + 32) toc.scrollTop = top - 32
       else if (bottom > toc.scrollTop + toc.clientHeight - 32) toc.scrollTop = bottom - toc.clientHeight + 32
@@ -133,7 +167,6 @@ const TOC_SCRIPT = `(() => {
   wide.addEventListener('change', layout)
   addEventListener('scroll', queue, { passive: true })
   addEventListener('resize', queue)
-  toc.addEventListener('click', (e) => { if (e.target.closest('a') && !wide.matches) details.open = false })
   fab.addEventListener('click', () => { details.open = true })
   layout()
 })()`
@@ -154,7 +187,7 @@ function page(lang, { name, path }) {
   const t = UI[lang]
   const date = updated(name, lang)
   const { html, toc } = toHtml(body, PAGES.find((p) => p.name === name).toc, t)
-  const tocHtml = `<nav class="toc" id="toc" aria-label="${t.toc}"><details><summary>${t.toc}</summary><ol>${toc.map((h) => `<li class="l${h.n}"><a href="#${h.id}">${tocEntry(h.text)}</a></li>`).join('')}</ol></details></nav>`
+  const tocHtml = `<nav class="toc" id="toc" aria-label="${t.toc}"><details open><summary>${t.toc}</summary><ol>${tocTree(toc, t)}</ol></details></nav>`
   const nav = PAGES.map((p) => {
     const href = `/${lang === 'ko' ? 'ko/' : ''}${p.path}`
     return `<a href="${href}"${p.name === name ? ' aria-current="page"' : ''}>${t[p.name]}</a>`

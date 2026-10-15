@@ -170,14 +170,30 @@ const TOC_SCRIPT = `(() => {
   spy()
 })()`
 
-// Structured data for search engines: who the pages are about.
-function person(lang) {
+// Structured data for search engines: each page is a profile of one person, shared across
+// languages through a fixed @id. worksFor / alumniOf live here, not in content/ — update on a job change.
+const PERSON_ID = `${SITE}/#person`, SITE_ID = `${SITE}/#website`
+function jsonLd(lang, path, meta, date) {
   const t = UI[lang]
   return JSON.stringify({
-    '@context': 'https://schema.org', '@type': 'Person',
-    name: t.name, alternateName: UI[t.otherLang].name, jobTitle: t.jobTitle, url: url(lang, ''),
-    image: `${SITE}/og-${lang}.png`, email: 'teiresias1987@gmail.com', sameAs: ['https://github.com/teiresias22'],
-    knowsAbout: ['Flutter', 'Swift', 'React', 'Laravel'],
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'ProfilePage', '@id': `${url(lang, path)}#webpage`, url: url(lang, path),
+        name: meta.title, description: meta.description || meta.title, inLanguage: lang, dateModified: date,
+        isPartOf: { '@id': SITE_ID }, mainEntity: { '@id': PERSON_ID },
+      },
+      {
+        '@type': 'Person', '@id': PERSON_ID,
+        name: t.name, alternateName: UI[t.otherLang].name, jobTitle: t.jobTitle, url: `${SITE}/`,
+        image: `${SITE}/og-${lang}.png`, email: 'teiresias1987@gmail.com', sameAs: ['https://github.com/teiresias22'],
+        worksFor: { '@type': 'Organization', name: 'ICU Company', url: 'https://icucompany.com' },
+        alumniOf: { '@type': 'EducationalOrganization', name: 'SeSAC' },
+        knowsLanguage: ['ko', 'en'],
+        knowsAbout: ['Flutter', 'Dart', 'Swift', 'React', 'TypeScript', 'Laravel', 'PHP', 'Supabase', 'Firebase', 'AWS'],
+      },
+      { '@type': 'WebSite', '@id': SITE_ID, url: `${SITE}/`, name: UI.en.name, alternateName: UI.ko.name, publisher: { '@id': PERSON_ID } },
+    ],
   }).replace(/</g, '\\u003c')
 }
 
@@ -215,7 +231,7 @@ ${ICONS}
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="${t.name} — ${t.role}">
 <meta name="twitter:card" content="summary_large_image">
-<script type="application/ld+json">${person(lang)}</script>
+<script type="application/ld+json">${jsonLd(lang, path, meta, date)}</script>
 </head>
 <body id="top">
 <a class="skip" href="#main">${t.skip}</a>
@@ -305,6 +321,8 @@ for (const lang of ['en', 'ko']) {
 writeFileSync(new URL('404.html', out), notFound())
 writeFileSync(new URL('sitemap.xml', out), sitemap())
 writeFileSync(new URL('robots.txt', out), `User-agent: *\nAllow: /\n\nSitemap: ${SITE}/sitemap.xml\n`)
+// Pointer for AI crawlers that read llms.txt (Google Search ignores it).
+writeFileSync(new URL('llms.txt', out), `# ${UI.en.name}\n\n> ${UI.en.role}\n\n${['en', 'ko'].flatMap((l) => PAGES.map((p) => `- [${UI[l].name} — ${UI[l][p.name]}](${url(l, p.path)})`)).join('\n')}\n`)
 for (const f of ['style.css', ...ASSETS]) copyFileSync(new URL(`../static/${f}`, import.meta.url), new URL(f, out))
 // App support form, opened by the apps' settings menus. GitHub Pages serves contact.html at /contact.
 writeFileSync(new URL('contact.html', out), readFileSync(new URL('../static/contact.html', import.meta.url), 'utf8').replace('/style.css', CSS).replace('<!-- icons -->', ICONS))

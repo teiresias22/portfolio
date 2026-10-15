@@ -111,34 +111,38 @@ function toHtml(body, tocDepth, t) {
   return { html, toc }
 }
 
-// Contents behaviour. Runs right after the contents so the sidebar never flashes closed.
-// - Beside the document on wide screens, collapsed above it otherwise. On wide screens the reader can
-//   fold the whole list away; that choice is remembered. Narrow screens always start folded.
+// Contents behaviour: a floating island in the bottom-right corner. Folded it is a "Contents" button;
+// opened it is a card with the list.
+// - Where the margin beside the document is wide enough for the card, it opens as the reader left it
+//   last time (open the first time). Elsewhere it would cover the text, so it starts folded, folds again
+//   once a link is picked, and also on Escape or a click outside it.
 // - Groups (a company and its projects) fold one by one. All start folded except the one being read,
 //   which opens as the reader scrolls into it and folds again on leaving unless the reader opened it.
 // - --header-h follows the real sticky header, which wraps to more than one row.
-// - The section being read is marked and kept visible in the sidebar.
-// - On narrow screens the list folds away when a link is picked, before the jump lands, and once it has
-//   scrolled out of view a floating button leads back to it (hidden again over the footer).
+// - The section being read is marked and kept visible in the list.
+// - The folded button hides over the footer, so it never covers the contact buttons.
 const TOC_SCRIPT = `(() => {
   const root = document.documentElement, header = document.querySelector('.top')
-  const toc = document.querySelector('.toc'), details = toc.querySelector('details')
-  const fab = document.querySelector('.toc-fab'), links = [...toc.querySelectorAll('a')]
+  const toc = document.querySelector('.toc'), details = toc.querySelector('details'), list = details.querySelector('ol')
+  const links = [...toc.querySelectorAll('a')]
   const heads = links.map((a) => document.getElementById(decodeURIComponent(a.hash.slice(1))))
-  const wide = matchMedia('(min-width: 960px)')
+  const roomy = matchMedia('(min-width: 1280px)')
   const pref = { get() { try { return localStorage.getItem('toc') !== 'closed' } catch { return true } },
     set(open) { try { localStorage.setItem('toc', open ? 'open' : 'closed') } catch {} } }
   const fold = (g, open) => { g.querySelector('.fold').setAttribute('aria-expanded', open); g.querySelector('ol').hidden = !open }
-  const groups = [...toc.querySelectorAll('.group')]
-  groups.forEach((g) => fold(g, false))
+  toc.querySelectorAll('.group').forEach((g) => fold(g, false))
   let auto // group opened by scrolling, not by the reader
   toc.addEventListener('click', (e) => {
     const b = e.target.closest('.fold')
     if (b) { const g = b.closest('.group'); fold(g, b.getAttribute('aria-expanded') !== 'true'); if (g === auto) auto = null; spy(); return }
-    if (e.target.closest('a') && !wide.matches) details.open = false
+    if (e.target.closest('a') && !roomy.matches) details.open = false
   })
-  const layout = () => { details.open = wide.matches && pref.get(); spy() }
-  details.addEventListener('toggle', () => { if (wide.matches) pref.set(details.open) })
+  document.addEventListener('click', (e) => { if (!roomy.matches && details.open && !toc.contains(e.target)) details.open = false })
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && details.open) { details.open = false; if (toc.contains(document.activeElement)) details.querySelector('summary').focus() }
+  })
+  const layout = () => { details.open = roomy.matches && pref.get(); spy() }
+  details.addEventListener('toggle', () => { if (roomy.matches) pref.set(details.open); if (details.open) spy() })
   new ResizeObserver(() => root.style.setProperty('--header-h', header.offsetHeight + 'px')).observe(header)
   let current, group, queued, foot
   function spy() {
@@ -155,19 +159,18 @@ const TOC_SCRIPT = `(() => {
       if (g) { g.classList.add('active'); if (g.querySelector('ol').hidden) { fold(g, true); auto = g } }
       group = g
     }
-    if (a && wide.matches && details.open && a.offsetHeight) {
-      const top = a.offsetTop, bottom = top + a.offsetHeight
-      if (top < toc.scrollTop + 32) toc.scrollTop = top - 32
-      else if (bottom > toc.scrollTop + toc.clientHeight - 32) toc.scrollTop = bottom - toc.clientHeight + 32
+    if (a && details.open && a.offsetHeight) {
+      const r = a.getBoundingClientRect(), c = list.getBoundingClientRect()
+      if (r.top < c.top + 32) list.scrollTop -= c.top + 32 - r.top
+      else if (r.bottom > c.bottom - 32) list.scrollTop += r.bottom - c.bottom + 32
     }
     foot ??= document.querySelector('.foot') // parsed after this script
-    fab.hidden = wide.matches || toc.getBoundingClientRect().bottom > 0 || foot?.getBoundingClientRect().top < innerHeight
+    toc.classList.toggle('away', !details.open && foot?.getBoundingClientRect().top < innerHeight)
   }
   const queue = () => { if (!queued) { queued = true; requestAnimationFrame(spy) } }
-  wide.addEventListener('change', layout)
+  roomy.addEventListener('change', layout)
   addEventListener('scroll', queue, { passive: true })
   addEventListener('resize', queue)
-  fab.addEventListener('click', () => { details.open = true })
   layout()
 })()`
 
@@ -187,7 +190,7 @@ function page(lang, { name, path }) {
   const t = UI[lang]
   const date = updated(name, lang)
   const { html, toc } = toHtml(body, PAGES.find((p) => p.name === name).toc, t)
-  const tocHtml = `<nav class="toc" id="toc" aria-label="${t.toc}"><details open><summary>${t.toc}</summary><ol>${tocTree(toc, t)}</ol></details></nav>`
+  const tocHtml = `<nav class="toc" id="toc" aria-label="${t.toc}"><details><summary><svg class="ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 4H21V6H3V4ZM3 11H15V13H3V11ZM3 18H21V20H3V18Z"/></svg><span>${t.toc}</span></summary><ol>${tocTree(toc, t)}</ol></details></nav>`
   const nav = PAGES.map((p) => {
     const href = `/${lang === 'ko' ? 'ko/' : ''}${p.path}`
     return `<a href="${href}"${p.name === name ? ' aria-current="page"' : ''}>${t[p.name]}</a>`
@@ -232,7 +235,6 @@ ${tocHtml}
 ${html}
 </main>
 </div>
-<a class="toc-fab" href="#toc" hidden><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 4H21V6H3V4ZM3 11H15V13H3V11ZM3 18H21V20H3V18Z"/></svg>${t.toc}</a>
 <script>${TOC_SCRIPT}</script>
 <footer class="foot">
   <div class="wrap">

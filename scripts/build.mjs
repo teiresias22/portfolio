@@ -61,12 +61,12 @@ const url = (lang, path) => `${SITE}/${lang === 'ko' ? 'ko/' : ''}${path}`
 const CSS = `/style.css?v=${createHash('sha1').update(readFileSync(new URL('../static/style.css', import.meta.url))).digest('hex').slice(0, 8)}`
 // Last update = the last commit that touched the page's Markdown (KST), so a style-only deploy
 // doesn't move it. Falls back to today when git history isn't there (needs fetch-depth: 0 in CI).
-const TODAY = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10)
+const NOW = new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 19) + '+09:00'
 function updated(name, lang) {
   try {
-    const d = execFileSync('git', ['log', '-1', '--format=%cd', '--date=format-local:%Y-%m-%d', '--', `content/${name}.${lang}.md`], { cwd: new URL('..', import.meta.url), env: { ...process.env, TZ: 'Asia/Seoul' }, encoding: 'utf8' }).trim()
-    return d || TODAY
-  } catch { return TODAY }
+    const d = execFileSync('git', ['log', '-1', '--format=%cd', '--date=iso-strict-local', '--', `content/${name}.${lang}.md`], { cwd: new URL('..', import.meta.url), env: { ...process.env, TZ: 'Asia/Seoul' }, encoding: 'utf8' }).trim()
+    return d || NOW
+  } catch { return NOW }
 }
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;')
 
@@ -202,7 +202,7 @@ function jsonLd(lang, path, meta, date) {
 function page(lang, { name, path }) {
   const { meta, body } = load(name, lang)
   const t = UI[lang]
-  const date = updated(name, lang)
+  const modified = updated(name, lang), date = modified.slice(0, 10)
   const { html, toc } = toHtml(body, PAGES.find((p) => p.name === name).toc, t)
   const tocHtml = `<nav class="toc" id="toc" aria-label="${t.toc}"><details><summary><svg class="ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 4H21V6H3V4ZM3 11H15V13H3V11ZM3 18H21V20H3V18Z"/></svg><span>${t.toc}</span></summary><ol>${tocTree(toc, t)}</ol></details></nav>`
   const nav = PAGES.map((p) => {
@@ -233,7 +233,7 @@ ${ICONS}
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="${t.name} — ${t.role}">
 <meta name="twitter:card" content="summary_large_image">
-<script type="application/ld+json">${jsonLd(lang, path, meta, date)}</script>
+<script type="application/ld+json">${jsonLd(lang, path, meta, modified)}</script>
 </head>
 <body id="top">
 <a class="skip" href="#main">${t.skip}</a>
@@ -303,7 +303,7 @@ ${ICONS}
 // Sitemap: each page with its language alternates and last content update.
 function sitemap() {
   const alt = (path) => ['en', 'ko'].map((l) => `<xhtml:link rel="alternate" hreflang="${l}" href="${url(l, path)}"/>`).join('')
-  const urls = PAGES.flatMap((p) => ['en', 'ko'].map((l) => `<url><loc>${url(l, p.path)}</loc><lastmod>${updated(p.name, l)}</lastmod>${alt(p.path)}</url>`))
+  const urls = PAGES.flatMap((p) => ['en', 'ko'].map((l) => `<url><loc>${url(l, p.path)}</loc><lastmod>${updated(p.name, l).slice(0, 10)}</lastmod>${alt(p.path)}</url>`))
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
 ${urls.join('\n')}

@@ -211,7 +211,7 @@ notion: 363a3015-22b8-81df-acde-dadc28a0814d
 
 # 🌟 개인 프로젝트 (1인 개발)
 
-> 기획 · 설계 · 디자인 · 개발 · 배포를 1인으로 진행했습니다. 현재 **7개 앱이 App Store · Play Store에서 실서비스 중**입니다(Discard · Almost는 iOS 출시, Android 심사 중). 앱 수보다 **여러 앱을 혼자서도 유지 가능한 상태로 묶는 것**에 무게를 둡니다 — 랜딩 · 약관은 `joon-dev` 모노레포에서 자동 생성 · 배포, 배포는 태그 푸시 한 번으로 iOS · Android 동시 출시. 앱 홍보용 마케팅 자동화는 마지막 항목에 별도로 정리했습니다.
+> 기획 · 설계 · 디자인 · 개발 · 배포를 1인으로 진행했습니다. 현재 **7개 앱이 App Store · Play Store에서 실서비스 중**입니다(Discard · Almost는 iOS 출시, Android 심사 중). 앱 수보다 **여러 앱을 혼자서도 유지 가능한 상태로 묶는 것**에 무게를 둡니다 — 랜딩 · 약관은 `joon-dev` 모노레포에서 자동 생성 · 배포, 배포는 태그 푸시 한 번으로 iOS · Android 동시 출시, 스토어 스크린샷 · App Store 헤더 · Play 그래픽 · 미리보기 영상은 언어별 데모 데이터로 4개 언어(ko · en · es · ja)를 스크립트로 생성. 앱 홍보용 마케팅 자동화는 마지막 항목에 별도로 정리했습니다.
 
 ---
 
@@ -279,7 +279,7 @@ notion: 363a3015-22b8-81df-acde-dadc28a0814d
 - **Problem** — My Maps에 모아둔 장소가 정작 데이터가 안 터지는 해외에서 쓸모가 없음
 - **Engineering Challenge** — URL 하나로 지도를 통째로 가져와 재동기화하고, 오프라인 타일 위에 수천 개 마커를 폰에서 끊김 없이 그리기
 - **Design Decision** — Drift(SQLite)를 원본, Supabase는 선택적 동기화로 두어 네트워크 없이 모든 기능이 동작(클라우드 우선이면 가장 필요한 곳에서 실패). 마커를 전부 그리는 대신 supercluster 군집화, 타일 캐시를 제어하려고 flutter_map을 래퍼 없이 직접 사용
-- **Evidence** — App Store · Play Store 실서비스, 사용자 지도 한 장에 최대 2,798개(누적 8,002개) 마커를 성능 저하 없이 렌더링. 4개 언어, 전체 지도 검색, KML · GeoJSON · CSV 내보내기와 백업 · 병합 복원, GPX · KML · KMZ 가져오기, 마커 사진 · 스마트 컬렉션 · 여행 모드, Android 홈 위젯, 읽기 전용 지도 공유 링크(테스트 348개)
+- **Evidence** — App Store · Play Store 실서비스, 사용자 지도 한 장에 최대 2,798개(누적 8,002개) 마커를 성능 저하 없이 렌더링. 4개 언어, 전체 지도 검색, KML · GeoJSON · CSV 내보내기와 백업 · 병합 복원, GPX · KML · KMZ 가져오기, 마커 사진 · 스마트 컬렉션 · 여행 모드, iOS · Android 홈 위젯, 읽기 전용 지도 공유 링크(테스트 348개)
 
 ---
 
@@ -289,14 +289,14 @@ notion: 363a3015-22b8-81df-acde-dadc28a0814d
 | --- | --- |
 | 기간 | 2026.06 ~ 현재 |
 | 플랫폼 | iOS · Android (Flutter, 실서비스 중) · [App Store](https://apps.apple.com/app/id6770894684) · [Google Play](https://play.google.com/store/apps/details?id=com.pickngo.joondev.pick_and_go) · [소개 페이지](https://apps.joon.is-a.dev/pick-and-go/) |
-| 주요 기술 | Flutter · Dart · Riverpod · go_router · Neon (Data API · RLS) · Firebase (Auth · Remote Config · Crashlytics) · AdMob |
+| 주요 기술 | Flutter · Dart · Riverpod · go_router · Neon (Data API · RLS · Functions) · Firebase (Auth · Remote Config · Crashlytics) · AdMob |
 
 > 위치 · 이동수단 · 시간으로 실제 갈 수 있는 랜덤 여행 코스를 게임처럼 뽑아주는 앱
 
 - **Problem** — 랜덤 여행 추천은 재밌지만, 가진 시간과 이동수단으로 못 가는 곳이 나오면 쓸모가 없음
 - **Engineering Challenge** — 같은 환승역이 노선마다 다른 이름이라 지하철 직통 · 1회 환승 경로 계산이 깨짐
 - **Design Decision** — 먼저 거르고 뽑기: 이동수단별 거리 범위로 후보를 제한한 뒤 추첨해 모든 결과가 도달 가능(뽑고 나서 다시 뽑는 방식은 추첨을 낭비하고 반복에 빠질 수 있음). 역 이름은 경로 계산 전에 정규화
-- **Evidence** — App Store · Play Store 실서비스, 룰렛 · 사다리 · 카드 뽑기 UI와 번갈아 뽑는 커플 모드. 1.1.0(2026.10)에서 돌아오는 길 · 영업시간 · 막차 안전장치를 넣고, 앱의 DB 직접 연결을 Firebase 익명 토큰 + Neon Data API · RLS로 교체. 이어서 시간표 기반 제약 코스 엔진(Top 3 · 트레이드오프 비교, 실시간 · 시간표 · 추정 정보 표시)과 코스 진행 Android 알림 · iOS Live Activity 추가(테스트 309개)
+- **Evidence** — App Store · Play Store 실서비스, 룰렛 · 사다리 · 카드 뽑기 UI와 번갈아 뽑는 커플 모드. 1.1.0(2026.10)에서 돌아오는 길 · 영업시간 · 막차 안전장치를 넣고, 앱의 DB 직접 연결을 Firebase 익명 토큰 + Neon Data API · RLS로 교체. 이어서 시간표 기반 제약 코스 엔진(Top 3 · 트레이드오프 비교, 실시간 · 시간표 · 추정 정보 표시)과 코스 진행 Android 알림 · iOS Live Activity 추가(테스트 309개). 막차는 공공 API 키를 앱에 두지 않으려 Neon Function 교통 중계(Firebase 토큰 검증 · 캐시 · 재시도 · 쿼터 보호)를 거쳐 귀가 열차를 두 역 시간표로 이어 검증될 때만 표시하고, 검증 못 하면 안전하다고 표시하지 않음(대구부터, Remote Config로 단계 공개)
 
 ---
 

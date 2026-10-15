@@ -131,7 +131,7 @@ notion: 363a3015-22b8-8145-9b66-c083ecf7b661
 
 ### DevOps / CI·CD
 
-- **GitHub Actions + Fastlane** (Match · App Store Connect API) — 태그 푸시 시 **TestFlight · Play Store 동시 자동 배포**
+- **GitHub Actions + Fastlane** (Match · App Store Connect API) — 태그 푸시 시 **TestFlight · Play Store 동시 자동 배포**, 스토어 스크린샷 · 그래픽 · 미리보기 영상 4개 언어 스크립트 생성
 - **Firebase Hosting** · **Laravel Vapor** — 웹 · 서버리스 배포 파이프라인 (concurrency 중복 방지)
 - **테스트 · 품질 게이트** — 백엔드 PHPUnit **659개 파일 병렬 실행 + pre-push 게이트**, 클라이언트는 Flutter 위젯 · 단위 테스트와 Jest · Vitest로 회귀 고정
 

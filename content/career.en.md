@@ -11,7 +11,7 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 
 **Flutter · React · Laravel · AWS · Firebase** | 2024.08 – present
 
-> I am the **one person responsible for the app, partner/admin console, user web and backend API** of **KoreHalal**, a service for Muslim travelers. The team started as frontend 1 · backend 1 · designer 1 and was reorganized into **developer 1 · designer 1**; I took over the backend then and now **own the whole stack**. A feature ships through the server schema and API and all three client UIs in one cycle — after an incident where a change landed on one side only and devices behaved differently, I **wrote "client parity" into the repo conventions**. Since the second half of 2026 I also build **internal sales and operations tools** such as overseas travel-agency discovery and travel quotes.
+> I am the **one person responsible for the app, partner/admin console, user web and backend API** of **KoreHalal**, a service for Muslim travelers. The team started as frontend 1 · backend 1 · designer 1 and was reorganized into **developer 1 · designer 1**; I took over the backend then and now **own the whole stack**. A feature ships through the server schema and API and all three client UIs in one cycle — after an incident where a change landed on one side only and devices behaved differently, I **wrote "client parity" into the repo conventions**. Since the second half of 2026 I also build **internal sales and operations tools** such as overseas travel-agency discovery, travel quotes and a unified inquiry inbox.
 
 ---
 
@@ -39,8 +39,8 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 
 - **Problem** — I took over the main API server (Laravel Vapor · AWS Lambda) as its only operator, and it had accumulated authorization, payment and concurrency defects
 - **Engineering Challenge** — Cross-account booking reads (IDOR in 6 routes), self-escalation through profile updates, unrecorded PayPal charges and zero-amount payments, double submits, and a community API that let anyone overwrite someone else's comment — author included
-- **Design Decision** — Ownership guards switched from role-based to scope-based and pinned to "the route decides the target"; double submits handled by reusable idempotency middleware. Refresh tokens rotate with reuse detection (a retry within a 60-second grace gets the same response; reuse outside it is treated as theft and revokes them all); passwords moved to argon2id, with legacy bcrypt hashes verified and then upgraded
-- **Evidence** — 9 community security issues and 6 IDOR routes fixed; PHPUnit (659 files) restored as a parallel pre-push gate; fixing 14 assertions that checked nothing exposed real defects they had been hiding
+- **Design Decision** — Ownership guards switched from role-based to scope-based and pinned to "the route decides the target"; double submits handled by reusable idempotency middleware. Refresh tokens rotate with reuse detection (a retry within a 10-minute grace gets the same response; reuse outside it is treated as theft and revokes them all); passwords moved to argon2id, with legacy bcrypt hashes verified and then upgraded
+- **Evidence** — 9 community security issues and 6 IDOR routes fixed; PHPUnit (681 files) restored as a parallel pre-push gate; fixing 14 assertions that checked nothing exposed real defects they had been hiding
 
 ### Removing per-request computation from list responses `server`
 
@@ -56,12 +56,12 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 - **Design Decision** — The server only issues presigned PUT URLs and the bytes go from the client straight to S3 (the limit disappears); temp (24 h) → permanent storage is a server-side S3 move
 - **Evidence** — After all three clients switched, the legacy route was removed only once CloudWatch showed zero traffic
 
-### Making the server authoritative for prices and order gates (delivery · booking) `server` `app` `web`
+### Making the server authoritative for prices, order gates and payments (delivery · booking) `server` `app` `web`
 
 - **Problem** — Fees are per item and currency conversion rounds per display unit, so a client imitating the rules ends up at minimum-order and free-delivery boundaries with "the screen says you can order, the server says no"
 - **Engineering Challenge** — Two clients (app, web), display in the user's currency but payment in USD, and quote responses arriving out of order while the user types
-- **Design Decision** — A pre-payment quote API (`POST /delivery/quote`) returns both the amounts and the gate decisions, and clients only render them. Coordinates are optional so prices show before an address is entered, and an ordering guard stops a late, stale quote from overwriting a newer one. Applied to delivery first, then extended to bookings
-- **Evidence** — Currency rounding errors at price-tier boundaries, mixed currencies on discount badges and mismatched amounts after switching currency were cleaned up; bookings and delivery now share one structure
+- **Design Decision** — A pre-payment quote API (`POST /delivery/quote`) returns both the amounts and the gate decisions, and clients only render them. Coordinates are optional so prices show before an address is entered, and an ordering guard stops a late, stale quote from overwriting a newer one. Applied to delivery first, then extended to bookings. Payment completion no longer trusts what the client sends either: a prepare/confirm flow has the server look up the PayPal transaction itself and check completion, USD and amount (2026.10)
+- **Evidence** — Currency rounding errors at price-tier boundaries, mixed currencies on discount badges and mismatched amounts after switching currency were cleaned up; bookings and delivery now share one structure. The payment switch removed the PayPal secret from the app and web, and also closed reuse of one transaction ID, paid bookings completing as zero-amount, and an app approval return URL that sent users to a third-party domain
 
 ### Customer ↔ business 1:1 chat `server` `app` `console` `web`
 
@@ -89,17 +89,24 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 - **Problem** — Find overseas travel agencies to sell KoreHalal products without manual B2B prospecting
 - **Engineering Challenge** — 22 sources in 20 countries in every format, deciding per site "does it sell Korea products?", and production Lambda limits (SQS visibility timeout, monthly budget)
 - **Design Decision** — Countries with official lists are read from their registries, associations and trade-fair lists, one reader per source; countries without one are found through search and Google Places (scraping web pages was ruled out — it breaks terms of service and risks getting the server's IP blocked). AI only gives an opinion; rules make the final call — obvious cases are filtered out by rules first to cut AI calls, and if the sentence the AI cites as evidence isn't actually on the site, the answer is treated as made up and downgraded. To fit the server's time limit, work is cut into 45-second pieces that schedule the next piece themselves, and split by company number so several chains run in parallel
-- **Evidence** — A production load bottleneck (1/10 of local speed) fixed with chunked queries and pinned by a test; found that 72% of 2,740 queued pages never needed the model and consolidated the prefilter in one place; running in production from collection → judging → contacts → outreach kanban
+- **Evidence** — A production load bottleneck (1/10 of local speed) fixed with chunked queries and pinned by a test; found that 72% of 2,740 queued pages never needed the model and consolidated the prefilter in one place; running in production from collection → judging → contacts → outreach kanban. Then moved the step that finds each agency's contacts on LinkedIn (with role and match score) onto the server with Message Batches — it reproduced 6 of the 8 people the earlier Mac routine found at about $0.08 per agency, and dropping the "search at least twice" instruction fell to 3, showing most of the quality comes from the prompt's search instruction
+
+### Unified inquiry inbox (2026.10) `server` `console` `web`
+
+- **Problem** — Custom-trip and partner inquiry forms (Firebase Functions) and email inquiries lived in separate places, so nothing traced an inquiry through to a quote
+- **Engineering Challenge** — The mailbox holds more service notifications, trade-fair list spam and our own receipt emails than real inquiries, and a reply must not split off into a new inquiry
+- **Design Decision** — Forms post straight to the backend; mail is pulled over POP3 every minute (UIDL cursor, Message-ID dedup, nothing deleted) and replies join the same inquiry thread via In-Reply-To/References. AI only advises on type, party size, company, country and summary through structured output, and never overwrites a type a person set. Spam rules were set from a dry run (`--sample=N`) showing real counts per reason, not by guesswork
+- **Evidence** — A dry run on the latest 300 emails found, among 127 that passed, about 55 service notifications, about 40 list spam and 5 of our own receipts, which went into the filter rules; the console links type filters, the original thread, AI summary, sender/domain blocking (public mail domains can't be blocked whole) and conversion to a quote
 
 ### Other work
 
-- `console` three-role permissions for Provider · Place Provider · Admin (set-based `roles[]` checks), `web` one-way MVVM layering (pages → viewmodels → repositories → api → stores)
+- `console` three-role permissions for Provider · Place Provider · Admin (set-based `roles[]` checks) plus two admin levels (only the head and team leads see cost and margin or can send and delete, enforced by a server gate), `web` one-way MVVM layering (pages → viewmodels → repositories → api → stores)
 - Coupons, group departures, date-range exceptions (holiday closures, special prices) and add-on options; real-time airport board, prayer times and Qibla correction; on-demand translation, contribution badges and a recommendation engine (Final Score)
 - Halal barcode scanner — on-device OCR (Vision / ML Kit) + a local HACCP mirror and a three-level verdict engine
 - 5 languages plus Arabic RTL, 293 hard-coded strings localized, 100 icon-only controls made accessible, SEO · GEO (JSON-LD · `llms.txt`)
 - Analytics dashboard (8 calls → 1 aggregate endpoint, GA4 · Clarity compared side by side), PostHog · Clarity · GA4 payment-funnel tracking
-- Travel quote builder (price snapshots · PDF), segmented push campaigns (900-second CLI dispatch), blog draft pipeline (only a human publishes)
-- App stability (Korean IME duplicate-character bug → `reactive_forms` rewrite, Crashlytics non-fatal demotion), Flutter 3.47 · Kotlin 2.3 · R8, deploy guards and multi-channel Slack alerts
+- Travel quote builder (price snapshots · PDF · arrangement checks and deposit, interim and balance payment records), segmented push campaigns (900-second CLI dispatch), blog draft pipeline (only a human publishes)
+- App stability (Korean IME duplicate-character bug → `reactive_forms` rewrite, Crashlytics non-fatal demotion, login tokens moved to device-only secure storage), Flutter 3.47 · Kotlin 2.3 · R8, deploy guards and multi-channel Slack alerts
 
 ---
 

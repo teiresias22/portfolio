@@ -2,11 +2,14 @@
   --bg: #fafafa; --fg: #18181b; --muted: #52525b; --line: #e4e4e7;
   --card: #ffffff; --accent: #2563eb; --chip: #f1f1f3; --label: #3f3f46;
   --header-h: 64px;
+  /* Open contents card: a soft blue-grey, apart from the neutral page but quiet enough to read on. */
+  --toc-bg: #f1f5fc; --toc-head: #e7eef9; --toc-line: #d5e0f1; --toc-chip: #dfe8f7;
 }
 @media (prefers-color-scheme: dark) {
   :root {
     --bg: #111113; --fg: #ececee; --muted: #a1a1aa; --line: #2a2a2e;
     --card: #19191c; --accent: #8ab4ff; --chip: #232327; --label: #d4d4d8;
+    --toc-bg: #1a1e26; --toc-head: #1f2430; --toc-line: #2c3442; --toc-chip: #273041;
   }
 }
 * { box-sizing: border-box; }
@@ -51,8 +54,9 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
 .toc summary { display: flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 16px; list-style: none; cursor: pointer; border-radius: 999px; background: var(--fg); color: var(--bg); font-weight: 600; font-size: .9rem; user-select: none; }
 .toc summary::-webkit-details-marker { display: none; }
 .toc summary .ic { width: 18px; height: 18px; flex: none; }
-.toc details[open] { width: min(340px, calc(100vw - 32px)); border: 1px solid var(--line); border-radius: 16px; background: var(--card); box-shadow: 0 12px 40px rgb(0 0 0 / .16), 0 2px 6px rgb(0 0 0 / .06); overflow: hidden; }
-.toc details[open] summary { min-height: 40px; padding: 0 12px 0 14px; border-radius: 0; background: none; color: var(--label); font-size: .85rem; border-bottom: 1px solid var(--line); }
+/* Inside the card, hover and current marks and dividers take the card's tint instead of plain grey. */
+.toc details[open] { --chip: var(--toc-chip); --line: var(--toc-line); width: min(340px, calc(100vw - 32px)); border: 1px solid var(--line); border-radius: 16px; background: var(--toc-bg); box-shadow: 0 12px 40px rgb(0 0 0 / .16), 0 2px 6px rgb(0 0 0 / .06); overflow: hidden; }
+.toc details[open] summary { min-height: 40px; padding: 0 12px 0 14px; border-radius: 0; background: var(--toc-head); color: var(--label); font-size: .85rem; border-bottom: 1px solid var(--line); }
 .toc details[open] summary:hover { background: var(--chip); }
 .toc details[open] summary:focus-visible { outline-offset: -2px; border-radius: 15px 15px 0 0; }
 .toc details[open] summary::after { content: ""; margin-left: auto; width: 8px; height: 8px; border: solid currentColor; border-width: 0 1.5px 1.5px 0; transform: translateY(-2px) rotate(45deg); }

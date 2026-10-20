@@ -11,8 +11,8 @@ const PAGES = [
   { name: 'career', path: 'career/', toc: 3 },
 ]
 const UI = {
-  en: { toc: 'Contents', sub: 'subsections', skip: 'Skip to content', name: 'Joonhwan Jeon', role: 'Cross-platform developer · Flutter · Swift · React · Laravel', resume: 'Resume', career: 'Career', apps: 'Apps', other: '한국어', otherLang: 'ko', contact: 'Get in touch', contactSub: 'For questions or opportunities, email is the fastest way to reach me.', updated: 'Updated', top: 'Back to top', newTab: '(opens in a new tab)', locale: 'en_US', jobTitle: 'Cross-platform developer' },
-  ko: { toc: '목차', sub: '하위 항목', skip: '본문 바로가기', name: '전준환', role: '크로스플랫폼 개발자 · Flutter · Swift · React · Laravel', resume: '이력서', career: '경력기술서', apps: '앱', other: 'English', otherLang: 'en', contact: '연락하기', contactSub: '문의나 제안은 이메일로 주시면 가장 빠르게 답변드립니다.', updated: '최종 업데이트', top: '맨 위로', newTab: '(새 창에서 열림)', locale: 'ko_KR', jobTitle: '크로스플랫폼 개발자' },
+  en: { toc: 'Contents', sub: 'subsections', skip: 'Skip to content', name: 'Joonhwan Jeon', role: 'Cross-platform developer · Flutter · Swift · React · Laravel', resume: 'Resume', career: 'Career', apps: 'Apps', otherLang: 'ko', contact: 'Get in touch', contactSub: 'For questions or opportunities, email is the fastest way to reach me.', updated: 'Updated', top: 'Back to top', newTab: '(opens in a new tab)', locale: 'en_US', jobTitle: 'Cross-platform developer' },
+  ko: { toc: '목차', sub: '하위 항목', skip: '본문 바로가기', name: '전준환', role: '크로스플랫폼 개발자 · Flutter · Swift · React · Laravel', resume: '이력서', career: '경력기술서', apps: '앱', otherLang: 'en', contact: '연락하기', contactSub: '문의나 제안은 이메일로 주시면 가장 빠르게 답변드립니다.', updated: '최종 업데이트', top: '맨 위로', newTab: '(새 창에서 열림)', locale: 'ko_KR', jobTitle: '크로스플랫폼 개발자' },
 }
 // Header and footer show these in the same order. Email stays the highlighted button (fastest reply).
 // Footer buttons pair each label with a Remix Icon (line) — the same set the app pages' footers use.
@@ -34,6 +34,9 @@ const ICONS = `<link rel="icon" href="/favicon.ico" sizes="48x48">
 <meta name="theme-color" content="#111113" media="(prefers-color-scheme: dark)">`
 const NEW_TAB = 'target="_blank" rel="noopener"'
 const APPS = 'https://apps.joon.is-a.dev/' // project hub, a separate site
+// The hub is another origin, so carry the reader's language over:
+// the hub has an /en/ path; each app's i18next detector reads ?lng=.
+const appLink = (href, lang) => href === APPS ? (lang === 'en' ? `${APPS}en/` : APPS) : `${href}?lng=${lang}`
 const linkAttrs = (href) => (href.startsWith('http') ? ` ${NEW_TAB}` : '')
 // Contents entries written as "Name — description" show the name with the description beneath it.
 const tocEntry = (text) => {
@@ -74,7 +77,7 @@ const EMOJI = /^(?:\p{Extended_Pictographic}|\uFE0F|\u200D)+\s*/u
 const FACTS = 'Problem|Engineering Challenge|Design Decision|Evidence'
 const slug = (s) => s.replace(/<[^>]+>/g, '').toLowerCase().replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-|-$/g, '')
 
-function toHtml(body, tocDepth, t) {
+function toHtml(body, tocDepth, t, lang) {
   // Notion-only blocks (profile table with phone/birthdate) never reach the web.
   body = body.replace(/<!-- notion-only -->[\s\S]*?<!-- \/notion-only -->\n*(---\n+)?/g, '')
   // Shift headings so the top level in each document becomes <h2> (the page header owns <h1>).
@@ -106,6 +109,7 @@ function toHtml(body, tocDepth, t) {
         .replace(/(<tr>\s*<td[^>]*>)((?:(?!<\/td>)[\s\S])*?) — ((?:(?!<\/td>)[\s\S])*?)<\/td>/g, '$1<span class="pn">$2</span><span class="pd">$3</span></td>')
         .replace(/^<table>(?=[\s\S]*class="pn")/, '<table class="projects">')
     })
+    .replace(/href="(https:\/\/apps\.joon\.is-a\.dev\/[^"?#]*)"/g, (_, href) => `href="${appLink(href, lang)}"`)
     // Web links open in a new tab, so the resume stays where the reader left it.
     .replace(/<a href="(https?:[^"]+)">([\s\S]*?)<\/a>/g, (_, href, text) => `<a href="${href}" ${NEW_TAB}>${text}<span class="sr"> ${t.newTab}</span></a>`)
     .replace(/<table( class="projects")?>/g, '<div class="table-wrap"><table$1>')
@@ -203,12 +207,14 @@ function page(lang, { name, path }) {
   const { meta, body } = load(name, lang)
   const t = UI[lang]
   const modified = updated(name, lang), date = modified.slice(0, 10)
-  const { html, toc } = toHtml(body, PAGES.find((p) => p.name === name).toc, t)
+  const { html, toc } = toHtml(body, PAGES.find((p) => p.name === name).toc, t, lang)
   const tocHtml = `<nav class="toc" id="toc" aria-label="${t.toc}"><details><summary><svg class="ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 4H21V6H3V4ZM3 11H15V13H3V11ZM3 18H21V20H3V18Z"/></svg><span>${t.toc}</span></summary><ol>${tocTree(toc, t)}</ol></details></nav>`
   const nav = PAGES.map((p) => {
     const href = `/${lang === 'ko' ? 'ko/' : ''}${p.path}`
     return `<a href="${href}"${p.name === name ? ' aria-current="page"' : ''}>${t[p.name]}</a>`
   }).join('')
+  const langs = [['en', 'English'], ['ko', '한국어']].map(([l, label]) =>
+    `<a href="${url(l, path).replace(SITE, '')}" hreflang="${l}" lang="${l}"${l === lang ? ' aria-current="page"' : ''}>${label}</a>`).join('')
   return `<!doctype html>
 <html lang="${lang}">
 <head>
@@ -240,7 +246,7 @@ ${ICONS}
 <header class="top">
   <div class="wrap">
     <div class="who"><h1 class="name"><a href="/${lang === 'ko' ? 'ko/' : ''}">${t.name}</a></h1><span class="role">${t.role}</span><span class="links">${CONTACTS.map((c) => `<a href="${c.href}"${linkAttrs(c.href)} data-print="${c.print}">${c.label}</a>`).join('')}</span></div>
-    <nav aria-label="Pages">${nav}<a href="${APPS}" ${NEW_TAB}>${t.apps}</a><a class="lang" href="${url(t.otherLang, path).replace(SITE, '')}" hreflang="${t.otherLang}" lang="${t.otherLang}">${t.other}</a></nav>
+    <nav aria-label="Pages"><span class="seg">${nav}</span><a class="apps" href="${appLink(APPS, lang)}" ${NEW_TAB}>${t.apps}</a><span class="seg" role="group" aria-label="Language">${langs}</span></nav>
   </div>
 </header>
 <div class="layout">

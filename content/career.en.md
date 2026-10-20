@@ -30,73 +30,130 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 
 ### Taking over the legacy app → full rebuild `app`
 
-- **Problem** — The inherited app was a commercial template with MobX and a flat structure, so state management got more tangled with every feature
-- **Engineering Challenge** — Production issues such as PayPal payment errors and social-login review requirements had to be handled first, on the inherited structure (shipped v1.0.0 – v1.0.6)
-- **Design Decision** — Judged that reorganizing folders would not get past the limits and led a full rebuild in 2025.01 — a 13-domain layered architecture (Data Source → Repository → UseCase → ViewModel → View) with Riverpod · Freezed
-- **Evidence** — New domains such as delivery, 1:1 chat, the barcode scanner and the airport board were added the same way on the rebuilt structure; about 3,500 active installs across 5 languages plus Arabic RTL
+- **Problem** — The inherited app was a **commercial template** with **MobX and a flat structure**,\
+  so state management got more tangled with every feature
+- **Engineering Challenge** — Production issues such as **PayPal payment errors** and **social-login review requirements** had to be handled first,\
+  on the inherited structure (shipped v1.0.0 – v1.0.6)
+- **Design Decision** — Judged that reorganizing folders would not get past the limits and led a **full rebuild** in 2025.01\
+  — a **13-domain layered architecture** (Data Source → Repository → UseCase → ViewModel → View) with Riverpod · Freezed
+- **Evidence** — New domains such as delivery, 1:1 chat, the barcode scanner and the airport board were **added the same way** on the rebuilt structure;\
+  about **3,500 active installs** across **5 languages plus Arabic RTL**
 
 ### Backend takeover · fixing security defects `server`
 
-- **Problem** — I took over the main API server (Laravel Vapor · AWS Lambda) as its only operator, and it had accumulated authorization, payment and concurrency defects
-- **Engineering Challenge** — Cross-account booking reads (IDOR in 6 routes), self-escalation through profile updates, unrecorded PayPal charges and zero-amount payments, double submits, and a community API that let anyone overwrite someone else's comment — author included
-- **Design Decision** — Ownership guards switched from role-based to scope-based and pinned to "the route decides the target"; double submits handled by reusable idempotency middleware. Refresh tokens rotate with reuse detection (a retry within a 10-minute grace gets the same response; reuse outside it is treated as theft and revokes them all); passwords moved to argon2id, with legacy bcrypt hashes verified and then upgraded
-- **Evidence** — 9 community security issues and 6 IDOR routes fixed; PHPUnit (681 files) restored as a parallel pre-push gate; fixing 14 assertions that checked nothing exposed real defects they had been hiding
+- **Problem** — I took over the main API server (Laravel Vapor · AWS Lambda) as its **only operator**,\
+  and it had accumulated **authorization, payment and concurrency defects**
+- **Engineering Challenge** — Cross-account booking reads (**IDOR in 6 routes**), **self-escalation** through profile updates,\
+  unrecorded PayPal charges and zero-amount payments, double submits,\
+  and a community API that let anyone overwrite someone else's comment — author included
+- **Design Decision** — Ownership guards switched from role-based to **scope-based** and pinned to "the route decides the target";\
+  double submits handled by reusable idempotency middleware.\
+  Refresh tokens rotate with **reuse detection** (a retry within a 10-minute grace gets the same response; reuse outside it is treated as theft and revokes them all);\
+  passwords moved to **argon2id**, with legacy bcrypt hashes verified and then upgraded
+- **Evidence** — **9 community security issues** and **6 IDOR routes** fixed;\
+  PHPUnit (681 files) restored as a parallel pre-push gate;\
+  fixing 14 assertions that checked nothing **exposed real defects** they had been hiding
 
 ### Removing per-request computation from list responses `server`
 
-- **Problem** — Dashboard and search lists recomputed every product's price and coupon eligibility in PHP on every response
-- **Engineering Challenge** — Cost grew as products × coupons × eligible targets, so lists got heavier as coupons piled up — and Lambda execution time is billed
-- **Design Decision** — Moved discount-period and weekday checks into SQL conditions, and computed "the set of product UUIDs a coupon applies to" in one indexed query for O(1) lookups. Like, comment and review stats were denormalized with nightly batches plus event sync
-- **Evidence** — `withCount` aggregation that ran on every response was removed, including from other call sites; less computation is directly lower Lambda cost
+- **Problem** — Dashboard and search lists recomputed every product's price and coupon eligibility **in PHP on every response**
+- **Engineering Challenge** — Cost grew as **products × coupons × eligible targets**, so lists got heavier as coupons piled up\
+  — and **Lambda execution time is billed**
+- **Design Decision** — Moved discount-period and weekday checks into **SQL conditions**,\
+  and computed "the set of product UUIDs a coupon applies to" in **one indexed query** for O(1) lookups.\
+  Like, comment and review stats were **denormalized** with nightly batches plus event sync
+- **Evidence** — `withCount` aggregation that ran on every response was **removed**, including from other call sites;\
+  less computation is directly **lower Lambda cost**
 
 ### Image upload — switching to direct S3 upload `server` `app` `console` `web`
 
-- **Problem** — Photos passed through a proxy image server as multipart uploads, so high-resolution and multi-image uploads often failed
-- **Engineering Challenge** — The ALB 10 MB payload limit, and three clients (app, console, web) all on the old path
-- **Design Decision** — The server only issues presigned PUT URLs and the bytes go from the client straight to S3 (the limit disappears); temp (24 h) → permanent storage is a server-side S3 move
-- **Evidence** — After all three clients switched, the legacy route was removed only once CloudWatch showed zero traffic
+- **Problem** — Photos passed through a **proxy image server** as multipart uploads,\
+  so high-resolution and multi-image uploads **often failed**
+- **Engineering Challenge** — The **ALB 10 MB payload limit**, and **three clients** (app, console, web) all on the old path
+- **Design Decision** — The server only issues **presigned PUT URLs** and the bytes go from the client **straight to S3** (the limit disappears);\
+  temp (24 h) → permanent storage is a **server-side S3 move**
+- **Evidence** — After all three clients switched, the **legacy route was removed** only once **CloudWatch showed zero traffic**
 
 ### Making the server authoritative for prices, order gates and payments (delivery · booking) `server` `app` `web`
 
-- **Problem** — Fees are per item and currency conversion rounds per display unit, so a client imitating the rules ends up at minimum-order and free-delivery boundaries with "the screen says you can order, the server says no"
-- **Engineering Challenge** — Two clients (app, web), display in the user's currency but payment in USD, and quote responses arriving out of order while the user types
-- **Design Decision** — A pre-payment quote API (`POST /delivery/quote`) returns both the amounts and the gate decisions, and clients only render them. Coordinates are optional so prices show before an address is entered, and an ordering guard stops a late, stale quote from overwriting a newer one. Applied to delivery first, then extended to bookings. Payment completion no longer trusts what the client sends either: a prepare/confirm flow has the server look up the PayPal transaction itself and check completion, USD and amount (2026.10)
-- **Evidence** — Currency rounding errors at price-tier boundaries, mixed currencies on discount badges and mismatched amounts after switching currency were cleaned up; bookings and delivery now share one structure. The payment switch removed the PayPal secret from the app and web, and also closed reuse of one transaction ID, paid bookings completing as zero-amount, and an app approval return URL that sent users to a third-party domain
+- **Problem** — Fees are **per item** and currency conversion **rounds per display unit**,\
+  so a client imitating the rules ends up at minimum-order and free-delivery boundaries\
+  with **"the screen says you can order, the server says no"**
+- **Engineering Challenge** — **Two clients** (app, web), display in the user's currency but **payment in USD**,\
+  and quote responses **arriving out of order** while the user types
+- **Design Decision** — A **pre-payment quote API** (`POST /delivery/quote`) returns both the amounts and the gate decisions, and clients only render them.\
+  Coordinates are optional so prices show before an address is entered, and an **ordering guard** stops a late, stale quote from overwriting a newer one.\
+  Applied to delivery first, then extended to bookings.\
+  Payment completion no longer trusts what the client sends either: a prepare/confirm flow has the **server look up the PayPal transaction itself** and check completion, USD and amount (2026.10)
+- **Evidence** — Currency rounding errors at price-tier boundaries, mixed currencies on discount badges and mismatched amounts after switching currency were cleaned up;\
+  bookings and delivery now **share one structure**.\
+  The payment switch **removed the PayPal secret** from the app and web, and also closed reuse of one transaction ID, paid bookings completing as zero-amount, and an app approval return URL that sent users to a third-party domain
 
 ### Customer ↔ business 1:1 chat `server` `app` `console` `web`
 
-- **Problem** — Customers with a booking or order and the business need to talk from the app, the web or the partner console
-- **Engineering Challenge** — Real-time delivery and guaranteed delivery at once, one room per pair rather than per booking, and Firebase security rules without new auth infrastructure
-- **Design Decision** — Conversation key = (customer, business); bookings and orders are only the reason a chat is allowed. MySQL is the source of truth and Firebase RTDB a real-time copy written only by the server (a failed mirror never breaks sending); guaranteed delivery comes from incremental polling (`after_id`). The server mints Firebase custom tokens
-- **Evidence** — App, console and web behave to one spec, with presence, typing, attachments, per-person read state, report/block and resend on failure
+- **Problem** — Customers with a booking or order and the business need to **talk from the app, the web or the partner console**
+- **Engineering Challenge** — **Real-time delivery and guaranteed delivery** at once,\
+  **one room per pair** rather than per booking,\
+  and Firebase security rules **without new auth infrastructure**
+- **Design Decision** — **Conversation key = (customer, business)**; bookings and orders are only the reason a chat is allowed.\
+  **MySQL is the source of truth** and Firebase RTDB a real-time copy written only by the server (a failed mirror never breaks sending);\
+  guaranteed delivery comes from **incremental polling** (`after_id`).\
+  The server mints Firebase custom tokens
+- **Evidence** — App, console and web **behave to one spec**,\
+  with presence, typing, attachments, per-person read state, report/block and resend on failure
 
 ### Halal map · place directory pipeline `server` `web` `app` `console`
 
-- **Problem** — The halal place map ran on a Google My Maps embed; it had to run on our own data and pick up new and closed places automatically
-- **Engineering Challenge** — Matching across external sources (Naver, Kakao, Google Place, TourAPI, LOCALDATA) and their quotas — one exception on the last keyword after hitting a quota threw away every candidate collected, and a cap of 120 dropped 58 of 178 eligible brands in the same place every run
-- **Design Decision** — Designed the lifecycle KML import → Naver matching → Kakao discovery (biweekly) → Google · TourAPI enrichment → LOCALDATA closure detection (grace → hidden → recheck). Failures are isolated per keyword and truncated runs are posted to Slack as "stopped" — reading as "covered everything" is more dangerous than the cap itself
-- **Evidence** — App and web maps now use our own public Place DB API (KML fallback), and "nearby products" clicks on a place page measure map → booking conversion
+- **Problem** — The halal place map ran on a **Google My Maps embed**;\
+  it had to run on **our own data** and pick up new and closed places automatically
+- **Engineering Challenge** — **Matching across external sources** (Naver, Kakao, Google Place, TourAPI, LOCALDATA) and their quotas\
+  — one exception on the last keyword after hitting a quota **threw away every candidate collected**,\
+  and a cap of 120 **dropped 58 of 178 eligible brands** in the same place every run
+- **Design Decision** — Designed the **lifecycle** KML import → Naver matching → Kakao discovery (biweekly) → Google · TourAPI enrichment → LOCALDATA closure detection (grace → hidden → recheck).\
+  Failures are **isolated per keyword** and truncated runs are posted to Slack as **"stopped"**\
+  — reading as "covered everything" is more dangerous than the cap itself
+- **Evidence** — App and web maps now use our own **public Place DB API** (KML fallback),\
+  and "nearby products" clicks on a place page measure **map → booking conversion**
 
 ### Location Information Act, Article 16 compliance `server` `console`
 
-- **Problem** — The personal-location-data handling ledger and admin access logs must be kept for at least the legal six months
-- **Engineering Challenge** — Early-return branches in the four routes that receive coordinates made it easy to miss a log entry, and logs must never be cut short by mistake
-- **Design Decision** — Append-only by design, with no update or delete path and no automatic purge job. Logging lives in route middleware and only records when coordinates are actually present; identities are stored only as a member uuid or a hash of a guest's IP + UA
-- **Evidence** — A read-only command for audit evidence (`evidence:password-hashing`) and a console screen for viewing location-data access logs
+- **Problem** — The personal-location-data handling ledger and admin access logs must be kept for **at least the legal six months**
+- **Engineering Challenge** — **Early-return branches** in the four routes that receive coordinates made it easy to **miss a log entry**,\
+  and logs must never be cut short by mistake
+- **Design Decision** — **Append-only** by design, with no update or delete path and no automatic purge job.\
+  Logging lives in **route middleware** and only records when coordinates are actually present;\
+  identities are stored only as a member uuid or **a hash of a guest's IP + UA**
+- **Evidence** — A **read-only command** for audit evidence (`evidence:password-hashing`)\
+  and a **console screen** for viewing location-data access logs
 
 ### Overseas travel-agency discovery pipeline (2026.09) `server` `console`
 
-- **Problem** — Find overseas travel agencies to sell KoreHalal products without manual B2B prospecting
-- **Engineering Challenge** — 22 sources in 20 countries in every format, deciding per site "does it sell Korea products?", and production Lambda limits (SQS visibility timeout, monthly budget)
-- **Design Decision** — Countries with official lists are read from their registries, associations and trade-fair lists, one reader per source; countries without one are found through search and Google Places (scraping web pages was ruled out — it breaks terms of service and risks getting the server's IP blocked). AI only gives an opinion; rules make the final call — obvious cases are filtered out by rules first to cut AI calls, and if the sentence the AI cites as evidence isn't actually on the site, the answer is treated as made up and downgraded. To fit the server's time limit, work is cut into 45-second pieces that schedule the next piece themselves, and split by company number so several chains run in parallel
-- **Evidence** — A production load bottleneck (1/10 of local speed) fixed with chunked queries and pinned by a test; found that 72% of 2,740 queued pages never needed the model and consolidated the prefilter in one place; running in production from collection → judging → contacts → outreach kanban. Then moved the step that finds each agency's contacts on LinkedIn (with role and match score) onto the server with Message Batches — it reproduced 6 of the 8 people the earlier Mac routine found at about $0.08 per agency, and dropping the "search at least twice" instruction fell to 3, showing most of the quality comes from the prompt's search instruction
+- **Problem** — Find **overseas travel agencies** to sell KoreHalal products **without manual B2B prospecting**
+- **Engineering Challenge** — **22 sources in 20 countries** in every format, deciding per site "does it sell Korea products?",\
+  and **production Lambda limits** (SQS visibility timeout, monthly budget)
+- **Design Decision** — Countries with official lists are read from their registries, associations and trade-fair lists, **one reader per source**;\
+  countries without one are found through search and Google Places (scraping web pages was ruled out — it breaks terms of service and risks getting the server's IP blocked).\
+  AI only gives an opinion; **rules make the final call** — obvious cases are filtered out by rules first to cut AI calls,\
+  and if the sentence the AI cites as evidence isn't actually on the site, the answer is treated as made up and downgraded.\
+  To fit the server's time limit, work is cut into **45-second pieces** that schedule the next piece themselves, and split by company number so several chains run in parallel
+- **Evidence** — A production load bottleneck (**1/10 of local speed**) fixed with chunked queries and pinned by a test;\
+  found that **72% of 2,740 queued pages** never needed the model and consolidated the prefilter in one place;\
+  running in production from collection → judging → contacts → outreach kanban.\
+  Then moved the step that finds each agency's contacts on LinkedIn (with role and match score) onto the server with Message Batches — it reproduced 6 of the 8 people the earlier Mac routine found at **about $0.08 per agency**, and dropping the "search at least twice" instruction fell to 3, showing most of the quality comes from the prompt's search instruction
 
 ### Unified inquiry inbox (2026.10) `server` `console` `web`
 
-- **Problem** — Custom-trip and partner inquiry forms (Firebase Functions) and email inquiries lived in separate places, so nothing traced an inquiry through to a quote
-- **Engineering Challenge** — The mailbox holds more service notifications, trade-fair list spam and our own receipt emails than real inquiries, and a reply must not split off into a new inquiry
-- **Design Decision** — Forms post straight to the backend; mail is pulled over POP3 every minute (UIDL cursor, Message-ID dedup, nothing deleted) and replies join the same inquiry thread via In-Reply-To/References. AI only advises on type, party size, company, country and summary through structured output, and never overwrites a type a person set. Spam rules were set from a dry run (`--sample=N`) showing real counts per reason, not by guesswork
-- **Evidence** — A dry run on the latest 300 emails found, among 127 that passed, about 55 service notifications, about 40 list spam and 5 of our own receipts, which went into the filter rules; the console links type filters, the original thread, AI summary, sender/domain blocking (public mail domains can't be blocked whole) and conversion to a quote
+- **Problem** — Custom-trip and partner inquiry forms (Firebase Functions) and email inquiries lived in **separate places**,\
+  so **nothing traced an inquiry** through to a quote
+- **Engineering Challenge** — The mailbox holds more service notifications, trade-fair list spam and our own receipt emails than real inquiries,\
+  and a reply **must not split off** into a new inquiry
+- **Design Decision** — Forms post straight to the backend; mail is pulled over **POP3 every minute** (UIDL cursor, Message-ID dedup, nothing deleted)\
+  and replies join the same inquiry thread via In-Reply-To/References.\
+  AI **only advises** on type, party size, company, country and summary through structured output, and never overwrites a type a person set.\
+  Spam rules were set from a **dry run** (`--sample=N`) showing real counts per reason, not by guesswork
+- **Evidence** — A dry run on the **latest 300 emails** found, among 127 that passed, about 55 service notifications, about 40 list spam and 5 of our own receipts,\
+  which went into the **filter rules**;\
+  the console links type filters, the original thread, AI summary, sender/domain blocking (public mail domains can't be blocked whole) and **conversion to a quote**
 
 ### Other work
 
@@ -121,10 +178,13 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 
 > Marketing / lead-generation website for ICU Company, an inbound travel agency specialized in halal travel — inquiry form, 4 SEO landing pages, multilingual hreflang
 
-- **Problem** — Collect inquiries (leads) for a halal inbound travel agency and show up in search and AI answers
-- **Engineering Challenge** — A React SPA looks empty to crawlers that don't run JavaScript (GPTBot, PerplexityBot and others), and several KoreHalal sites in the same account made deploying to the wrong one a real risk
-- **Design Decision** — Runtime (react-helmet-async) + build-time prerendering generate per-route HTML, meta, JSON-LD and sitemap. Inquiry form → Firestore → Cloud Function → real-time Slack alert; a predeploy hook checks the target project against a whitelist
-- **Evidence** — Lighthouse SEO 100 and CLS 0.001, Vitest + GitHub Actions CI
+- **Problem** — Collect **inquiries (leads)** for a halal inbound travel agency and show up in **search and AI answers**
+- **Engineering Challenge** — A React SPA **looks empty to crawlers** that don't run JavaScript (GPTBot, PerplexityBot and others),\
+  and several KoreHalal sites in the same account made **deploying to the wrong one** a real risk
+- **Design Decision** — Runtime (react-helmet-async) + **build-time prerendering** generate per-route HTML, meta, JSON-LD and sitemap.\
+  Inquiry form → Firestore → Cloud Function → **real-time Slack alert**;\
+  a **predeploy hook** checks the target project against a whitelist
+- **Evidence** — **Lighthouse SEO 100** and **CLS 0.001**, Vitest + GitHub Actions CI
 
 ---
 
@@ -147,10 +207,12 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 
 > An AI image and text trademark search app — started in Swift, then led the move to Flutter
 
-- **Problem** — The AI trademark search app existed only on iOS and had to reach Android
-- **Engineering Challenge** — Moving an app built in Swift · SwiftUI to cross-platform without losing its UI spec, and keeping large image searches and loading fast
-- **Design Decision** — Led the Flutter migration with MVVM + Provider · go_router, defining design tokens and shared components first so the Swift version's UI spec carried over unchanged
-- **Evidence** — Image search 50% faster; part of the product shown at CES 2023
+- **Problem** — The AI trademark search app existed **only on iOS** and had to **reach Android**
+- **Engineering Challenge** — Moving an app built in Swift · SwiftUI to cross-platform **without losing its UI spec**,\
+  and keeping **large image searches** and loading fast
+- **Design Decision** — Led the **Flutter migration** with MVVM + Provider · go_router,\
+  defining **design tokens and shared components first** so the Swift version's UI spec carried over unchanged
+- **Evidence** — Image search **50% faster**; part of the product shown at **CES 2023**
 
 ---
 
@@ -165,10 +227,14 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 
 > A matching platform connecting patent, trademark and design applicants with patent attorneys — designed and maintained a UIKit codebase of 211 Swift files and **about 27k lines** on my own
 
-- **Problem** — An iOS app for a platform matching patent, trademark and design applicants with patent attorneys
-- **Engineering Challenge** — Two roles, applicant and attorney, with different sign-up, profiles and screens; real-time 1:1 chat with per-room unread badges
-- **Design Decision** — Sign-up flows and my-pages split by role; MessageKit chat UI synced through Firebase RTDB, with per-room unread counts computed by comparing `last_read_index` to drive FCM badges. Iamport identity verification, nearby-attorney search with Kakao Local + MapKit, and AI attorney recommendations from an in-house server
-- **Evidence** — 211 Swift files (about 27k lines) designed and maintained alone, released on the App Store as v2.0.1, sign-up → interest → consultation funnel tracked with Firebase Analytics
+- **Problem** — An **iOS app** for a platform matching patent, trademark and design applicants with **patent attorneys**
+- **Engineering Challenge** — **Two roles**, applicant and attorney, with different sign-up, profiles and screens;\
+  **real-time 1:1 chat** with per-room unread badges
+- **Design Decision** — Sign-up flows and my-pages **split by role**;\
+  MessageKit chat UI synced through **Firebase RTDB**, with per-room unread counts computed by comparing `last_read_index` to drive FCM badges.\
+  Iamport identity verification, nearby-attorney search with Kakao Local + MapKit, and **AI attorney recommendations** from an in-house server
+- **Evidence** — **211 Swift files (about 27k lines)** designed and maintained alone, released on the App Store as v2.0.1,\
+  sign-up → interest → consultation **funnel tracked** with Firebase Analytics
 
 ---
 
@@ -208,10 +274,17 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 
 > A community app for finding and joining local classes and small-group meetups — pivoted to a class / meetup marketplace in 2026.
 
-- **Problem** — A marketplace for finding and joining local classes and small groups. The app shares one codebase with another frontend developer, and I build the web (Next.js) alone
-- **Engineering Challenge** — Keeping web and app screens and behavior the same while the app kept changing. Even with matching design tokens, screen-level differences kept growing; framing Flutter web inside the site isolated sessions through Safari's cross-origin storage partitioning, and OAuth doesn't work inside an iframe
-- **Design Decision** — The app is the design source of truth: `sync-design` regenerates web CSS tokens from the Dart theme and icons and fails CI when they drift. To avoid building every screen twice, the Flutter web build is framed inside Next.js pages but served from the same origin, with OAuth delegated to a popup on the parent page. The switch is one environment variable (`NEXT_PUBLIC_APP_FRAME`), so rolling back needs no code deploy. For two-person work, the in-feature `data / domain / presentation` structure is fixed in docs
-- **Evidence** — Removing `dart:io` and unused fonts cut the web first load from 28.9 MB to 15.7 MB and the app by 13 MB; an A/B bug that alternated variants for the same account was fixed with fixed assignment, stopping experiment-data pollution
+- **Problem** — A marketplace for finding and joining **local classes and small groups**.\
+  The app shares one codebase with another frontend developer, and **I build the web (Next.js) alone**
+- **Engineering Challenge** — Keeping **web and app screens and behavior the same** while the app kept changing.\
+  Even with matching design tokens, screen-level differences kept growing;\
+  framing Flutter web inside the site isolated sessions through Safari's **cross-origin storage partitioning**, and OAuth doesn't work inside an iframe
+- **Design Decision** — The **app is the design source of truth**: `sync-design` regenerates web CSS tokens from the Dart theme and icons and fails CI when they drift.\
+  To avoid building every screen twice, the Flutter web build is framed inside Next.js pages but **served from the same origin**, with OAuth delegated to a popup on the parent page.\
+  The switch is one environment variable (`NEXT_PUBLIC_APP_FRAME`), so **rolling back needs no code deploy**.\
+  For two-person work, the in-feature `data / domain / presentation` structure is fixed in docs
+- **Evidence** — Removing `dart:io` and unused fonts cut the web first load **from 28.9 MB to 15.7 MB** and the app **by 13 MB**;\
+  an A/B bug that alternated variants for the same account was fixed with **fixed assignment**, stopping experiment-data pollution
 
 ---
 
@@ -231,10 +304,21 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 
 > A mood diary that records each day as one of seven colors — yearly calendar, stats, recaps, home/lock-screen widgets, health data and watch logging; my longest-running personal app
 
-- **Problem** — A mood record that only takes picking a color, even on days you don't feel like writing — and the entries should come back as a year of patterns
-- **Engineering Challenge** — Getting meaningful insight from entries that are just a color and a short note (when insights relied on tags, a user with 800 days of entries still saw "need more data"); a streak computed separately on client and server that could disagree; an AI recap that must not send anyone's diary text; and showing health data such as sleep, steps and heart rate next to the mood without it ever leaving the device
-- **Design Decision** — Insights, weekly/monthly recaps and tag suggestions are on-device pure functions pinned by unit tests; insights read color, weekday and tags, so they work without tags. One streak function is the single source, and the evening "your streak is about to break" push (Edge Function + pg_cron) is tested to follow the same rule. The AI recap sends only color ranks (0–6) and built-in tag counts, never diary text or custom tags, falls back to static copy on failure, and sits behind a Remote Config kill switch. Health data comes through my own MethodChannel from the HealthKit / Health Connect aggregate APIs as daily values only (the platform removes duplicates such as iPhone + Watch), and raw values never go to the server, analytics SDKs or logs; a link to mood is shown as one line under "Patterns" only when a Spearman correlation clears the bar (14+ paired days, |ρ| ≥ max(0.3, 2/√n)) — the user always picks the color (no automatic judgment, no medical wording). Watches can't share the Supabase session, so they call the record RPC directly with a device token issued by the phone (only its hash is stored), and entries save even when the phone app is closed
-- **Evidence** — 59% of sign-ups write entries (31 per writer on average, up to 855); interactive home-screen and iOS lock-screen widgets let users pick a color without opening the app; 2.3.0 (October 2026) shipped health data (on Android, Health Connect access kept to steps and sleep) and Apple Watch / Galaxy Watch logging; 2.4.0 added recording straight from the widget or Siri without opening the app (reusing the watch's device-token RPC), a redesigned yearly layer view and a year-end "Year in Color" share card, and fixed a same-day concurrent-save race with an upsert
+- **Problem** — A mood record that **only takes picking a color**, even on days you don't feel like writing\
+  — and the entries should come back as **a year of patterns**
+- **Engineering Challenge** — Getting **meaningful insight** from entries that are just a color and a short note (when insights relied on tags, a user with 800 days of entries still saw "need more data");\
+  a streak computed separately on client and server that could disagree;\
+  an AI recap that **must not send anyone's diary text**;\
+  and showing health data such as sleep, steps and heart rate next to the mood **without it ever leaving the device**
+- **Design Decision** — Insights, weekly/monthly recaps and tag suggestions are **on-device pure functions** pinned by unit tests; insights read color, weekday and tags, so they work without tags.\
+  One streak function is the single source, and the evening "your streak is about to break" push (Edge Function + pg_cron) is tested to follow the same rule.\
+  The AI recap sends only color ranks (0–6) and built-in tag counts, **never diary text or custom tags**, falls back to static copy on failure, and sits behind a Remote Config kill switch.\
+  Health data comes through my own MethodChannel from the HealthKit / Health Connect aggregate APIs as daily values only (the platform removes duplicates such as iPhone + Watch), and **raw values never go to the server**, analytics SDKs or logs;\
+  a link to mood is shown as one line under "Patterns" only when a Spearman correlation clears the bar (14+ paired days, |ρ| ≥ max(0.3, 2/√n)) — the user always picks the color (no automatic judgment, no medical wording). Watches can't share the Supabase session, so they call the record RPC directly with a device token issued by the phone (only its hash is stored), and entries save even when the phone app is closed
+- **Evidence** — **59% of sign-ups** write entries (31 per writer on average, up to 855);\
+  interactive home-screen and iOS lock-screen widgets let users pick a color without opening the app;\
+  2.3.0 (October 2026) shipped **health data** (on Android, Health Connect access kept to steps and sleep) and Apple Watch / Galaxy Watch logging;\
+  2.4.0 added recording straight from the widget or Siri without opening the app (reusing the watch's device-token RPC), a redesigned yearly layer view and a year-end "**Year in Color**" share card, and fixed a same-day concurrent-save race with an upsert
 
 ---
 
@@ -248,10 +332,15 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 
 > A shared calendar where friends, families and couples record memories together
 
-- **Problem** — People want one shared calendar, but copying booking details in by hand is tedious
-- **Engineering Challenge** — Turning free-form booking messages into reliable events, and anniversaries (yearly, multi-day, across New Year) that showed up on different dates on different screens
-- **Design Decision** — The user shares the message to the app; an Edge Function parses it with Gemini structured output and pre-fills only when the reservation flag, confidence ≥ 0.5 and the time parse all pass. Background SMS detection was ruled out for platform policy and privacy. Recurring events are stored as one row and computed at display time, with one `occursOn` function replacing four duplicated checks
-- **Evidence** — Live on the App Store and Google Play; invite links sent before a domain migration still open the app. Event search, a space-wide photo album, event photos, date polls and comment @mentions with push rolled out through Remote Config, and invite previews with an Android install-referrer handoff carry an invite across the install
+- **Problem** — People want **one shared calendar**, but copying booking details in **by hand is tedious**
+- **Engineering Challenge** — Turning **free-form booking messages into reliable events**,\
+  and anniversaries (yearly, multi-day, across New Year) that showed up on **different dates on different screens**
+- **Design Decision** — The user shares the message to the app;\
+  an Edge Function parses it with **Gemini structured output** and pre-fills only when the reservation flag, confidence ≥ 0.5 and the time parse all pass.\
+  Background SMS detection was **ruled out** for platform policy and privacy.\
+  Recurring events are **stored as one row** and computed at display time, with one `occursOn` function replacing four duplicated checks
+- **Evidence** — Live on the App Store and Google Play; invite links sent before a domain migration **still open the app**.\
+  Event search, a space-wide photo album, event photos, date polls and comment @mentions with push rolled out through **Remote Config**, and invite previews with an Android install-referrer handoff carry an invite across the install
 
 ---
 
@@ -265,10 +354,14 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 
 > A location-based journal: photos and notes left at a place open for other users when they get nearby
 
-- **Problem** — Let travelers leave records at real places that only people who come nearby can open
-- **Engineering Challenge** — iOS can monitor only 20 regions in the background, while any number of notes can be around the user
-- **Design Decision** — Monitor the 18 nearest notes plus one 3 km "re-centering" geofence; leaving it refreshes the set. Chosen over continuous background GPS, which drains battery and is hard to justify in review. Journeys are rebuilt from photo EXIF GPS with proximity clustering and PostGIS instead of manual entry
-- **Evidence** — Live on the App Store and Google Play; recap highlights are written by Gemini, and city badge images fall back from Gemini image models to FLUX.1. Korean, English, Spanish and Japanese (pushes and AI highlights included), map list mode, place search and marker clustering, and three recap share cards
+- **Problem** — Let travelers leave records at **real places** that **only people who come nearby can open**
+- **Engineering Challenge** — iOS can monitor **only 20 regions** in the background, while **any number of notes** can be around the user
+- **Design Decision** — Monitor the **18 nearest notes** plus one **3 km "re-centering" geofence**; leaving it refreshes the set.\
+  Chosen over continuous background GPS, which drains battery and is hard to justify in review.\
+  Journeys are rebuilt from **photo EXIF GPS** with proximity clustering and PostGIS instead of manual entry
+- **Evidence** — Live on the App Store and Google Play; recap highlights are written by **Gemini**,\
+  and city badge images fall back from Gemini image models to **FLUX.1**.\
+  Korean, English, Spanish and Japanese (pushes and AI highlights included), map list mode, place search and marker clustering, and **three recap share cards**
 
 ---
 
@@ -282,10 +375,15 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 
 > An offline-first map app that brings in places saved in Google My Maps or Naver Map and works without a network
 
-- **Problem** — Places saved in My Maps are useless abroad, exactly where there's no data connection
-- **Engineering Challenge** — Importing whole maps from one URL and re-syncing them, and drawing thousands of markers smoothly on a phone over offline tiles
-- **Design Decision** — Drift (SQLite) is the source of truth and Supabase only an optional sync layer, so every feature works without a network (a cloud-first design would fail where it's needed most). Supercluster clustering instead of drawing every marker, and flutter_map driven directly, without wrappers, to control tile caching
-- **Evidence** — Live on the App Store and Google Play; users' maps hold up to 2,798 markers on a single map (8,002 in total) and render without slowdown. Four languages, search across all maps, KML · GeoJSON · CSV export with backup and merge-restore, GPX · KML · KMZ import, marker photos, smart collections and trip mode, iOS and Android home widgets, and read-only map share links (348 tests)
+- **Problem** — Places saved in My Maps are **useless abroad**, exactly where there's **no data connection**
+- **Engineering Challenge** — Importing **whole maps from one URL** and re-syncing them,\
+  and drawing **thousands of markers** smoothly on a phone over offline tiles
+- **Design Decision** — **Drift (SQLite) is the source of truth** and Supabase only an optional sync layer,\
+  so **every feature works without a network** (a cloud-first design would fail where it's needed most).\
+  **Supercluster clustering** instead of drawing every marker, and flutter_map driven directly, without wrappers, to control tile caching
+- **Evidence** — Live on the App Store and Google Play; users' maps hold up to **2,798 markers** on a single map (8,002 in total)\
+  and render **without slowdown**.\
+  Four languages, search across all maps, KML · GeoJSON · CSV export with backup and merge-restore, GPX · KML · KMZ import, marker photos, smart collections and trip mode, iOS and Android home widgets, and read-only map share links (**348 tests**)
 
 ---
 
@@ -299,10 +397,17 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 
 > Draws random trip courses you can actually reach, given your location, transport and time — like a game
 
-- **Problem** — Random trip ideas are fun until they land somewhere you can't reach with the time and transport you have
-- **Engineering Challenge** — The same transfer station is named differently on different subway lines, which breaks direct and one-transfer route finding
-- **Design Decision** — Filter first, then draw: candidates are limited to per-transport distance ranges before the random pick, so every result is reachable (drawing first and re-rolling wastes draws and can loop). Station names are normalized before routes are computed
-- **Evidence** — Live on the App Store and Google Play, with roulette / ladder / card-draw UI and a couple mode for taking turns. 1.1.0 (October 2026) added return-trip, closing-time and last-train guards, and replaced the app's direct DB connection with Firebase anonymous tokens + Neon Data API and RLS; then a timetable-aware constraint engine for courses (a top 3 with trade-offs, live · timetable · estimated labels) and course progress as an Android notification and an iOS Live Activity (309 tests). Last trains go through a Neon Function transit relay (Firebase token check, caching, retries, quota protection) so public API keys never ship in the app, and are shown only when the ride home is verified by chaining two stations' timetables — never marked safe when unverified (Daegu first, rolled out via Remote Config)
+- **Problem** — Random trip ideas are fun until they land somewhere **you can't reach** with the time and transport you have
+- **Engineering Challenge** — The same transfer station is **named differently on different subway lines**,\
+  which breaks direct and one-transfer **route finding**
+- **Design Decision** — **Filter first, then draw**: candidates are limited to per-transport distance ranges before the random pick,\
+  so **every result is reachable** (drawing first and re-rolling wastes draws and can loop).\
+  Station names are **normalized** before routes are computed
+- **Evidence** — Live on the App Store and Google Play, with roulette / ladder / card-draw UI and a couple mode for taking turns.\
+  1.1.0 (October 2026) added return-trip, closing-time and last-train guards, and replaced the app's direct DB connection with **Firebase anonymous tokens + Neon Data API** and RLS;\
+  then a timetable-aware constraint engine for courses (a top 3 with trade-offs, live · timetable · estimated labels) and course progress as an Android notification and an iOS Live Activity (**309 tests**).\
+  Last trains go through a Neon Function transit relay (Firebase token check, caching, retries, quota protection) so public API keys never ship in the app,\
+  and are shown only when the ride home is verified by chaining two stations' timetables — **never marked safe when unverified** (Daegu first, rolled out via Remote Config)
 
 ---
 
@@ -316,10 +421,16 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 
 > Records what you throw away like numbered museum exhibits and shows your buying and owning patterns
 
-- **Problem** — What you throw away says as much about your habits as what you buy, but there's no way to see that pattern
-- **Engineering Challenge** — Local-first sync across devices: device clocks only store seconds and can't order edits within the same second, two devices can create the same exhibit number, and a sync's own writes could trigger the next sync forever
-- **Design Decision** — Drift is the source of truth; Neon Data API (Firebase JWT + RLS) syncs incrementally on a server-clock cursor instead of device time, and duplicate numbers are resolved by a rule every device computes identically. Photos never get direct storage access — a Neon Function issues signed URLs after size/count limits and App Check. Subject cutouts run on-device (Vision / ML Kit), so photos aren't sent anywhere to be processed
-- **Evidence** — 132 unit and migration tests covering sync, domain rules and schema upgrades. 1.1.0 added a "storage room" for things you still own, usage logging, cost per day and rebuy detection, gift and repair events, and four languages with currency from the device region
+- **Problem** — What you **throw away** says as much about your habits as what you buy, but there's **no way to see that pattern**
+- **Engineering Challenge** — **Local-first sync across devices**: device clocks only store seconds and can't order edits within the same second,\
+  two devices can create the **same exhibit number**,\
+  and a sync's own writes could **trigger the next sync forever**
+- **Design Decision** — Drift is the source of truth; Neon Data API (Firebase JWT + RLS) syncs incrementally on a **server-clock cursor** instead of device time,\
+  and duplicate numbers are resolved by **a rule every device computes identically**.\
+  Photos never get direct storage access — a Neon Function issues **signed URLs** after size/count limits and App Check.\
+  Subject cutouts run on-device (Vision / ML Kit), so photos aren't sent anywhere to be processed
+- **Evidence** — **132 unit and migration tests** covering sync, domain rules and schema upgrades.\
+  1.1.0 added a "storage room" for things you still own, usage logging, **cost per day** and rebuy detection, gift and repair events, and four languages with currency from the device region
 
 ---
 
@@ -333,10 +444,17 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 
 > Write down what you want to do and it checks in when it's time; finished goals become flowers in a garden, abandoned ones a gravestone in a cemetery
 
-- **Problem** — Things you meant to do fade away quietly. Check in when it's time, and keep finished goals as flowers and abandoned ones as gravestones to look back on
-- **Engineering Challenge** — There is no app server: the client talks to Postgres through Neon Data API, so the database must enforce ownership, limits and paid items. On a cold-started database a freshly issued token could leave the user id empty, and RLS silently returned no rows
-- **Design Decision** — Rules live in Postgres (RLS, triggers, CHECK constraints, SECURITY DEFINER RPCs for public cemeteries) instead of a backend I'd have to run. RLS raises an error instead of returning nothing, and the client retries. Check-in reminders are rescheduled to the nearest 50 to stay under iOS's 64 pending-notification limit
-- **Evidence** — A 16-step server E2E script exercises RLS, triggers and RPCs with several anonymous users; 111 Flutter tests, including one that checks the in-app catalog against the server seed. Goal event history and a "patterns of giving up" screen, motive × outcome analysis, median time-to-start (Kaplan–Meier), and a shareable year-recap card
+- **Problem** — Things you meant to do **fade away quietly**.\
+  Check in when it's time, and keep finished goals as **flowers** and abandoned ones as **gravestones** to look back on
+- **Engineering Challenge** — There is **no app server**: the client talks to Postgres through Neon Data API,\
+  so the **database must enforce** ownership, limits and paid items.\
+  On a cold-started database a freshly issued token could leave the user id empty, and **RLS silently returned no rows**
+- **Design Decision** — **Rules live in Postgres** (RLS, triggers, CHECK constraints, SECURITY DEFINER RPCs for public cemeteries) instead of a backend I'd have to run.\
+  RLS **raises an error instead of returning nothing**, and the client retries.\
+  Check-in reminders are rescheduled to the **nearest 50** to stay under iOS's 64 pending-notification limit
+- **Evidence** — A **16-step server E2E script** exercises RLS, triggers and RPCs with several anonymous users;\
+  **111 Flutter tests**, including one that checks the in-app catalog against the server seed.\
+  Goal event history and a "patterns of giving up" screen, motive × outcome analysis, median time-to-start (**Kaplan–Meier**), and a shareable year-recap card
 
 ---
 
@@ -350,10 +468,18 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 
 > Shows, side by side and from public records, what elected officials promised, how much they kept, and what they did in office — it carries only records published by official agencies, never opinions
 
-- **Problem** — Campaign booklets alone don't tell voters what an incumbent did last term, and pledges and records are scattered across six agencies as APIs, spreadsheets and PDFs
-- **Engineering Challenge** — Getting complete, correct data: an API that, called without a key, ignores paging and keeps returning the same 5 rows with a normal total count; attendance and side-job data that identify members only by name, mixed with hanja, spacing and bracket variants
-- **Design Decision** — The LLM only judges "is this record the same thing as this pledge?"; whether a pledge is fulfilled is decided by a published SQL rule table — reruns give the same answer and anyone can audit it. Pledges with nothing measurable are left as "cannot judge" instead of being forced into a verdict (only about 10% of lawmakers' pledges are legislative)
-- **Evidence** — 21,336 pledges extracted from 1,683 election bulletins; records for 3,239 lawmakers and 259 governors, mayors and superintendents refreshed by scheduled GitHub Actions; source code and judging rules are public. Also a co-sponsorship network graph; attendance, assets, outside jobs, overseas trips and research groups; and pledge comparison between candidates in the same district
+- **Problem** — Campaign booklets alone don't tell voters **what an incumbent did last term**,\
+  and pledges and records are **scattered across six agencies** as APIs, spreadsheets and PDFs
+- **Engineering Challenge** — Getting **complete, correct data**: an API that, called without a key, ignores paging and keeps returning **the same 5 rows** with a normal total count;\
+  attendance and side-job data that **identify members only by name**, mixed with hanja, spacing and bracket variants
+- **Design Decision** — The **LLM only judges** "is this record the same thing as this pledge?";\
+  whether a pledge is fulfilled is decided by a **published SQL rule table**\
+  — reruns give the same answer and anyone can audit it.\
+  Pledges with nothing measurable are left as **"cannot judge"** instead of being forced into a verdict (only about 10% of lawmakers' pledges are legislative)
+- **Evidence** — **21,336 pledges** extracted from 1,683 election bulletins;\
+  records for **3,239 lawmakers** and 259 governors, mayors and superintendents refreshed by scheduled GitHub Actions;\
+  **source code and judging rules are public**.\
+  Also a co-sponsorship network graph; attendance, assets, outside jobs, overseas trips and research groups; and pledge comparison between candidates in the same district
 
 ---
 
@@ -367,10 +493,15 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 
 > A pnpm monorepo that merged every app's separate landing and terms sites into one Firebase Hosting site — 9 apps and 1 external project, Korean and English pages, and a showreel video per app
 
-- **Problem** — Each app had its own hosting site, landing page and terms, and adding an app meant editing several config files by hand
-- **Engineering Challenge** — Serving Vite and Next.js apps under subpaths of one Firebase Hosting site — rewrites, cache headers, and a blank page when an app was opened without a trailing slash
-- **Design Decision** — One `apps.config.json` generates the sitemap, Remote Config and Hosting rewrites/headers/redirects, so none of them are edited by hand. Trailing-slash redirects use regex because Hosting's glob matching ignores the slash and would loop
-- **Evidence** — Every push to master builds, deploys and runs a smoke check that requests every subpath for HTTP 200 and a page title; every PR gets a Firebase preview channel. App pages fill in store versions and release notes from the App Store lookup, and Gilmok's read-only map share viewer (/s/:token) is served here too
+- **Problem** — Each app had its own hosting site, landing page and terms,\
+  and adding an app meant **editing several config files by hand**
+- **Engineering Challenge** — Serving Vite and Next.js apps **under subpaths of one Firebase Hosting site**\
+  — rewrites, cache headers, and a **blank page** when an app was opened without a trailing slash
+- **Design Decision** — One `apps.config.json` generates the sitemap, Remote Config and Hosting rewrites/headers/redirects, so **none of them are edited by hand**.\
+  Trailing-slash redirects **use regex** because Hosting's glob matching ignores the slash and would loop
+- **Evidence** — Every push to master builds, deploys and runs a **smoke check** that requests every subpath for HTTP 200 and a page title;\
+  every PR gets a **Firebase preview channel**.\
+  App pages fill in store versions and release notes from the App Store lookup, and Gilmok's read-only map share viewer (/s/:token) is served here too
 
 ---
 
@@ -384,7 +515,17 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 
 > A multi-agent posting and tracking system for promoting apps I built alone, without a marketing team
 
-- **Problem** — Eight solo-built apps and services need steady promotion, and I need to know which posts actually lead to installs
-- **Engineering Challenge** — Attribution. The post → click → install funnel looked healthy, but most clicks were crawlers; user-agent rules broke whenever crawlers changed versions, and widening them would drop real Android users on Chrome's reduced user agent
-- **Design Decision** — Four agents (CMO · ContentWriter · PerformanceAnalyst · SocialMediaManager) split planning, writing and analysis, and publishing runs server-side on Supabase pg_cron + pg_net instead of GitHub Actions (slots routed per app — four Threads posts a day plus regional Instagram cards, carousels and Reels; three Korea-only projects take turns in a Korean slot). Bots are flagged by timing and IP reputation (arrival within 60 s of posting, the same user agent reappearing within 120 s, IPs already seen as bots), counting switched from a blacklist to a whitelist of real platforms (crawlers keep changing user agents, so a blacklist always lags), and past data was corrected
-- **Evidence** — Publishing automatically since April 2026, extended to eight projects in October 2026, with a 9:16 short video rendered automatically for every app each day. Self-clicks and test installs are classified separately (debug builds and bursts of 3+ installs within 30 minutes are flagged automatically), and weights inflated by bot clicks were corrected retroactively. Bot counts are reported separately rather than hidden — if they drop to zero, the tracking itself has stopped
+- **Problem** — **Eight solo-built apps** and services need steady promotion,\
+  and I need to know which posts **actually lead to installs**
+- **Engineering Challenge** — **Attribution.** The post → click → install funnel looked healthy, but **most clicks were crawlers**;\
+  user-agent rules broke whenever crawlers changed versions,\
+  and widening them would drop real Android users on Chrome's **reduced user agent**
+- **Design Decision** — Four agents (CMO · ContentWriter · PerformanceAnalyst · SocialMediaManager) split planning, writing and analysis,\
+  and publishing runs server-side on **Supabase pg_cron + pg_net** instead of GitHub Actions (slots routed per app — four Threads posts a day plus regional Instagram cards, carousels and Reels; three Korea-only projects take turns in a Korean slot).\
+  Bots are flagged by **timing and IP reputation** (arrival within 60 s of posting, the same user agent reappearing within 120 s, IPs already seen as bots),\
+  counting switched from a blacklist to a **whitelist of real platforms** (crawlers keep changing user agents, so a blacklist always lags),\
+  and past data was corrected
+- **Evidence** — Publishing automatically since April 2026, extended to **eight projects** in October 2026,\
+  with a **9:16 short video** rendered automatically for every app each day.\
+  Self-clicks and test installs are classified separately (debug builds and bursts of 3+ installs within 30 minutes are flagged automatically), and weights inflated by bot clicks were corrected retroactively.\
+  Bot counts are reported separately rather than hidden — if they drop to zero, the **tracking itself has stopped**

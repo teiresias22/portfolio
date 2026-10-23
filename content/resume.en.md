@@ -28,8 +28,8 @@ description: Cross-platform developer working across mobile, web and backend —
 
 - **Problem** — When the team shrank to one developer and one designer, I took over the app, partner/admin console, user web and backend alone — the inherited app was a flat, template-based structure and the backend had accumulated authorization, payment and concurrency defects
 - **Engineering Challenge** — Keeping four surfaces (app, console, web, server) behaving the same while fixing defects in production — cross-account reads (IDOR in 6 routes), zero-amount payments, double submits — across 5 languages plus Arabic RTL
-- **Design Decision** — Rebuilt the app into a 13-domain layered architecture (Riverpod · Freezed) in 2025.01. Prices and order gates are decided by the server through quote APIs, and payments by the server verifying the PayPal transaction itself; added scope-based ownership guards, idempotency middleware and refresh-token rotation with reuse detection; photos go straight to S3 via presigned URLs. Also built internal sales tools (overseas travel-agency discovery, quote builder, push campaigns, a unified inquiry inbox that pulls in email, 2026.08 – present) and the ICU Company website ([website](https://icucompany.com))
-- **Evidence** — About 3,500 active installs (peak about 8,000); the legacy upload route was removed only after CloudWatch showed zero traffic; PHPUnit (681 files) restored as a parallel pre-push gate; 293 hard-coded strings localized and 100 icon-only controls given accessible names; the ICU website scores Lighthouse SEO 100
+- **Design Decision** — Rebuilt the app into a 13-domain layered architecture (Riverpod · Freezed) in 2025.01. Prices and order gates are decided by the server through quote APIs, and payments by the server verifying the PayPal transaction itself; added scope-based ownership guards, idempotency middleware and refresh-token rotation with reuse detection; photos go straight to S3 via presigned URLs. Admin permissions were rebuilt as a department → ability table plus team membership, enforced by the server on every route group. Also built internal sales and operations tools (overseas travel-agency discovery, quote builder, cost sheets tied to rate tables with price propagation, a unified inquiry inbox that pulls in email and WhatsApp, staff DMs and per-event operations rooms, 2026.08 – present) and the ICU Company website ([website](https://icucompany.com))
+- **Evidence** — About 3,500 active installs (peak about 8,000); the legacy upload route was removed only after CloudWatch showed zero traffic; PHPUnit (681 files) restored as a parallel pre-push gate; 293 hard-coded strings localized and 100 icon-only controls given accessible names; the ICU website scores Lighthouse SEO 100; **two patent applications** filed on halal verdicts and culture-aware search (co-inventor, 2026.10)
 
 ---
 
@@ -51,6 +51,15 @@ description: Cross-platform developer working across mobile, web and backend —
 **Purchasing · production management** | 2015 – 2019
 
 - Production management and overseas shipment management
+
+---
+
+## 📜 Patent applications
+
+| Title | Application no. | Filed | Notes |
+| --- | --- | --- | --- |
+| Method for determining the halal status of a product based on the user's halal tolerance | KR 10-2026-0193309 | 2026.10.08 | Applicant ICU Company · co-inventor · examination requested |
+| Method for personalized natural-language search using a cultural-zone filter | KR 10-2026-0193310 | 2026.10.08 | Applicant ICU Company · co-inventor · examination requested |
 
 ---
 
@@ -88,7 +97,8 @@ description: Cross-platform developer working across mobile, web and backend —
 | [Almost](https://apps.joon.is-a.dev/almost/) — a graveyard for things you almost did | 2026.10 – | iOS live · Android in review | Flutter · CustomPainter scenes · Neon (Postgres RLS · triggers · RPC) · Firebase Auth · 4 languages |
 | [Nureongso](https://nureongso.joon.is-a.dev) — elected officials' pledges and public record ([GitHub](https://github.com/teiresias22/nureongso)) | 2026.09 – | Live (web) | Next.js 16 · Supabase · Python public-data pipeline · LLM pledge judging · Vercel |
 | [joon-dev web](https://apps.joon.is-a.dev/) — personal project hub | 2026.07 – | Live | pnpm monorepo · Vite/Next.js · Firebase Hosting · GitHub Actions |
-| Multi-app marketing automation — separate system for promoting my own apps | 2026.04 – | Running | Claude Agent SDK · Supabase pg_cron · Threads/Instagram Graph API · attribution tracking |
+| [Pulse](https://teiresias22.github.io/pulse/) — rewind earthquakes, rocket launches and the ISS orbit on a 3D globe ([GitHub](https://github.com/teiresias22/pulse)) | 2026.10 – | Live (web) | React 19 · TypeScript · globe.gl (WebGL) · satellite.js (TLE orbits) · USGS · Launch Library 2 · GitHub Pages |
+| Multi-app marketing automation — separate system for promoting my own apps | 2026.04 – | Running | Claude Agent SDK · Supabase pg_cron · Threads/Instagram Graph API · attribution tracking · app metrics collection |
 
 ---
 
@@ -119,6 +129,7 @@ description: Cross-platform developer working across mobile, web and backend —
 - **GitHub Actions + Fastlane** (Match · App Store Connect API) — one tag push ships to **TestFlight and the Play Store together**; store screenshots, graphics and preview videos generated by script in four languages
 - **Firebase Hosting** · **Laravel Vapor** — web and serverless deploy pipelines (concurrency guards)
 - **Tests and quality gates** — backend PHPUnit **681 files in parallel + pre-push gate**; clients pinned by Flutter widget/unit tests and Jest · Vitest
+- **Release hardening** — caught the Android start-up crash that R8 strict mode causes with WorkManager after the AGP 9 · Gradle 9 move and shipped the same hotfix across several apps; native debug symbols included in release AABs
 
 ### Native iOS
 
@@ -127,7 +138,8 @@ description: Cross-platform developer working across mobile, web and backend —
 ### AI · analytics
 
 - **LLM judging routines** — a prefilter that only sends the model questions worth asking, plus **server-side re-verification of the model's evidence** (checking that quotes actually appear in the collected text — hallucination detection); on-demand Google Cloud Translation
-- **Google Gemini AI** (badges · recaps) · **PostHog · GA4 · Microsoft Clarity**
+- **LLM cross-checking** — two models (Claude · Codex) review the same verdict independently and **only agreements are applied**; a person checks only the disagreements, with precision measured against a gold sample (Nureongso)
+- **Claude API · Google Gemini AI** (badges · recaps, with model fallback when a quota runs out) · **PostHog · GA4 · Microsoft Clarity**
 
 ### Marketing automation (separate system for promoting my own apps)
 

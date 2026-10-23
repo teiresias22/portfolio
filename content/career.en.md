@@ -11,7 +11,7 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 
 **Flutter · React · Laravel · AWS · Firebase** | 2024.08 – present
 
-> I am the **one person responsible for the app, partner/admin console, user web and backend API** of **KoreHalal**, a service for Muslim travelers. The team started as frontend 1 · backend 1 · designer 1 and was reorganized into **developer 1 · designer 1**; I took over the backend then and now **own the whole stack**. A feature ships through the server schema and API and all three client UIs in one cycle — after an incident where a change landed on one side only and devices behaved differently, I **wrote "client parity" into the repo conventions**. Since the second half of 2026 I also build **internal sales and operations tools** such as overseas travel-agency discovery, travel quotes and a unified inquiry inbox.
+> I am the **one person responsible for the app, partner/admin console, user web and backend API** of **KoreHalal**, a service for Muslim travelers. The team started as frontend 1 · backend 1 · designer 1 and was reorganized into **developer 1 · designer 1**; I took over the backend then and now **own the whole stack**. A feature ships through the server schema and API and all three client UIs in one cycle — after an incident where a change landed on one side only and devices behaved differently, I **wrote "client parity" into the repo conventions**. Since the second half of 2026 I also build **internal sales and operations tools** such as overseas travel-agency discovery, travel quotes and a unified inquiry inbox, and I am a **co-inventor on two patent applications** that came out of the service: halal verdicts and culture-aware search.
 
 ---
 
@@ -87,7 +87,8 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
   Payment completion no longer trusts what the client sends either: a prepare/confirm flow has the **server look up the PayPal transaction itself** and check completion, USD and amount (2026.10)
 - **Evidence** — Currency rounding errors at price-tier boundaries, mixed currencies on discount badges and mismatched amounts after switching currency were cleaned up;\
   bookings and delivery now **share one structure**.\
-  The payment switch **removed the PayPal secret** from the app and web, and also closed reuse of one transaction ID, paid bookings completing as zero-amount, and an app approval return URL that sent users to a third-party domain
+  The payment switch **removed the PayPal secret** from the app and web, and also closed reuse of one transaction ID, paid bookings completing as zero-amount, and an app approval return URL that sent users to a third-party domain.\
+  Later I found the `web/*` responses behind the guest booking form were **handing out the live PayPal client_secret** and removed it from them
 
 ### Customer ↔ business 1:1 chat `server` `app` `console` `web`
 
@@ -101,6 +102,49 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
   The server mints Firebase custom tokens
 - **Evidence** — App, console and web **behave to one spec**,\
   with presence, typing, attachments, per-person read state, report/block and resend on failure
+
+### Growing chat into support tooling and staff chat (2026.10) `server` `console` `app` `web`
+
+- **Problem** — Using customer chat as a support channel lacked assignees, closing an inquiry and internal notes,\
+  and staff conversations and event coordination **leaked into outside messengers** with no record
+- **Engineering Challenge** — The same conversation tables now hold **messages customers must never see** (internal notes) and staff-only rooms;\
+  edits and deletes must reach both the real-time copy and incremental polling;\
+  and someone who loses staff status **must not stay in a room**
+- **Design Decision** — Messages carry a `type` (normal · SYSTEM) and `visibility` (public · internal), and the **customer view only gets public ones** — notes are also left out of the RTDB mirror, Slack and previews.\
+  Staff DMs are authorized by membership alone (no ADMIN bypass) and only members are mirrored to RTDB;\
+  a confirmed quote **creates an event operations room automatically** (archived on cancel, auto-archived 7 days after the event).\
+  Authors can edit or delete within 5 minutes, customers see only a "deleted" line, and changes travel through `changed_since`.\
+  Every booking status change posts a SYSTEM notice in the business's name
+- **Evidence** — Shipped in five stages (7a – 7e) across server, console, app and web:\
+  auto-assignment and unanswered-first sorting, group rooms, mentions, pins and templates, translate-before-send (200 a day), ngram message search limited to conversations you can see, and a Slack bridge for group rooms.\
+  Staff notifications go only to the console drawer with no app push; customers can mute a conversation for an hour or a day
+
+### Rebuilding staff permissions (2026.10) `server` `console` `app`
+
+- **Problem** — Permissions were just ADMIN in `roles[]` plus two levels (head · team lead),\
+  so menus **couldn't be split by department** such as finance, sales and support
+- **Engineering Challenge** — Live accounts and **older app versions had to keep working**,\
+  and **edge-case data** during the move — admins with no organization mapping, accounts with a NULL email — could easily gain or lose access by mistake
+- **Design Decision** — One department (`StaffRole`) → ability table, enforced **by the server** with `can:<ability>` on every route group.\
+  Team membership moved to a `team_members` table through a four-step migration (M1 – M4) with backfill and **dual writes** to the old mapping,\
+  and `/profile` keeps sending the old `roles[]` alongside the new `abilities` and `teams`.\
+  Team routes check **403 before 404** so they never reveal whether someone else's team exists, and membership and role changes go to an audit log (before/after)
+- **Evidence** — Pinned by a permission-matrix test; found and fixed accounts that slipped out of a demotion query through `NOT IN`'s NULL handling, and ADMIN holders outside the seed.\
+  Console and app menus are gated by ability only (the dev-build bypass is gone), with team switching and owner-only team deletion
+
+### Travel product cost sheets · price propagation (2026.10) `server` `console` `app`
+
+- **Problem** — When hotel, meal or vehicle rates changed, the **products priced from them had to be fixed by hand**,\
+  and turning an itinerary built as a quote into a product meant typing it all again
+- **Engineering Challenge** — A rate row must **stay the same row** when its name (vehicle type, option) is edited, or links break;\
+  rates have validity periods; and products whose margin a person set **must not be overwritten automatically**
+- **Design Decision** — Rate rows get a uuid and are managed with natural-key upserts, soft deletes for missing rows and a change history; six rate tables gained **validity periods** (picked by today or the quote's start date).\
+  Products link to rates through a **cost sheet**, and linked prices are locked (`PRICE_LINKED`).\
+  Rate changes propagate per product policy — AUTO applies at once, REVIEW waits for approval, MANUAL only **flags margin erosion**.\
+  A quote can be registered directly as an internal product with its cost sheet, prices and prefill, and a designer brief exports to Markdown, PDF or Notion
+- **Evidence** — Shipped in seven server PRs, together with a supplier list (categories, rate-sheet files, expiry) and supplier assignment on arrangement rows;\
+  an **impact preview** before saving, a pending-changes tab, price-history rollback and CSV import/export.\
+  Rules such as "an n-person group price is the per-person price × n" and "party-size tiers must leave no gaps" are checked when a sheet is applied
 
 ### Halal map · place directory pipeline `server` `web` `app` `console`
 
@@ -153,17 +197,30 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
   Spam rules were set from a **dry run** (`--sample=N`) showing real counts per reason, not by guesswork
 - **Evidence** — A dry run on the **latest 300 emails** found, among 127 that passed, about 55 service notifications, about 40 list spam and 5 of our own receipts,\
   which went into the **filter rules**;\
-  the console links type filters, the original thread, AI summary, sender/domain blocking (public mail domains can't be blocked whole) and **conversion to a quote**
+  the console links type filters, the original thread, AI summary, sender/domain blocking (public mail domains can't be blocked whole) and **conversion to a quote**.\
+  Then added a **WhatsApp Cloud API webhook** (signature check, one thread per number, number blocking) and console replies within the 24-hour window (recording which staff member sent them);\
+  quoted replies join the quoted message's inquiry, and another quote from the same number can be **split into a new inquiry from a chosen message**;\
+  the ICU website's contact and FIT forms moved into the inbox and the old Firebase Functions inquiry path was deleted. Per-person read state, a received-account filter and the cs@ mailbox were added
+
+### Patent applications (2026.10)
+
+- Two problems from the service were filed in the company's name (ICU Company) with me as a **co-inventor** (filed 2026.10.08, examination requested)
+  - **Method for determining the halal status of a product based on the user's halal tolerance** (KR 10-2026-0193309)\
+    — checks a barcode-identified product's ingredients against risk levels in an ingredient database and decides the verdict by **each user's own tolerance**
+  - **Method for personalized natural-language search using a cultural-zone filter** (KR 10-2026-0193310)\
+    — determines the user's cultural zone, finds candidates with that zone's filter and expanded search terms, and sets the **display order** for that zone
 
 ### Other work
 
-- `console` three-role permissions for Provider · Place Provider · Admin (set-based `roles[]` checks) plus two admin levels (only the head and team leads see cost and margin or can send and delete, enforced by a server gate), `web` one-way MVVM layering (pages → viewmodels → repositories → api → stores)
+- `console` three-role permissions for Provider · Place Provider · Admin (set-based `roles[]` checks, rebuilt as a department → ability table in 2026.10), `web` one-way MVVM layering (pages → viewmodels → repositories → api → stores)
 - Coupons, group departures, date-range exceptions (holiday closures, special prices) and add-on options; real-time airport board, prayer times and Qibla correction; on-demand translation, contribution badges and a recommendation engine (Final Score)
-- Halal barcode scanner — on-device OCR (Vision / ML Kit) + a local HACCP mirror and a three-level verdict engine
+- Halal barcode scanner — on-device OCR (Vision / ML Kit) + a local HACCP mirror and a three-level verdict engine (a related verdict method is under patent application)
 - 5 languages plus Arabic RTL, 293 hard-coded strings localized, 100 icon-only controls made accessible, SEO · GEO (JSON-LD · `llms.txt`)
 - Analytics dashboard (8 calls → 1 aggregate endpoint, GA4 · Clarity compared side by side), PostHog · Clarity · GA4 payment-funnel tracking
 - Travel quote builder (price snapshots · PDF · arrangement checks and deposit, interim and balance payment records), segmented push campaigns (900-second CLI dispatch), blog draft pipeline (only a human publishes)
-- App stability (Korean IME duplicate-character bug → `reactive_forms` rewrite, Crashlytics non-fatal demotion, login tokens moved to device-only secure storage), Flutter 3.47 · Kotlin 2.3 · R8, deploy guards and multi-channel Slack alerts
+- App stability (Korean IME duplicate-character bug → `reactive_forms` rewrite, Crashlytics non-fatal demotion, login tokens moved to device-only secure storage, a fatal crash from closing the PayPal sheet twice), Flutter 3.47 · Kotlin 2.3 · R8, deploy guards and multi-channel Slack alerts,\
+  and **upload scripts** for TestFlight (App Store Connect API key) and Google Play (fastlane supply)
+- Over-engineering cleanup (2026.10) — 56 confirmed items across app, console and web (13 copied confirm dialogs, 15 input decorations and 23 loading/error skeletons moved to shared helpers; unreachable files, unused dependencies and unreferenced assets deleted); on the server, 12 controllers with no routes removed, product-list N+1 fixed and the booking sweep moved to `chunkById`
 
 ---
 
@@ -184,7 +241,9 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 - **Design Decision** — Runtime (react-helmet-async) + **build-time prerendering** generate per-route HTML, meta, JSON-LD and sitemap.\
   Inquiry form → Firestore → Cloud Function → **real-time Slack alert**;\
   a **predeploy hook** checks the target project against a whitelist
-- **Evidence** — **Lighthouse SEO 100** and **CLS 0.001**, Vitest + GitHub Actions CI
+- **Evidence** — **Lighthouse SEO 100** and **CLS 0.001**, Vitest + GitHub Actions CI.\
+  In 2026.10 the structured data became one `@graph` with Service/ContactPage per service, internal links became crawlable, and the site was repositioned as **a Korea-specialist travel agency and tour operator**;\
+  inquiry forms now leave the inquiry in the **KoreHalal unified inbox** before handing off to email or WhatsApp
 
 ---
 
@@ -300,7 +359,7 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 | --- | --- |
 | Period | 2024.03 – present |
 | Platform | iOS · Android (live) · [App Store](https://apps.apple.com/app/id6443436725) · [Google Play](https://play.google.com/store/apps/details?id=com.colorofdays.color_of_days) · [Website](https://apps.joon.is-a.dev/colorofdays/) |
-| Main tech | Flutter · Riverpod · Freezed · Supabase (Edge Functions · pg_cron) · Firebase · Gemini · home_widget · fl_chart · local_auth · HealthKit · Health Connect · watchOS · Wear OS · App Intents |
+| Main tech | Flutter · Riverpod · Freezed · Supabase (Edge Functions · pg_cron) · Firebase · Claude API · home_widget · fl_chart · local_auth · HealthKit · Health Connect · watchOS · Wear OS · App Intents |
 
 > A mood diary that records each day as one of seven colors — yearly calendar, stats, recaps, home/lock-screen widgets, health data and watch logging; my longest-running personal app
 
@@ -318,7 +377,9 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 - **Evidence** — **59% of sign-ups** write entries (31 per writer on average, up to 855);\
   interactive home-screen and iOS lock-screen widgets let users pick a color without opening the app;\
   2.3.0 (October 2026) shipped **health data** (on Android, Health Connect access kept to steps and sleep) and Apple Watch / Galaxy Watch logging;\
-  2.4.0 added recording straight from the widget or Siri without opening the app (reusing the watch's device-token RPC), a redesigned yearly layer view and a year-end "**Year in Color**" share card, and fixed a same-day concurrent-save race with an upsert
+  2.4.0 added recording straight from the widget or Siri without opening the app (reusing the watch's device-token RPC), a redesigned yearly layer view and a year-end "**Year in Color**" share card, and fixed a same-day concurrent-save race with an upsert.\
+  A second Play rejection over health data was answered by dropping the Health Connect history permission to the minimum scope, and the AI recap moved from Gemini's free tier to the **Claude API** (October 2026).\
+  2.4.1 suggests a daily reminder after the first entry and moved account deletion to an Edge Function that **revokes the Apple token and deletes photos and the account in one go**
 
 ---
 
@@ -340,7 +401,9 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
   Background SMS detection was **ruled out** for platform policy and privacy.\
   Recurring events are **stored as one row** and computed at display time, with one `occursOn` function replacing four duplicated checks
 - **Evidence** — Live on the App Store and Google Play; invite links sent before a domain migration **still open the app**.\
-  Event search, a space-wide photo album, event photos, date polls and comment @mentions with push rolled out through **Remote Config**, and invite previews with an Android install-referrer handoff carry an invite across the install
+  Event search, a space-wide photo album, event photos, date polls and comment @mentions with push rolled out through **Remote Config**, and invite previews with an Android install-referrer handoff carry an invite across the install.\
+  1.3.0 (October 2026) lets users link and unlink Google and Apple accounts on an existing account, revokes the Apple token on deletion (Edge Function),\
+  and raised small text such as anniversary counters and tags to **4.5:1 contrast**
 
 ---
 
@@ -360,8 +423,9 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
   Chosen over continuous background GPS, which drains battery and is hard to justify in review.\
   Journeys are rebuilt from **photo EXIF GPS** with proximity clustering and PostGIS instead of manual entry
 - **Evidence** — Live on the App Store and Google Play; recap highlights are written by **Gemini**,\
-  and city badge images fall back from Gemini image models to **FLUX.1**.\
-  Korean, English, Spanish and Japanese (pushes and AI highlights included), map list mode, place search and marker clustering, and **three recap share cards**
+  and city badge images fall back from Gemini image models to **FLUX.1** (with Cloudflare added as a provider), filling in badges that had no image.\
+  Korean, English, Spanish and Japanese (pushes and AI highlights included), map list mode, place search and marker clustering, and **three recap share cards**.\
+  1.0.8 (October 2026) fixed a race that undercounted cities when badges were earned at once, and country names landing as cities and creating country badges
 
 ---
 
@@ -383,7 +447,8 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
   **Supercluster clustering** instead of drawing every marker, and flutter_map driven directly, without wrappers, to control tile caching
 - **Evidence** — Live on the App Store and Google Play; users' maps hold up to **2,798 markers** on a single map (8,002 in total)\
   and render **without slowdown**.\
-  Four languages, search across all maps, KML · GeoJSON · CSV export with backup and merge-restore, GPX · KML · KMZ import, marker photos, smart collections and trip mode, iOS and Android home widgets, and read-only map share links (**348 tests**)
+  Four languages, search across all maps, KML · GeoJSON · CSV export with backup and merge-restore, GPX · KML · KMZ import, marker photos, smart collections and trip mode, iOS and Android home widgets, and read-only map share links (**348 tests**).\
+  1.0.7 and 1.0.8 (October 2026) fixed offline font-download and splash crashes, and a same-day hotfix for the Android start-up crash the AGP 9 move introduced (R8 strict mode × WorkManager)
 
 ---
 
@@ -407,7 +472,9 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
   1.1.0 (October 2026) added return-trip, closing-time and last-train guards, and replaced the app's direct DB connection with **Firebase anonymous tokens + Neon Data API** and RLS;\
   then a timetable-aware constraint engine for courses (a top 3 with trade-offs, live · timetable · estimated labels) and course progress as an Android notification and an iOS Live Activity (**309 tests**).\
   Last trains go through a Neon Function transit relay (Firebase token check, caching, retries, quota protection) so public API keys never ship in the app,\
-  and are shown only when the ride home is verified by chaining two stations' timetables — **never marked safe when unverified** (Daegu first, rolled out via Remote Config)
+  and are shown only when the ride home is verified by chaining two stations' timetables — **never marked safe when unverified** (Daegu first, rolled out via Remote Config).\
+  1.2.1 (October 2026) snapshots the course timetable at check-in and searches undecided stops in a map app;\
+  coordinates, search terms and raw responses were removed from logs, and account deletion revokes the Apple token
 
 ---
 
@@ -430,7 +497,8 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
   Photos never get direct storage access — a Neon Function issues **signed URLs** after size/count limits and App Check.\
   Subject cutouts run on-device (Vision / ML Kit), so photos aren't sent anywhere to be processed
 - **Evidence** — **132 unit and migration tests** covering sync, domain rules and schema upgrades.\
-  1.1.0 added a "storage room" for things you still own, usage logging, **cost per day** and rebuy detection, gift and repair events, and four languages with currency from the device region
+  1.1.0 added a "storage room" for things you still own, usage logging, **cost per day** and rebuy detection, gift and repair events, and four languages with currency from the device region.\
+  1.1.1 asks once more the next day if the 30-day reflection reminder was missed
 
 ---
 
@@ -454,7 +522,8 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
   Check-in reminders are rescheduled to the **nearest 50** to stay under iOS's 64 pending-notification limit
 - **Evidence** — A **16-step server E2E script** exercises RLS, triggers and RPCs with several anonymous users;\
   **111 Flutter tests**, including one that checks the in-app catalog against the server seed.\
-  Goal event history and a "patterns of giving up" screen, motive × outcome analysis, median time-to-start (**Kaplan–Meier**), and a shareable year-recap card
+  Goal event history and a "patterns of giving up" screen, motive × outcome analysis, median time-to-start (**Kaplan–Meier**), and a shareable year-recap card.\
+  1.0.2 added example chips for writing a first goal right away and a reminder that asks again the next day when a check-in is missed
 
 ---
 
@@ -464,7 +533,7 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 | --- | --- |
 | Period | 2026.09 – present |
 | Platform | Web (live) · [Website](https://nureongso.joon.is-a.dev) · [GitHub](https://github.com/teiresias22/nureongso) |
-| Main tech | Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS 4 · Supabase (PostgreSQL) · Python (httpx · psycopg · pdfplumber) · Gemini · GitHub Actions · Vercel |
+| Main tech | Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS 4 · Supabase (PostgreSQL) · Python (httpx · psycopg · pdfplumber) · Gemini · Claude · Codex · GitHub Actions · Vercel |
 
 > Shows, side by side and from public records, what elected officials promised, how much they kept, and what they did in office — it carries only records published by official agencies, never opinions
 
@@ -479,7 +548,11 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 - **Evidence** — **21,336 pledges** extracted from 1,683 election bulletins;\
   records for **3,239 lawmakers** and 259 governors, mayors and superintendents refreshed by scheduled GitHub Actions;\
   **source code and judging rules are public**.\
-  Also a co-sponsorship network graph; attendance, assets, outside jobs, overseas trips and research groups; and pledge comparison between candidates in the same district
+  Also a co-sponsorship network graph; attendance, assets, outside jobs, overseas trips and research groups; and pledge comparison between candidates in the same district.\
+  The October 2026 judging overhaul started with **the measuring tools** (R0 — zero verdict changes): a gold sample (v1) with fact labels for precision, and contract tests pinning the expected verdict for each branch,\
+  then rule versions R1 and R2, each change published with its effective date — matching only current-term pledges, excluding withdrawn bills, counting a by-election term from its election day.\
+  LLM review has Claude and Codex check independently and **applies only what they agree on**, sending disagreements to a human list; when Gemini's daily quota runs out, Claude carries on.\
+  Human review marks are never overwritten by re-matching or re-parsing, and crawler prefetches that burned through function CPU were handled with CDN caching and blocking training crawlers
 
 ---
 
@@ -501,7 +574,29 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
   Trailing-slash redirects **use regex** because Hosting's glob matching ignores the slash and would loop
 - **Evidence** — Every push to master builds, deploys and runs a **smoke check** that requests every subpath for HTTP 200 and a page title;\
   every PR gets a **Firebase preview channel**.\
-  App pages fill in store versions and release notes from the App Store lookup, and Gilmok's read-only map share viewer (/s/:token) is served here too
+  App pages fill in store versions and release notes from the App Store lookup, and Gilmok's read-only map share viewer (/s/:token) is served here too.\
+  October 2026 added an operator-only app metrics dashboard (`/admin/` — 7-day installs, uninstalls, ratings and new reviews, GA4 visits for the web service),\
+  a `sync:release` script (pure functions + tests) that writes the latest store version and notes onto app pages, and fixes for SEO audit items from High to Low (static HTML for subpaths, soft 404s, hreflang, LCP)
+
+---
+
+## Pulse — rewinding what happened on Earth on a 3D globe
+
+| Item | Details |
+| --- | --- |
+| Period | 2026.10 – present |
+| Platform | Web (live) · [Website](https://teiresias22.github.io/pulse/) · [GitHub](https://github.com/teiresias22/pulse) |
+| Main tech | React 19 · TypeScript · Vite · globe.gl (WebGL) · satellite.js · USGS earthquake feed · Launch Library 2 · GitHub Pages |
+
+> A web page that rewinds the last seven days of earthquakes, rocket launches and the ISS orbit on a 3D globe with a time scrubber
+
+- **Problem** — Earthquakes, launches and the ISS position each live in a separate source and **can't be seen on one timeline**
+- **Engineering Challenge** — Folding three differently shaped sources into one event model,\
+  and handling time state so scrubbing or changing speed during playback **doesn't snap back**
+- **Design Decision** — One adapter per source converts to a shared `PulseEvent`, and the ISS orbit is **computed in the browser from TLEs** with no server.\
+  "Which events are visible at time t" and the URL hash are **pure functions**, so a shared link opens the same scene
+- **Evidence** — Time scrubber, playback, keyboard controls, layer toggles and detail cards, with overlapping launches merged;\
+  a list of recent events when WebGL isn't available, source links limited to http(s), and a GitHub Pages deploy on every master push
 
 ---
 
@@ -528,4 +623,6 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 - **Evidence** — Publishing automatically since April 2026, extended to **eight projects** in October 2026,\
   with a **9:16 short video** rendered automatically for every app each day.\
   Self-clicks and test installs are classified separately (debug builds and bursts of 3+ installs within 30 minutes are flagged automatically), and weights inflated by bot clicks were corrected retroactively.\
-  Bot counts are reported separately rather than hidden — if they drop to zero, the **tracking itself has stopped**
+  Bot counts are reported separately rather than hidden — if they drop to zero, the **tracking itself has stopped**.\
+  October 2026 added an app metrics collector (`app_metrics_daily` — GA4, PostHog, app databases, App Store and Google Play)\
+  so the weekly Slack digest carries each app's 7-day average DAU, WAU, installs, sign-ups and key actions against last week, plus **collection-failure warnings**

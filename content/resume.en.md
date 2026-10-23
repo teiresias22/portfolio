@@ -11,7 +11,7 @@ description: Cross-platform developer working across mobile, web and backend —
 
 > From travel to code — always finding the next road
 
-- Started my career in **purchasing at PECO** and left for a **working holiday in Canada**. With a year of travel before and after it, I spent **two years traveling the world** (40+ countries).
+- Started my career in **purchasing at PECO** and left in 2015 for a **working holiday in Canada**. Traveling before and after it, I spent **31 months across 36 countries (2015–2017)**, and 40+ countries counting later trips.
 - Back in Korea I worked in the **travel industry**, until **COVID-19** brought travel to a halt and I looked for a new path.
 - I committed to **software development**, which I had long been interested in, completed the **SeSAC iOS developer program**, and started my career as a developer.
 - The multicultural sense I gained backpacking through 40+ countries goes straight into building multilingual, global products.

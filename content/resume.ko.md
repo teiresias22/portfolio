@@ -112,7 +112,7 @@ notion: 363a3015-22b8-8145-9b66-c083ecf7b661
 | [Almost](https://apps.joon.is-a.dev/almost/) — 하려다 만 것들의 묘지 | 2026.10 ~ | iOS 출시 · Android 심사 중 | Flutter · CustomPainter 장면 렌더링 · Neon (Postgres RLS · 트리거 · RPC) · Firebase Auth · 4개 언어 |
 | [누렁소검은소](https://nureongso.joon.is-a.dev) — 선출직 공약 · 의정활동 공개 기록 ([GitHub](https://github.com/teiresias22/nureongso)) | 2026.09 ~ | 운영 중 (웹) | Next.js 16 · Supabase · Python 공공데이터 수집 파이프라인 · LLM 공약 판정 · Vercel |
 | [joon-dev 웹](https://apps.joon.is-a.dev/) — 개인 프로젝트 허브 | 2026.07 ~ | 운영 중 | pnpm 모노레포 · Vite/Next.js · Firebase Hosting · GitHub Actions |
-| [Pulse](https://teiresias22.github.io/pulse/) — 지진 · 로켓 발사 · ISS 궤도를 3D 지구본에서 되감아 보는 웹 ([GitHub](https://github.com/teiresias22/pulse)) | 2026.10 ~ | 운영 중 (웹) | React 19 · TypeScript · globe.gl(WebGL) · satellite.js(TLE 궤도 계산) · USGS · Launch Library 2 · GitHub Pages |
+| [Pulse](https://pulse.joon.is-a.dev) — 지진 · 기상 재해 · 로켓 발사 · 위성 궤도를 3D 지구본에서 되감아 보는 웹 ([GitHub](https://github.com/teiresias22/pulse)) | 2026.10 ~ | 운영 중 (웹) | React 19 · TypeScript · globe.gl(WebGL) · satellite.js(TLE 궤도 계산) · USGS · NASA EONET · NOAA · CelesTrak · iNaturalist · GitHub Pages |
 | 멀티앱 마케팅 자동화 — 자체 앱 홍보용 별도 시스템 | 2026.04 ~ | 운영 중 | Claude Agent SDK · Supabase pg_cron · Threads/Instagram Graph API · 어트리뷰션 계측 · 앱 지표 수집 |
 
 ---

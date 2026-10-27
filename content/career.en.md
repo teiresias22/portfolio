@@ -183,7 +183,11 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 - **Evidence** — A production load bottleneck (**1/10 of local speed**) fixed with chunked queries and pinned by a test;\
   found that **72% of 2,740 queued pages** never needed the model and consolidated the prefilter in one place;\
   running in production from collection → judging → contacts → outreach kanban.\
-  Then moved the step that finds each agency's contacts on LinkedIn (with role and match score) onto the server with Message Batches — it reproduced 6 of the 8 people the earlier Mac routine found at **about $0.08 per agency**, and dropping the "search at least twice" instruction fell to 3, showing most of the quality comes from the prompt's search instruction
+  Then moved the step that finds each agency's contacts on LinkedIn (with role and match score) onto the server with Message Batches — it reproduced 6 of the 8 people the earlier Mac routine found at **about $0.08 per agency**, and dropping the "search at least twice" instruction fell to 3, showing most of the quality comes from the prompt's search instruction.\
+  In October 2026 a Muslim-market pilot added a **new-market track** for outbound agencies that don't sell Korea products yet,\
+  and connected contact email guessing, MX checks and verification (with a DynamoDB monthly budget counter) → exports for an external sequencing tool (CSV formula injection blocked) → reply CSV imports (unsubscribes and bounces).\
+  A **read-only recall diagnostic** that sorts buyers who came in through other channels into 7 buckets by where the pipeline missed them came first,\
+  and its results led to a track that catches agencies without websites by their LinkedIn company page (judged from quoted snippets in discovery results, without scraping LinkedIn)
 
 ### Unified inquiry inbox (2026.10) `server` `console` `web`
 
@@ -220,7 +224,7 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 - Travel quote builder (price snapshots · PDF · arrangement checks and deposit, interim and balance payment records), segmented push campaigns (900-second CLI dispatch), blog draft pipeline (only a human publishes)
 - App stability (Korean IME duplicate-character bug → `reactive_forms` rewrite, Crashlytics non-fatal demotion, login tokens moved to device-only secure storage, a fatal crash from closing the PayPal sheet twice), Flutter 3.47 · Kotlin 2.3 · R8, deploy guards and multi-channel Slack alerts,\
   and **upload scripts** for TestFlight (App Store Connect API key) and Google Play (fastlane supply)
-- Over-engineering cleanup (2026.10) — 56 confirmed items across app, console and web (13 copied confirm dialogs, 15 input decorations and 23 loading/error skeletons moved to shared helpers; unreachable files, unused dependencies and unreferenced assets deleted); on the server, 12 controllers with no routes removed, product-list N+1 fixed and the booking sweep moved to `chunkById`
+- Over-engineering cleanup (2026.10) — 56 confirmed items across app, console and web (13 copied confirm dialogs, 15 input decorations and 23 loading/error skeletons moved to shared helpers; unreachable files, unused dependencies and unreferenced assets deleted); on the server, the 60 legacy api/v1 and api/v2 routes retired and 12 controllers with no routes removed, product-list N+1 fixed and the booking sweep moved to `chunkById`
 
 ---
 
@@ -550,9 +554,10 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
   **source code and judging rules are public**.\
   Also a co-sponsorship network graph; attendance, assets, outside jobs, overseas trips and research groups; and pledge comparison between candidates in the same district.\
   The October 2026 judging overhaul started with **the measuring tools** (R0 — zero verdict changes): a gold sample (v1) with fact labels for precision, and contract tests pinning the expected verdict for each branch,\
-  then rule versions R1 and R2, each change published with its effective date — matching only current-term pledges, excluding withdrawn bills, counting a by-election term from its election day.\
+  then rule versions R1 to R3, each change published with its effective date — matching only current-term pledges, excluding withdrawn bills, counting a by-election term from its election day.\
   LLM review has Claude and Codex check independently and **applies only what they agree on**, sending disagreements to a human list; when Gemini's daily quota runs out, Claude carries on.\
-  Human review marks are never overwritten by re-matching or re-parsing, and crawler prefetches that burned through function CPU were handled with CDN caching and blocking training crawlers
+  Human review marks are never overwritten by re-matching or re-parsing, and crawler prefetches that burned through function CPU were handled with CDN caching and blocking training crawlers.\
+  Evidence for procurement in a first year in office now notes whether the same project was announced before the official took office, separating **projects prepared under the predecessor**
 
 ---
 
@@ -564,7 +569,7 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 | Platform | Web · [Website](https://apps.joon.is-a.dev/) |
 | Main tech | pnpm monorepo · Vite + React · Next.js 16 · TypeScript · Firebase Hosting · GitHub Actions |
 
-> A pnpm monorepo that merged every app's separate landing and terms sites into one Firebase Hosting site — 9 apps and 1 external project, Korean and English pages, and a showreel video per app
+> A pnpm monorepo that merged every app's separate landing and terms sites into one Firebase Hosting site — 7 apps and 2 web projects, Korean and English pages, and a showreel video per app
 
 - **Problem** — Each app had its own hosting site, landing page and terms,\
   and adding an app meant **editing several config files by hand**
@@ -576,7 +581,8 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
   every PR gets a **Firebase preview channel**.\
   App pages fill in store versions and release notes from the App Store lookup, and Gilmok's read-only map share viewer (/s/:token) is served here too.\
   October 2026 added an operator-only app metrics dashboard (`/admin/` — 7-day installs, uninstalls, ratings and new reviews, GA4 visits for the web service),\
-  a `sync:release` script (pure functions + tests) that writes the latest store version and notes onto app pages, and fixes for SEO audit items from High to Low (static HTML for subpaths, soft 404s, hreflang, LCP)
+  a `sync:release` script (pure functions + tests) that writes the latest store version and notes onto app pages, and fixes for SEO audit items from High to Low (static HTML for subpaths, soft 404s, hreflang, LCP).\
+  Pulse (web) joined the list, now ordered apps → web with type badges, and Gilmok got an offline guide page for Google My Maps (/guide)
 
 ---
 
@@ -585,18 +591,24 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 | Item | Details |
 | --- | --- |
 | Period | 2026.10 – present |
-| Platform | Web (live) · [Website](https://teiresias22.github.io/pulse/) · [GitHub](https://github.com/teiresias22/pulse) |
-| Main tech | React 19 · TypeScript · Vite · globe.gl (WebGL) · satellite.js · USGS earthquake feed · Launch Library 2 · GitHub Pages |
+| Platform | Web (live) · [Website](https://pulse.joon.is-a.dev) · [GitHub](https://github.com/teiresias22/pulse) |
+| Main tech | React 19 · TypeScript · Vite · globe.gl (WebGL) · satellite.js · USGS · Launch Library 2 · NASA EONET · NOAA (NWS · SWPC) · CelesTrak · iNaturalist · GitHub Actions · GitHub Pages |
 
-> A web page that rewinds the last seven days of earthquakes, rocket launches and the ISS orbit on a 3D globe with a time scrubber
+> A web page that rewinds the last seven days of earthquakes, typhoons, tornado warnings, wildfires, auroras, rocket launches and satellite orbits — plus recent wildlife sightings — on a 3D globe with a time scrubber
 
-- **Problem** — Earthquakes, launches and the ISS position each live in a separate source and **can't be seen on one timeline**
-- **Engineering Challenge** — Folding three differently shaped sources into one event model,\
-  and handling time state so scrubbing or changing speed during playback **doesn't snap back**
-- **Design Decision** — One adapter per source converts to a shared `PulseEvent`, and the ISS orbit is **computed in the browser from TLEs** with no server.\
-  "Which events are visible at time t" and the URL hash are **pure functions**, so a shared link opens the same scene
+- **Problem** — Earthquakes, weather hazards, launches and satellite positions each live in a separate source and **can't be seen on one timeline**
+- **Engineering Challenge** — Folding **seven** differently shaped sources into one event model,\
+  handling time state so scrubbing or changing speed during playback **doesn't snap back**,\
+  and keeping the day/night line, orbit tracks and warning areas that change during playback from stalling on **shader recompiles**
+- **Design Decision** — One adapter per source converts to a shared `PulseEvent`, and satellite positions are **computed in the browser from orbital elements (TLEs)** fetched once a day, with no server, so any moment can be rewound.\
+  "Which events are visible at time t", the subsolar point and the URL hash are **pure functions**, so a shared link opens the same scene.\
+  The night overlay and orbit objects are reused, and tornado warning areas are loaded for all seven days at once with only their color changing, which removed the recompiles.\
+  Wildlife sightings are gathered once a day by a GitHub Actions collector and deployed with the site as static files (still no server)
 - **Evidence** — Time scrubber, playback, keyboard controls, layer toggles and detail cards, with overlapping launches merged;\
-  a list of recent events when WebGL isn't available, source links limited to http(s), and a GitHub Pages deploy on every master push
+  a list of recent events when WebGL isn't available, source links limited to http(s), and a GitHub Pages deploy on every master push.\
+  October 2026 added typhoon tracks (interpolated between observations) and wildfires, US tornado warning areas that follow updates and cancellations, aurora bands computed from the Kp index,\
+  about 56 low-orbit satellites (station docking detection, follow any satellite), iNaturalist wildlife sightings grouped by grid cell, and a time-accurate day/night line with satellite tiles when zoomed in;\
+  also Spanish and Japanese, and a move to pulse.joon.is-a.dev
 
 ---
 
@@ -625,4 +637,5 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
   Self-clicks and test installs are classified separately (debug builds and bursts of 3+ installs within 30 minutes are flagged automatically), and weights inflated by bot clicks were corrected retroactively.\
   Bot counts are reported separately rather than hidden — if they drop to zero, the **tracking itself has stopped**.\
   October 2026 added an app metrics collector (`app_metrics_daily` — GA4, PostHog, app databases, App Store and Google Play)\
-  so the weekly Slack digest carries each app's 7-day average DAU, WAU, installs, sign-ups and key actions against last week, plus **collection-failure warnings**
+  so the weekly Slack digest carries each app's 7-day average DAU, WAU, installs, sign-ups and key actions against last week, plus **collection-failure warnings**.\
+  The Instagram profile link goes through a redirector to the app hub so its clicks are recorded, and link-preview requests from mobile user agents outside the Instagram app are flagged as bots

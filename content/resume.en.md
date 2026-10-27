@@ -97,7 +97,7 @@ description: Cross-platform developer working across mobile, web and backend —
 | [Almost](https://apps.joon.is-a.dev/almost/) — a graveyard for things you almost did | 2026.10 – | iOS live · Android in review | Flutter · CustomPainter scenes · Neon (Postgres RLS · triggers · RPC) · Firebase Auth · 4 languages |
 | [Nureongso](https://nureongso.joon.is-a.dev) — elected officials' pledges and public record ([GitHub](https://github.com/teiresias22/nureongso)) | 2026.09 – | Live (web) | Next.js 16 · Supabase · Python public-data pipeline · LLM pledge judging · Vercel |
 | [joon-dev web](https://apps.joon.is-a.dev/) — personal project hub | 2026.07 – | Live | pnpm monorepo · Vite/Next.js · Firebase Hosting · GitHub Actions |
-| [Pulse](https://teiresias22.github.io/pulse/) — rewind earthquakes, rocket launches and the ISS orbit on a 3D globe ([GitHub](https://github.com/teiresias22/pulse)) | 2026.10 – | Live (web) | React 19 · TypeScript · globe.gl (WebGL) · satellite.js (TLE orbits) · USGS · Launch Library 2 · GitHub Pages |
+| [Pulse](https://pulse.joon.is-a.dev) — rewind earthquakes, weather hazards, rocket launches and satellite orbits on a 3D globe ([GitHub](https://github.com/teiresias22/pulse)) | 2026.10 – | Live (web) | React 19 · TypeScript · globe.gl (WebGL) · satellite.js (TLE orbits) · USGS · NASA EONET · NOAA · CelesTrak · iNaturalist · GitHub Pages |
 | Multi-app marketing automation — separate system for promoting my own apps | 2026.04 – | Running | Claude Agent SDK · Supabase pg_cron · Threads/Instagram Graph API · attribution tracking · app metrics collection |
 
 ---

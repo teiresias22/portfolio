@@ -26,7 +26,7 @@ notion: 363a3015-22b8-8145-9b66-c083ecf7b661
 
 > 여행에서 시작해 개발로 — 멈추지 않고 새로운 길을 찾아온 여정
 
-- **PECO 구매부**로 사회생활을 시작, **캐나다 워킹홀리데이**를 계기로 퇴사했습니다. 워홀 전후로 각 1년씩, 총 **2년간 세계여행**(40여 개국)을 경험했습니다.
+- **PECO 구매부**로 사회생활을 시작, **캐나다 워킹홀리데이**를 계기로 2015년 퇴사했습니다. 워홀 전후로 **2015~2017년, 31개월간 36개국**을 여행했고, 이후 여행까지 더하면 지금까지 40여 개국을 다녔습니다.
 - 귀국 후 **여행업**에 종사했으나, **코로나19**로 여행업계가 멈추면서 새로운 진로를 모색하게 되었습니다.
 - 평소 관심을 두던 **개발**에 본격적으로 입문하기로 결심, **청년취업사관학교(SeSAC) iOS 개발자 과정**을 이수하고 개발자 커리어를 시작했습니다.
 - 40여 개국 배낭여행에서 쌓은 다문화 감각을 다국어 · 글로벌 서비스 개발에 그대로 녹여내고 있습니다.
@@ -43,8 +43,8 @@ notion: 363a3015-22b8-8145-9b66-c083ecf7b661
 
 - **Problem** — 개발팀이 개발자 1 · 디자이너 1로 줄면서 앱 · 관리자/파트너 콘솔 · 사용자 웹 · 백엔드를 혼자 맡게 됨 — 인수한 앱은 템플릿 기반 평면 구조, 백엔드에는 권한 · 결제 · 동시성 결함이 쌓여 있었음
 - **Engineering Challenge** — 네 표면(앱 · 콘솔 · 웹 · 서버)을 같은 동작으로 유지하면서 교차계정 조회(IDOR 6곳) · 0원 결제 · 더블 서브밋 같은 결함을 운영 중에 고치기, 5개 언어 + 아랍어 RTL 대응
-- **Design Decision** — 앱을 13개 도메인 레이어드 아키텍처(Riverpod · Freezed)로 전면 재구축(2025.01). 금액 · 주문 판정은 견적 API로, 결제 완료는 서버의 PayPal 거래 직접 검증으로 서버가 결정하고, 스코프 기준 소유권 가드 · idempotency 미들웨어 · refresh 토큰 회전(재사용 감지)을 도입, 사진은 Presigned URL로 S3 직행. 사내 영업 도구(해외 여행사 발굴 · 견적 빌더 · 푸시 캠페인 · 메일까지 모으는 통합 문의함, 2026.08 ~)와 ICU Company 웹사이트([웹사이트](https://icucompany.com))도 구축
-- **Evidence** — 약 3,500명 설치 유지(누적 최대 약 8,000명), 레거시 업로드 경로는 CloudWatch 트래픽 0 확인 후 제거, PHPUnit 681개 파일 병렬 pre-push 게이트 복구, 하드코딩 문구 293곳 다국어화 · 아이콘 컨트롤 100곳 접근성 보강, ICU 웹사이트 Lighthouse SEO 100점
+- **Design Decision** — 앱을 13개 도메인 레이어드 아키텍처(Riverpod · Freezed)로 전면 재구축(2025.01). 금액 · 주문 판정은 견적 API로, 결제 완료는 서버의 PayPal 거래 직접 검증으로 서버가 결정하고, 스코프 기준 소유권 가드 · idempotency 미들웨어 · refresh 토큰 회전(재사용 감지)을 도입, 사진은 Presigned URL로 S3 직행. 관리자 권한은 부서 → ability 표와 팀 소속으로 재구성해 라우트 그룹마다 서버가 강제. 사내 영업 · 운영 도구(해외 여행사 발굴 · 견적 빌더 · 단가표에 묶인 원가 시트와 가격 전파 · 메일과 WhatsApp까지 모으는 통합 문의함 · 사내 DM과 행사 운영방, 2026.08 ~)와 ICU Company 웹사이트([웹사이트](https://icucompany.com))도 구축
+- **Evidence** — 약 3,500명 설치 유지(누적 최대 약 8,000명), 레거시 업로드 경로는 CloudWatch 트래픽 0 확인 후 제거, PHPUnit 681개 파일 병렬 pre-push 게이트 복구, 하드코딩 문구 293곳 다국어화 · 아이콘 컨트롤 100곳 접근성 보강, ICU 웹사이트 Lighthouse SEO 100점, 할랄 판정 · 문화권 맞춤 검색 **특허 2건 출원**(공동 발명자, 2026.10)
 
 ---
 
@@ -66,6 +66,15 @@ notion: 363a3015-22b8-8145-9b66-c083ecf7b661
 **구매 · 생산관리** | 2015 ~ 2019
 
 - 제품 생산 관리 및 해외 제품 출하 관리
+
+---
+
+## 📜 특허 출원
+
+| 발명의 명칭 | 출원번호 | 출원일 | 비고 |
+| --- | --- | --- | --- |
+| 사용자의 할랄 허용치 정보에 따른 제품의 할랄 판정 방법 | 10-2026-0193309 | 2026.10.08 | 출원인 아이씨유컴퍼니 · 공동 발명자 · 심사청구 |
+| 문화권 필터를 이용한 사용자 맞춤형 자연어 검색 방법 | 10-2026-0193310 | 2026.10.08 | 출원인 아이씨유컴퍼니 · 공동 발명자 · 심사청구 |
 
 ---
 
@@ -103,7 +112,8 @@ notion: 363a3015-22b8-8145-9b66-c083ecf7b661
 | [Almost](https://apps.joon.is-a.dev/almost/) — 하려다 만 것들의 묘지 | 2026.10 ~ | iOS 출시 · Android 심사 중 | Flutter · CustomPainter 장면 렌더링 · Neon (Postgres RLS · 트리거 · RPC) · Firebase Auth · 4개 언어 |
 | [누렁소검은소](https://nureongso.joon.is-a.dev) — 선출직 공약 · 의정활동 공개 기록 ([GitHub](https://github.com/teiresias22/nureongso)) | 2026.09 ~ | 운영 중 (웹) | Next.js 16 · Supabase · Python 공공데이터 수집 파이프라인 · LLM 공약 판정 · Vercel |
 | [joon-dev 웹](https://apps.joon.is-a.dev/) — 개인 프로젝트 허브 | 2026.07 ~ | 운영 중 | pnpm 모노레포 · Vite/Next.js · Firebase Hosting · GitHub Actions |
-| 멀티앱 마케팅 자동화 — 자체 앱 홍보용 별도 시스템 | 2026.04 ~ | 운영 중 | Claude Agent SDK · Supabase pg_cron · Threads/Instagram Graph API · 어트리뷰션 계측 |
+| [Pulse](https://pulse.joon.is-a.dev) — 지진 · 기상 재해 · 로켓 발사 · 위성 궤도를 3D 지구본에서 되감아 보는 웹 ([GitHub](https://github.com/teiresias22/pulse)) | 2026.10 ~ | 운영 중 (웹) | React 19 · TypeScript · globe.gl(WebGL) · satellite.js(TLE 궤도 계산) · USGS · NASA EONET · NOAA · CelesTrak · iNaturalist · GitHub Pages |
+| 멀티앱 마케팅 자동화 — 자체 앱 홍보용 별도 시스템 | 2026.04 ~ | 운영 중 | Claude Agent SDK · Supabase pg_cron · Threads/Instagram Graph API · 어트리뷰션 계측 · 앱 지표 수집 |
 
 ---
 
@@ -134,6 +144,7 @@ notion: 363a3015-22b8-8145-9b66-c083ecf7b661
 - **GitHub Actions + Fastlane** (Match · App Store Connect API) — 태그 푸시 시 **TestFlight · Play Store 동시 자동 배포**, 스토어 스크린샷 · 그래픽 · 미리보기 영상 4개 언어 스크립트 생성
 - **Firebase Hosting** · **Laravel Vapor** — 웹 · 서버리스 배포 파이프라인 (concurrency 중복 방지)
 - **테스트 · 품질 게이트** — 백엔드 PHPUnit **681개 파일 병렬 실행 + pre-push 게이트**, 클라이언트는 Flutter 위젯 · 단위 테스트와 Jest · Vitest로 회귀 고정
+- **릴리스 안정화** — AGP 9 · Gradle 9 전환 때 R8 엄격 모드가 WorkManager 시작 크래시를 내는 것을 잡아 여러 앱에 같은 규칙으로 긴급 수정 배포, 릴리스 AAB에 네이티브 디버그 기호 포함
 
 ### iOS 네이티브
 
@@ -142,7 +153,8 @@ notion: 363a3015-22b8-8145-9b66-c083ecf7b661
 ### AI · 분석
 
 - **LLM 판정 루틴 설계** — 모델에게 물을 것만 골라 넘기는 프리필터 + **모델이 낸 근거를 서버가 재검증**하는 구조(인용문이 실제 수집 본문에 있는지 대조 — 환각 검출), Google Cloud Translation 온디맨드 번역
-- **Google Gemini AI**(배지 · 회고 생성) · **PostHog · GA4 · Microsoft Clarity**
+- **LLM 교차 검수** — 두 모델(Claude · Codex)이 같은 판정을 따로 보고 **합의한 것만 반영**, 갈린 것만 사람이 확인 · 정답 표본으로 정밀도 측정(누렁소검은소)
+- **Claude API · Google Gemini AI**(배지 · 회고 생성, 한도 소진 시 모델 폴백) · **PostHog · GA4 · Microsoft Clarity**
 
 ### 마케팅 자동화 (자체 앱 홍보용 별도 시스템)
 

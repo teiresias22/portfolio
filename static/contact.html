@@ -44,6 +44,7 @@
     </label>
     <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
     <p class="meta" id="meta" hidden></p>
+    <div id="ts"></div>
     <button class="btn primary" type="submit" data-t="send">보내기</button>
     <p class="status" id="status" role="status" aria-live="polite"></p>
   </form>
@@ -79,6 +80,14 @@ if (['question', 'bug', 'feature'].includes(q.get('type'))) f.type.value = q.get
 const meta = [q.get('v') && 'v' + q.get('v'), q.get('os')].filter(Boolean).join(' · ')
 if (meta) Object.assign(document.getElementById('meta'), { hidden: false, textContent: `${t.with}: ${meta}` })
 
+// Cloudflare Turnstile — 봇 차단. 토큰은 서버(contact 함수)가 siteverify로 확인한다.
+// 스크립트가 막혀 토큰이 없으면 서버가 거절하고, 아래 메일 링크 대체로 간다.
+const TURNSTILE_SITEKEY = '0x4AAAAAAFpEwpAhQbvyZB_W'
+let tsWidget
+window.onTurnstileLoad = () => {
+  tsWidget = turnstile.render('#ts', { sitekey: TURNSTILE_SITEKEY, language: lang, size: 'flexible' })
+}
+
 f.addEventListener('submit', async (e) => {
   e.preventDefault()
   const message = f.message.value.trim()
@@ -88,10 +97,12 @@ f.addEventListener('submit', async (e) => {
   btn.disabled = true
   btn.textContent = t.sending
   status.textContent = ''
-  const body = { app: f.app.value, type: f.type.value, message, email: f.email.value.trim(), website: f.website.value, v: q.get('v'), os: q.get('os'), lang: sentLang }
+  const turnstileToken = tsWidget === undefined ? '' : turnstile.getResponse(tsWidget) || ''
+  const body = { app: f.app.value, type: f.type.value, message, email: f.email.value.trim(), website: f.website.value, v: q.get('v'), os: q.get('os'), lang: sentLang, turnstile: turnstileToken }
   const ok = await fetch('https://uvonbpeniprufdpmbhse.supabase.co/functions/v1/contact', {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
   }).then((r) => r.ok, () => false)
+  if (tsWidget !== undefined) turnstile.reset(tsWidget) // 토큰은 한 번만 쓸 수 있다
   btn.disabled = false
   btn.textContent = t.send
   if (ok) {
@@ -108,5 +119,6 @@ f.addEventListener('submit', async (e) => {
   status.replaceChildren(t.fail + ' ', a)
 })
 </script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=onTurnstileLoad" async defer></script>
 </body>
 </html>

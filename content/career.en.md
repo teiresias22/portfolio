@@ -383,7 +383,8 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
   2.3.0 (October 2026) shipped **health data** (on Android, Health Connect access kept to steps and sleep) and Apple Watch / Galaxy Watch logging;\
   2.4.0 added recording straight from the widget or Siri without opening the app (reusing the watch's device-token RPC), a redesigned yearly layer view and a year-end "**Year in Color**" share card, and fixed a same-day concurrent-save race with an upsert.\
   A second Play rejection over health data was answered by dropping the Health Connect history permission to the minimum scope, and the AI recap moved from Gemini's free tier to the **Claude API** (October 2026).\
-  2.4.1 suggests a daily reminder after the first entry and moved account deletion to an Edge Function that **revokes the Apple token and deletes photos and the account in one go**
+  2.4.1 suggests a daily reminder after the first entry and moved account deletion to an Edge Function that **revokes the Apple token and deletes photos and the account in one go**.\
+  2.4.2 added holidays, season (day length) and weather (NASA POWER) to "Patterns found" — weather is opt-in, sends only an approximate location **rounded to a 0.5° grid**, and keeps only the grid on the device (the raw coordinates are discarded; turning it off clears the cache)
 
 ---
 
@@ -407,7 +408,7 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 - **Evidence** — Live on the App Store and Google Play; invite links sent before a domain migration **still open the app**.\
   Event search, a space-wide photo album, event photos, date polls and comment @mentions with push rolled out through **Remote Config**, and invite previews with an Android install-referrer handoff carry an invite across the install.\
   1.3.0 (October 2026) lets users link and unlink Google and Apple accounts on an existing account, revokes the Apple token on deletion (Edge Function),\
-  and raised small text such as anniversary counters and tags to **4.5:1 contrast**
+  and raised small text such as anniversary counters and tags to **4.5:1 contrast**; 1.3.2 adds a one-line weather summary for the day to event details (NASA POWER)
 
 ---
 
@@ -429,7 +430,8 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 - **Evidence** — Live on the App Store and Google Play; recap highlights are written by **Gemini**,\
   and city badge images fall back from Gemini image models to **FLUX.1** (with Cloudflare added as a provider), filling in badges that had no image.\
   Korean, English, Spanish and Japanese (pushes and AI highlights included), map list mode, place search and marker clustering, and **three recap share cards**.\
-  1.0.8 (October 2026) fixed a race that undercounted cities when badges were earned at once, and country names landing as cities and creating country badges
+  1.0.8 (October 2026) fixed a race that undercounted cities when badges were earned at once, and country names landing as cities and creating country badges;\
+  1.0.9 shows the day's weather on place cards and picks city badges strictly at city level, without missing Tokyo's wards or Seoul
 
 ---
 
@@ -478,7 +480,8 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
   Last trains go through a Neon Function transit relay (Firebase token check, caching, retries, quota protection) so public API keys never ship in the app,\
   and are shown only when the ride home is verified by chaining two stations' timetables — **never marked safe when unverified** (Daegu first, rolled out via Remote Config).\
   1.2.1 (October 2026) snapshots the course timetable at check-in and searches undecided stops in a map app;\
-  coordinates, search terms and raw responses were removed from logs, and account deletion revokes the Apple token
+  coordinates, search terms and raw responses were removed from logs, and account deletion revokes the Apple token.\
+  1.2.4 adds a rain-forecast hint to trip settings (KMA short-term forecast, behind a Remote Config switch) and a reminder on the eve of public holidays
 
 ---
 
@@ -582,7 +585,9 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
   App pages fill in store versions and release notes from the App Store lookup, and Gilmok's read-only map share viewer (/s/:token) is served here too.\
   October 2026 added an operator-only app metrics dashboard (`/admin/` — 7-day installs, uninstalls, ratings and new reviews, GA4 visits for the web service),\
   a `sync:release` script (pure functions + tests) that writes the latest store version and notes onto app pages, and fixes for SEO audit items from High to Low (static HTML for subpaths, soft 404s, hreflang, LCP).\
-  Pulse (web) joined the list, now ordered apps → web with type badges, and Gilmok got an offline guide page for Google My Maps (/guide)
+  Pulse (web) joined the list, now ordered apps → web with type badges, and Gilmok got an offline guide page for Google My Maps (/guide).\
+  The site also generates `developer-apps.json` (descriptions in five languages) for the in-app "More apps from the developer" screen, with icons and showreels served from Cloudflare R2\
+  — seven apps show open, install and web links from that one static file, which removed the secondary Firebase project each app used to carry
 
 ---
 
@@ -638,4 +643,7 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
   Bot counts are reported separately rather than hidden — if they drop to zero, the **tracking itself has stopped**.\
   October 2026 added an app metrics collector (`app_metrics_daily` — GA4, PostHog, app databases, App Store and Google Play)\
   so the weekly Slack digest carries each app's 7-day average DAU, WAU, installs, sign-ups and key actions against last week, plus **collection-failure warnings**.\
-  The Instagram profile link goes through a redirector to the app hub so its clicks are recorded, and link-preview requests from mobile user agents outside the Instagram app are flagged as bots
+  The Instagram profile link goes through a redirector to the app hub so its clicks are recorded, and link-preview requests from mobile user agents outside the Instagram app are flagged as bots.\
+  Apps and web services then moved into **a single PostHog project** keyed by an `app` property, with shared events (sign-in, onboarding, key action) and activation funnels across seven apps.\
+  The web's Google Play buttons pass the visitor's web id through the **Install Referrer**, so web and app activity join into one person after install (alias),\
+  and along the way it turned out install attribution in Time with Me and Gilmok had been calling a different project that lacked the function — **not a single row had been recorded** — which is now fixed

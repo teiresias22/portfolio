@@ -130,7 +130,8 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
   and `/profile` keeps sending the old `roles[]` alongside the new `abilities` and `teams`.\
   Team routes check **403 before 404** so they never reveal whether someone else's team exists, and membership and role changes go to an audit log (before/after)
 - **Evidence** — Pinned by a permission-matrix test; found and fixed accounts that slipped out of a demotion query through `NOT IN`'s NULL handling, and ADMIN holders outside the seed.\
-  Console and app menus are gated by ability only (the dev-build bypass is gone), with team switching and owner-only team deletion
+  Console and app menus are gated by ability only (the dev-build bypass is gone), with team switching and owner-only team deletion.\
+  In 2026.11 the console gained an owner → PM → team **org chart** and a menu-access table by department (finance, development, sales, marketing, CS), and the server now sends per-department `department_abilities` instead of per-team abilities
 
 ### Travel product cost sheets · price propagation (2026.10) `server` `console` `app`
 
@@ -145,6 +146,20 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 - **Evidence** — Shipped in seven server PRs, together with a supplier list (categories, rate-sheet files, expiry) and supplier assignment on arrangement rows;\
   an **impact preview** before saving, a pending-changes tab, price-history rollback and CSV import/export.\
   Rules such as "an n-person group price is the per-person price × n" and "party-size tiers must leave no gaps" are checked when a sheet is applied
+
+### Quote and invoice documents · tour operations board (2026.11) `server` `console`
+
+- **Problem** — Quote documents, invoices and payments for confirmed quotes were tracked separately,\
+  and guide, vehicle, hotel and restaurant assignments for groups in progress lived in a **spreadsheet**
+- **Engineering Challenge** — If a re-downloaded quote got a new number every time, the client couldn't tell **which revision was current**;\
+  two first issues arriving at once could collide on a number; and quotes go out in foreign currency while payments must be matched per invoice
+- **Design Decision** — Document numbers come from a monthly base number (`YYMM-NNNN`) issued under a lock: **same visible content, currency and rate → same number**, anything different → a new revision.\
+  The first issue is serialized with a row lock on the quote, and the PDF exchange rate is fixed at first export (and can be refreshed).\
+  Invoices are issued per stage of a confirmed quote in the quote's currency and rate, never edited — only **voided and reissued**,\
+  and payments are linked to invoices (in foreign-currency amounts) to compute **outstanding and billing status per invoice**
+- **Evidence** — The console's arrangement screen bundles quote documents, invoice history, re-download, issue and void, and gained four arrangement states, free-cancellation deadlines, supplier deposits, on-site contacts and arrangement-only items not in the quote.\
+  A **tour operations board** replaces the sheet (guides, vehicles, hotels, restaurants and deadline warnings per group over overlapping dates, plus payment status and the latest invoice number), alongside a client list;\
+  the quote builder grew per-day itinerary lists, per-item margins, a PDF currency choice (KRW · USD · EUR · SGD) and a rate-sheet import command (`travel:import-rate-sheet`)
 
 ### Halal map · place directory pipeline `server` `web` `app` `console`
 
@@ -204,7 +219,9 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
   the console links type filters, the original thread, AI summary, sender/domain blocking (public mail domains can't be blocked whole) and **conversion to a quote**.\
   Then added a **WhatsApp Cloud API webhook** (signature check, one thread per number, number blocking) and console replies within the 24-hour window (recording which staff member sent them);\
   quoted replies join the quoted message's inquiry, and another quote from the same number can be **split into a new inquiry from a chosen message**;\
-  the ICU website's contact and FIT forms moved into the inbox and the old Firebase Functions inquiry path was deleted. Per-person read state, a received-account filter and the cs@ mailbox were added
+  the ICU website's contact and FIT forms moved into the inbox and the old Firebase Functions inquiry path was deleted. Per-person read state, a received-account filter and the cs@ mailbox were added.\
+  In 2026.11 server 5xx errors, failed scheduled/queue jobs and deploy records were gathered into a **"server log" source** in the inbox (once per fingerprint every 5 minutes, excluded from AI classification),\
+  and the list, detail, badges and desktop notifications are filtered by **per-source access**
 
 ### Patent applications (2026.10)
 
@@ -220,11 +237,12 @@ description: Project-by-project career details of Joonhwan Jeon — problem, eng
 - Coupons, group departures, date-range exceptions (holiday closures, special prices) and add-on options; real-time airport board, prayer times and Qibla correction; on-demand translation, contribution badges and a recommendation engine (Final Score)
 - Halal barcode scanner — on-device OCR (Vision / ML Kit) + a local HACCP mirror and a three-level verdict engine (a related verdict method is under patent application)
 - 5 languages plus Arabic RTL, 293 hard-coded strings localized, 100 icon-only controls made accessible, SEO · GEO (JSON-LD · `llms.txt`)
-- Analytics dashboard (8 calls → 1 aggregate endpoint, GA4 · Clarity compared side by side), PostHog · Clarity · GA4 payment-funnel tracking
+- Analytics dashboard (8 calls → 1 aggregate endpoint, GA4 · Clarity compared side by side), PostHog · Clarity · GA4 payment-funnel tracking (booking and delivery order uuids masked out of URL properties)
+- `console` internal desktop app (Flutter macOS) — tray badge and OS notifications from a 30-second pulse, with a Developer ID–signed, notarized DMG 1.0.0 shipped from a dedicated download Hosting site (2026.11)
 - Travel quote builder (price snapshots · PDF · arrangement checks and deposit, interim and balance payment records), segmented push campaigns (900-second CLI dispatch), blog draft pipeline (only a human publishes)
 - App stability (Korean IME duplicate-character bug → `reactive_forms` rewrite, Crashlytics non-fatal demotion, login tokens moved to device-only secure storage, a fatal crash from closing the PayPal sheet twice), Flutter 3.47 · Kotlin 2.3 · R8, deploy guards and multi-channel Slack alerts,\
   and **upload scripts** for TestFlight (App Store Connect API key) and Google Play (fastlane supply)
-- Over-engineering cleanup (2026.10) — 56 confirmed items across app, console and web (13 copied confirm dialogs, 15 input decorations and 23 loading/error skeletons moved to shared helpers; unreachable files, unused dependencies and unreferenced assets deleted); on the server, the 60 legacy api/v1 and api/v2 routes retired and 12 controllers with no routes removed, product-list N+1 fixed and the booking sweep moved to `chunkById`
+- Over-engineering cleanup (2026.10) — 56 confirmed items across app, console and web (13 copied confirm dialogs, 15 input decorations and 23 loading/error skeletons moved to shared helpers; unreachable files, unused dependencies and unreferenced assets deleted); on the server, the 60 legacy api/v1 and api/v2 routes retired and 12 controllers with no routes removed, product-list N+1 fixed and the booking sweep moved to `chunkById`; in 2026.11, 8,028 lines of dead server code and unused dependencies deleted and 35 duplicated Admin/Api test pairs merged through prefix inheritance
 
 ---
 
